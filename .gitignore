@@ -1,3 +1,4 @@
+# client
 node_modules/
 .expo/
 npm-debug.*
@@ -9,5 +10,17 @@ npm-debug.*
 *.orig.*
 web-build/
 
+# server
+server/config/*
+server/db/migration/*
+server/data/*
+
+# keep
+!.gitkeep
+
 # macOS
 .DS_Store
+__MAC_OSX
+
+# misc
+__pycache__
