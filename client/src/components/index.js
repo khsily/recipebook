@@ -7,6 +7,8 @@ import RBCard from './Common/RBCard';
 import OverlayModal from './Common/OverlayModal';
 import LoadingModal from './Common/LoadingModal';
 import HeaderButton from './Common/HeaderButton';
+import FloatingButton from './Common/FloatingButton';
+import FloatingCameraButton from './Home/FloatingCameraButton';
 
 // home
 import RecipeList from "./Home/RecipeList";
@@ -21,6 +23,8 @@ export {
     OverlayModal,
     LoadingModal,
     HeaderButton,
+    FloatingButton,
+    FloatingCameraButton,
 
     // home
     RecipeList,
