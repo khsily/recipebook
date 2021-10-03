@@ -6,6 +6,7 @@ import RBChoiceGroup from './Common/RBChoiceGroup';
 import RBCard from './Common/RBCard';
 import OverlayModal from './Common/OverlayModal';
 import LoadingModal from './Common/LoadingModal';
+import HeaderButton from './Common/HeaderButton';
 
 // home
 import RecipeList from "./Home/RecipeList";
@@ -19,6 +20,7 @@ export {
     RBCard,
     OverlayModal,
     LoadingModal,
+    HeaderButton,
 
     // home
     RecipeList,

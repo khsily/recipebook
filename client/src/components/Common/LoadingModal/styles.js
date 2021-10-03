@@ -2,7 +2,7 @@ import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
     loading: {
-        width: 200,
+        width: 250,
         height: 150,
         resizeMode: 'contain',
     },

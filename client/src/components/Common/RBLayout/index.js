@@ -1,10 +1,12 @@
 import React from 'react';
-import { View } from 'react-native';
+import { SafeAreaView, ScrollView } from 'react-native';
 import { styles } from './styles';
 
 function RBLayout({ ...props }) {
     return (
-        <View style={styles.container} {...props} />
+        <SafeAreaView>
+            <ScrollView contentContainerStyle={styles.container} {...props} />
+        </SafeAreaView>
     );
 }
 
