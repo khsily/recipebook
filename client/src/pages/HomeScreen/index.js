@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { observer } from 'mobx-react';
 
 import {
@@ -19,12 +19,15 @@ const HomeScreen = ({ navigation }) => {
         });
     }, [navigation]);
 
+    const [active, setActive] = useState(0);
+
     return (
-        <RBLayout>
+        <RBLayout contentContainerStyle={{ paddingBottom: 30 }}>
             <RBChoiceGroup
                 style={{ marginBottom: 14 }}
                 choices={['추천', '식재료 충분', '식재료 부족']}
-                active={0} />
+                active={active}
+                onChange={(i) => setActive(i)} />
 
             <RecipeList
                 thumbnail='https://www.elmundoeats.com/wp-content/uploads/2021/02/FP-Quick-30-minutes-chicken-ramen.jpg'

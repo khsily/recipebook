@@ -5,7 +5,9 @@ import { styles } from './styles';
 function RBLayout({ ...props }) {
     return (
         <SafeAreaView>
-            <ScrollView contentContainerStyle={styles.container} {...props} />
+            <ScrollView
+                {...props}
+                contentContainerStyle={{ ...styles.container, ...props.contentContainerStyle }} />
         </SafeAreaView>
     );
 }
