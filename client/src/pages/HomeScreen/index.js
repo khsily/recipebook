@@ -1,34 +1,31 @@
-import React, { useState } from 'react';
-import { Button, Image, Text, View } from 'react-native';
+import React from 'react';
 import { observer } from 'mobx-react';
-import { counter } from '../../store';
-import * as utils from '../../utils'
 
-const HomeScreen = observer(({ navigation }) => {
-    const [image, setImage] = useState(null);
+import {
+    LoadingModal,
+    RBChoiceGroup,
+    RBLayout,
+    RecipeList,
+} from '../../components';
 
+const HomeScreen = ({ navigation }) => {
     return (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            <Text>Home Screen</Text>
-            <Button title='Go to Search' onPress={() => navigation.navigate('Search')} />
+        <RBLayout>
+            <RBChoiceGroup
+                style={{ marginBottom: 14 }}
+                choices={['추천', '식재료 충분', '식재료 부족']}
+                active={0} />
 
-            <Button title={`mobx test ${counter.number}`} onPress={() => counter.increase()} />
+            <RecipeList
+                thumbnail='https://www.elmundoeats.com/wp-content/uploads/2021/02/FP-Quick-30-minutes-chicken-ramen.jpg'
+                title='참치김치찌개 황금레시피 맛있게  끓여먹어요' />
+            <RecipeList
+                thumbnail='https://www.elmundoeats.com/wp-content/uploads/2021/02/FP-Quick-30-minutes-chicken-ramen.jpg'
+                title='참치김치찌개 황금레시피 맛있게  끓여먹어요' />
 
-            <Button title='open gallery' onPress={async () => {
-                result = await utils.open_gallery();
-                setImage(result.uri);
-                console.log(result);
-            }} />
-
-            <Button title='Take Picture' onPress={async () => {
-                result = await utils.open_camera();
-                setImage(result.uri);
-                console.log(result);
-            }} />
-
-            {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
-        </View>
+            <LoadingModal visible text={'사진을 처리하고 있습니다...'} />
+        </RBLayout>
     );
-})
+}
 
-export default HomeScreen;
+export default observer(HomeScreen);

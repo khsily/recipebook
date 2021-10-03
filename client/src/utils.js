@@ -1,3 +1,5 @@
+import React from 'react'
+import { Text, Platform, StyleSheet } from 'react-native'
 import * as ImagePicker from 'expo-image-picker';
 
 
@@ -34,5 +36,21 @@ export async function open_camera(options) {
         });
     } catch (e) {
         console.error(e);
+    }
+}
+
+export const typography = () => {
+    const styles = StyleSheet.create({
+        defaultText: {
+            fontFamily: 'AppleSDGothicNeoM',//Default font family
+        }
+    });
+
+    const oldTextRender = Text.render
+    Text.render = function (...args) {
+        const origin = oldTextRender.call(this, ...args)
+        return React.cloneElement(origin, {
+            style: [styles.defaultText, origin.props.style],
+        })
     }
 }
