@@ -9,10 +9,12 @@ import {
     RecipeList,
 } from '../../components';
 
+import { useCameraAction } from '../../customHook/useCameraAction';
 import ic_search from '../../../assets/icon/ic_search.png';
 
 const HomeScreen = ({ navigation }) => {
     const [active, setActive] = useState(0);
+    const showAction = useCameraAction();
 
     React.useLayoutEffect(() => {
         navigation.setOptions({
@@ -69,8 +71,8 @@ const HomeScreen = ({ navigation }) => {
                     views={131209380} />
             </RBLayout>
 
-            <FloatingCameraButton onAction={(res) => {
-                console.log(res);
+            <FloatingCameraButton onPress={() => {
+                showAction((res) => console.log(res));
             }} />
         </>
     );
