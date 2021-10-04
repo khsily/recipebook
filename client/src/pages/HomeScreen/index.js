@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 import {
     FloatingCameraButton,
     HeaderButton,
+    LoadingModal,
     RBChoiceGroup,
     RBLayout,
     RecipeList,
@@ -11,9 +12,11 @@ import {
 
 import { useCameraAction } from '../../customHook/useCameraAction';
 import ic_search from '../../../assets/icon/ic_search.png';
+import { fakeLoading } from '../../utils';
 
 const HomeScreen = ({ navigation }) => {
     const [active, setActive] = useState(0);
+    const [isDetectioning, setIsDetectioning] = useState(false);
     const showAction = useCameraAction();
 
     React.useLayoutEffect(() => {
@@ -71,8 +74,19 @@ const HomeScreen = ({ navigation }) => {
                     views={131209380} />
             </RBLayout>
 
+            <LoadingModal visible={isDetectioning} text='식재료를 확인하고 있어요...' />
+
             <FloatingCameraButton onPress={() => {
-                showAction((res) => console.log(res));
+                showAction(async (res) => {
+                    setIsDetectioning(true);
+                    // TODO: object detection 수행
+                    await fakeLoading(4000);
+
+                    // TODO: object detection 완료 결과 보여주기
+                    setIsDetectioning(false);
+                    console.log(res);
+                    navigation.navigate('Detection', { images: [res.uri] });
+                });
             }} />
         </>
     );
