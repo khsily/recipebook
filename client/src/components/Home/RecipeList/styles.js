@@ -6,9 +6,15 @@ export const styles = StyleSheet.create({
         marginBottom: 12,
     },
 
+    thumbnailWrapper: {
+        width: 115,
+        height: 115,
+    },
+
     thumbnail: {
         width: 115,
-        height: '100%',
+        height: 115,
+        resizeMode: 'cover',
     },
 
     content: {
@@ -20,6 +26,10 @@ export const styles = StyleSheet.create({
         fontSize: 15,
         fontWeight: 'bold',
         marginBottom: 5,
+    },
+
+    ingredientsWrapper: {
+        flex: 1,
     },
 
     ingredients: {
