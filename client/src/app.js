@@ -22,6 +22,7 @@ const Stack = createSharedElementStackNavigator();
 const app = () => {
     const [loaded] = useFonts({
         AppleSDGothicNeoM: require('../assets/fonts/AppleSDGothicNeoM.ttf'),
+        AppleSDGothicNeoB: require('../assets/fonts/AppleSDGothicNeoB.ttf'),
     });
 
     if (!loaded) return null;
@@ -47,7 +48,6 @@ const app = () => {
                         options={{ title: '레시피 정보', ...header_style, ...transition_style }}
                         sharedElements={(route, otherRoute, showing) => {
                             const { recipe } = route.params;
-                            console.log(recipe)
                             return [`recipe.${recipe.id}.photo`];
                         }} />
                     <Stack.Screen
