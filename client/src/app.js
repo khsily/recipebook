@@ -4,7 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createSharedElementStackNavigator } from 'react-navigation-shared-element';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet'
-import { StatusBar } from 'react-native';
+import { Platform, StatusBar } from 'react-native';
 import { useFonts } from 'expo-font';
 
 import {
@@ -17,7 +17,7 @@ import { header_style, transition_style } from './styles/common';
 import { MainTheme } from './styles/themes';
 import { typography } from './utils';
 
-const Stack = createSharedElementStackNavigator();
+const Stack = Platform.OS === 'ios' ? createStackNavigator() : createSharedElementStackNavigator();
 
 const app = () => {
     const [loaded] = useFonts({
