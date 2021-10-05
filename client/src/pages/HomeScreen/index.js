@@ -41,7 +41,16 @@ const HomeScreen = ({ navigation }) => {
                     title='참치김치찌개 황금레시피 맛있게  끓여먹어요'
                     ingredients={['닭고기', '양파', '양배추', '대파', '깻잎', '후추', '떡볶이용 떡', '고구마', '당근', '생강술']}
                     category='한식'
-                    views={1001230} />
+                    views={1001230}
+                    id={0}
+                    onPress={() => {
+                        navigation.navigate('Recipe', {
+                            recipe: {
+                                id: 0,
+                                thumbnail: 'https://www.elmundoeats.com/wp-content/uploads/2021/02/FP-Quick-30-minutes-chicken-ramen.jpg',
+                            }
+                        })
+                    }} />
                 <RecipeList
                     thumbnail='https://www.elmundoeats.com/wp-content/uploads/2021/02/FP-Quick-30-minutes-chicken-ramen.jpg'
                     title='참치김치찌개 황금레시피 맛있게  끓여먹어요'
