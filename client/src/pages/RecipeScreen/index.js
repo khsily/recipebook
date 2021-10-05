@@ -1,6 +1,8 @@
 import React from 'react';
 import { Text, View, Image } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import { SharedElement } from 'react-navigation-shared-element';
+import { RecipeSection } from '../../components';
 
 import { styles } from './styles';
 
@@ -8,11 +10,24 @@ const RecipeScreen = ({ route }) => {
     const { recipe } = route.params;
 
     return (
-        <View>
+        <ScrollView>
             <SharedElement id={`recipe.${recipe.id}.photo`}>
                 <Image style={styles.image} source={{ uri: recipe.thumbnail }} />
             </SharedElement>
-        </View>
+            <View style={styles.container}>
+                <Text style={styles.title}>참치김치찌개 황금레시피 맛있게 끓여먹어요</Text>
+                <View style={styles.info}>
+                    <Text style={styles.infoText}>1,123 views</Text>
+                    <Text style={styles.infoText}>한식</Text>
+                </View>
+                <RecipeSection title='재료' subTitle='Ingredients'>
+                    
+                </RecipeSection>
+                <RecipeSection title='레시피' subTitle='Ingredients'>
+
+                </RecipeSection>
+            </View>
+        </ScrollView>
     );
 }
 

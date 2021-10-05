@@ -13,6 +13,9 @@ import FloatingCameraButton from './Home/FloatingCameraButton';
 // home
 import RecipeList from "./Home/RecipeList";
 
+// Recipe
+import RecipeSection from './Recipe/RecipeSection';
+
 export {
     // common
     RBLayout,
@@ -28,4 +31,7 @@ export {
 
     // home
     RecipeList,
+
+    // Recipe
+    RecipeSection,
 }
