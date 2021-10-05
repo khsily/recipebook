@@ -2,16 +2,19 @@ import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
     container: {
-        marginTop: 22,
+        marginTop: 20,
+        marginBottom: 20,
     },
 
     header: {
         flexDirection: 'row',
+        marginBottom: 3,
     },
 
     title: {
         fontFamily: 'AppleSDGothicNeoB',
         fontSize: 20,
+        marginLeft: 3,
         marginRight: 5,
     },
 
