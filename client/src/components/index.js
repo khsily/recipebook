@@ -16,6 +16,7 @@ import RecipeList from "./Home/RecipeList";
 // Recipe
 import RecipeSection from './Recipe/RecipeSection';
 import IngredientList from './Recipe/IngredientList';
+import RecipeStep from './Recipe/RecipeStep';
 
 export {
     // common
@@ -36,4 +37,5 @@ export {
     // Recipe
     RecipeSection,
     IngredientList,
+    RecipeStep,
 }
