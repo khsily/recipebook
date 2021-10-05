@@ -7,7 +7,7 @@ export const styles = StyleSheet.create({
     
     image: {
         width: '100%',
-        height: 350,
+        height: 300,
         resizeMode: 'cover',
     },
 
@@ -24,5 +24,10 @@ export const styles = StyleSheet.create({
         fontSize: 13,
         color: '#999999',
         marginRight: 8,
+    },
+
+    ingredients: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
     },
 });
