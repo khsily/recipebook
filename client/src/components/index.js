@@ -18,6 +18,9 @@ import RecipeSection from './Recipe/RecipeSection';
 import IngredientList from './Recipe/IngredientList';
 import RecipeStep from './Recipe/RecipeStep';
 
+// Search
+import SearchInput from './Search/SearchInput';
+
 export {
     // common
     RBLayout,
@@ -38,4 +41,7 @@ export {
     RecipeSection,
     IngredientList,
     RecipeStep,
+
+    // Search
+    SearchInput,
 }
