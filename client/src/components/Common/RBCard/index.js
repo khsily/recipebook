@@ -1,10 +1,16 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 import { styles } from './styles';
 
-function RBCard({ ...props }) {
+function RBCard({ touchable = false, ...props }) {
+    Container = touchable ? TouchableOpacity : View;
+    touchableOptions = { activeOpacity: 0.8 }
+
     return (
-        <View {...props} style={{ ...styles.card, ...props.style }} />
+        <Container
+            {...props}
+            {...touchableOptions}
+            style={{ ...styles.card, ...props.style }} />
     );
 }
 
