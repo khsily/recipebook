@@ -52,12 +52,14 @@ def eval_one_rating(idx):
     items = _testNegatives[idx]
     u = rating[0]
     gtItem = rating[1]
-    items.append(gtItem)
+    items.append(gtItem)                                # 유저가 안본 것과 본 것을 합침
     # Get prediction scores
     map_item_score = {}
-    users = np.full(len(items), u, dtype='int32')
+    users = np.full(len(items), u, dtype='int32')       # 모든 영화 길이 만큼 유저를 옆에 붙여줌 150, 150, 150, ...
     predictions = _model.predict([users, np.array(items)],
                                  batch_size=100, verbose=0)
+
+
     for i in range(len(items)):
         item = items[i]
         map_item_score[item] = predictions[i]
