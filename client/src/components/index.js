@@ -9,6 +9,7 @@ import LoadingModal from './Common/LoadingModal';
 import HeaderButton from './Common/HeaderButton';
 import FloatingButton from './Common/FloatingButton';
 import FloatingCameraButton from './Home/FloatingCameraButton';
+import AutoComplete from './Common/AutoComplete';
 
 // home
 import RecipeList from "./Home/RecipeList";
@@ -20,6 +21,7 @@ import RecipeStep from './Recipe/RecipeStep';
 
 // Search
 import SearchInput from './Search/SearchInput';
+import SearchForm from './Search/SearchForm';
 
 export {
     // common
@@ -33,6 +35,7 @@ export {
     HeaderButton,
     FloatingButton,
     FloatingCameraButton,
+    AutoComplete,
 
     // home
     RecipeList,
@@ -44,4 +47,5 @@ export {
 
     // Search
     SearchInput,
+    SearchForm,
 }
