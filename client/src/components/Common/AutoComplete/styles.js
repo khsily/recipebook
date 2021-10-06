@@ -2,6 +2,7 @@ import { Dimensions, StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
     container: {
+        
     },
 
     input: {
@@ -17,10 +18,11 @@ export const styles = StyleSheet.create({
 
     listWrapper: {
         position: 'absolute',
-        top: 37,
+        top: 35,
         zIndex: 1,
         width: '100%',
         borderWidth: 1,
+        borderTopWidth: 0,
         borderColor: '#CCCCCC',
         backgroundColor: '#FFFFFF',
         maxHeight: 150,

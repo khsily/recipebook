@@ -16,7 +16,7 @@ function RBButton({ title, color, backgroundColor, rounded, ...props }) {
             <Text style={{
                 ...styles.text,
                 color: color || styles.text.color,
-                ...props.styles,
+                ...props.textStyle,
             }}>{title}</Text>
         </TouchableOpacity>
     );
