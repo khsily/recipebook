@@ -1,9 +1,13 @@
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
         height: 30,
+        zIndex: Platform.select({
+            android: undefined,
+            ios: 1,
+        })
     },
 
     button: {

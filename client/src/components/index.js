@@ -22,6 +22,7 @@ import RecipeStep from './Recipe/RecipeStep';
 // Search
 import SearchInput from './Search/SearchInput';
 import SearchForm from './Search/SearchForm';
+import SearchTag from './Search/SearchTag';
 
 export {
     // common
@@ -48,4 +49,5 @@ export {
     // Search
     SearchInput,
     SearchForm,
+    SearchTag,
 }

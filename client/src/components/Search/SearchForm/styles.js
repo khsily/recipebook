@@ -8,11 +8,12 @@ export const styles = StyleSheet.create({
     title: {
         fontSize: 20,
         marginLeft: 8,
+        fontFamily: 'AppleSDGothicNeoB',
     },
 
     content: {
         padding: 14,
         marginTop: 11,
-        minHeight: 220,
+        minHeight: 210,
     },
 });

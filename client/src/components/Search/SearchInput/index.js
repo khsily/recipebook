@@ -6,11 +6,11 @@ import RBButton from '../../Common/RBButton';
 
 import { styles } from './styles';
 
-function SearchInput({ ...props }) {
+function SearchInput({ onSubmit, ...props }) {
     return (
         <View style={styles.container}>
-            <AutoComplete {...props} />
-            <RBButton style={styles.button} title='추가' />
+            <AutoComplete {...props} onSubmitEditing={onSubmit} />
+            <RBButton style={styles.button} title='추가' onPress={onSubmit} />
             <View style={styles.divider} />
         </View>
     );

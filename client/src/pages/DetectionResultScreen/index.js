@@ -16,10 +16,10 @@ const DetectionResultScreen = ({ route, navigation }) => {
             navigation.navigate({
                 name: 'Search',
                 merge: true,
-                params: { ingredients: [] }
+                params: { ingredients: ['대파', '고구마', '당근'] }
             });
         } else {
-            navigation.replace('Search', { ingredients: [] });
+            navigation.replace('Search', { ingredients: ['대파', '고구마', '당근'] });
         }
     }
 
