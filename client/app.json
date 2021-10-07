@@ -1,7 +1,7 @@
 {
   "expo": {
     "entryPoint": "./src/app.js",
-    "name": "recipebook",
+    "name": "라따뚜이",
     "slug": "recipebook",
     "version": "1.0.0",
     "orientation": "portrait",
