@@ -147,13 +147,14 @@ def test():
 # test()
 
 '''
-아이디 만든 방법 -> 카테고리 별로 대표할 만한 음식을 고름 -> 2개 3개 4개 5개 선택한 선택지를 만듬
+아이디 만든 방법 -> 카테고리 별로 대표할 만한 음식을 고름 x 그냥 유니크 요리명에서 조합 만들기-> 2개 3개 4개 5개 선택한 선택지를 만듬
 -> 번호를 붙여 아이디로 사용.
 '''
 
 
 with open('recipc_list_utf_8.json', 'r', encoding='utf-8') as f:
     data = json.load(f)
+
 
 def title_dictionary_catagory(catagory):
     dic_title = {catagory: [d['title'] for d in data['list'] if d['catagory_name'] == catagory]}
@@ -166,9 +167,7 @@ for d in data['list']:
     dic_tit.update(title_dictionary_catagory(d['catagory_name']))
 
 unique_title = list(collections.Counter(title).keys())
-pprint.pprint(dic_tit)
-
-
+pprint.pprint(unique_title)
 
 # k = 1
 # id = {}

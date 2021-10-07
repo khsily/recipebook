@@ -1,4 +1,6 @@
 # MLP_2.py
+import json
+
 import numpy as np
 
 import tensorflow as tf
@@ -10,7 +12,7 @@ from tensorflow.keras.layers import Dense, Lambda, Activation
 from tensorflow.keras.layers import Embedding, Input, Dense, Reshape, concatenate, add, Flatten, Dropout
 from tensorflow.keras.constraints import max_norm
 from tensorflow.keras.optimizers import Adagrad, Adam, SGD, RMSprop
-from evaluate import evaluate_model
+from evaluate_2 import evaluate_model
 from dataset import Dataset
 from time import time
 import sys
@@ -23,7 +25,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Run MLP.")
     parser.add_argument('--path', nargs='?', default='D:\python\\tensorflow2.5\project_ratatouiille\data/',
                         help='Input data path.')
-    parser.add_argument('--dataset', nargs='?', default='ml-1m',
+    parser.add_argument('--dataset', nargs='?', default='recipe',
                         help='Choose a dataset.')
     parser.add_argument('--epochs', type=int, default=1,
                         help='Number of epochs.')
@@ -43,6 +45,10 @@ def parse_args():
                         help='Show performance per X iterations')
     parser.add_argument('--out', type=int, default=1,
                         help='Whether to save the trained model.')
+    parser.add_argument('--category', type=str, default='메인요리',
+                        help='choice theme by users.')
+    parser.add_argument('--user_id', nargs='?', default=('밤 조림', '돼지고기 수육 양념 조림', '비프 부르기뇽'),
+                        help='user_id for prediction')
     return parser.parse_args()
 
 
@@ -113,20 +119,37 @@ if __name__ == '__main__':
     batch_size = args.batch_size
     epochs = args.epochs
     verbose = args.verbose
+    category = args.category
+    user_id = args.user_id
 
     topK = 10
     evaluation_threads = 1  # mp.cpu_count()
     print("MLP arguments: %s " % (args))
-    model_out_file = 'D:\python\\tensorflow2.5\project_ratatouiille\model\Pretrain/%s_MLP_%s_%d.h5' \
+    model_out_file = 'D:\python\\tensorflow2.5\project_ratatouiille\model\Pretrain/recipe_%s_MLP_%s_%d.h5' \
                      % (args.dataset, args.layers, time())
 
     # Loading data
     t1 = time()
     data = Dataset(args.path + args.dataset)
-    train, testRatings, testNegatives = data.trainMatrix, data.testRatings, data.testNegatives
+
+    # for prediction data
+    with open('D:/python/tensorflow2.5/project_ratatouiille/data/theme2item.json', 'r', encoding='utf-8') as f:
+        category_dic = json.load(f)
+    with open('D:/python/tensorflow2.5/project_ratatouiille/data/idx2item.json', 'r', encoding='utf-8') as f:
+        idx2item = json.load(f)
+        item2idx = {idx2item[n]: i for i, n in enumerate(idx2item, 1)}
+    item_idx = [item2idx[n] for n in category_dic[category]]
+
+    with open('D:/python/tensorflow2.5/project_ratatouiille/data/idx2id.json', 'r', encoding='utf-8') as f:
+        idx2id = json.load(f)
+        id2idx = {tuple(idx2id[n]): i for i, n in enumerate(idx2id, 1)}
+
+
+    # train, testRatings, testNegatives = data.trainMatrix, data.testRatings, data.testNegatives
+    train = data.trainMatrix
     num_users, num_items = train.shape
-    print("Load data done [%.1f s]. #user=%d, #item=%d, #train=%d, #test=%d"
-          % (time() - t1, num_users, num_items, train.nnz, len(testRatings)))
+    print("Load data done [%.1f s]. #user=%d, #item=%d, #train=%d, #test_usr_id=%d"
+          % (time() - t1, num_users, num_items, train.nnz, id2idx[user_id]))
 
     # Build model
     model = get_model(num_users, num_items, layers, reg_layers)
@@ -138,12 +161,16 @@ if __name__ == '__main__':
 
     # Check Init performance
     t1 = time()
-    (hits, ndcgs) = evaluate_model(model, testRatings, testNegatives, topK, evaluation_threads)
-    hr, ndcg = np.array(hits).mean(), np.array(ndcgs).mean()
-    print('Init: HR = %.4f, NDCG = %.4f [%.1f]' % (hr, ndcg, time() - t1))
+    # (hits, ndcgs) = evaluate_model(model, id2idx[user_id], category_dic[category], topK, evaluation_threads)
+    # hr, ndcg = np.array(hits).mean(), np.array(ndcgs).mean()
+    # print('Init: HR = %.4f, NDCG = %.4f [%.1f]' % (hr, ndcg, time() - t1))
+
+    rank_list = evaluate_model(model, id2idx[user_id], item_idx, topK, evaluation_threads)
+    print(rank_list)
+
 
     # Train model
-    best_hr, best_ndcg, best_iter = hr, ndcg, -1
+    # best_hr, best_ndcg, best_iter = hr, ndcg, -1
     for epoch in range(epochs):
         t1 = time()
         # Generate training instances
@@ -163,16 +190,20 @@ if __name__ == '__main__':
 
         # Evaluation
         if epoch % verbose == 0:
-            (hits, ndcgs) = evaluate_model(model, testRatings, testNegatives, topK, evaluation_threads)
-            hr, ndcg, loss = np.array(hits).mean(), np.array(ndcgs).mean(), hist.history['loss'][0]
-            print('Iteration %d [%.1f s]: HR = %.4f, NDCG = %.4f, loss = %.4f [%.1f s]'
-                  % (epoch, t2 - t1, hr, ndcg, loss, time() - t2))
-            if hr > best_hr:
-                best_hr, best_ndcg, best_iter = hr, ndcg, epoch
-                if args.out > 0:
-                    model.save_weights(model_out_file.format(epoch=0), overwrite=True)
+            # (hits, ndcgs) = evaluate_model(model, id2idx[user_id], category_dic[category], topK, evaluation_threads)
+            # hr, ndcg, loss = np.array(hits).mean(), np.array(ndcgs).mean(), hist.history['loss'][0]
+            # print('Iteration %d [%.1f s]: HR = %.4f, NDCG = %.4f, loss = %.4f [%.1f s]'
+            #       % (epoch, t2 - t1, hr, ndcg, loss, time() - t2))
+            # if hr > best_hr:
+            #     best_hr, best_ndcg, best_iter = hr, ndcg, epoch
+            #     if args.out > 0:
+            #         model.save_weights(model_out_file.format(epoch=0), overwrite=True)
+            rank_list = evaluate_model(model, id2idx[user_id], category_dic[category], topK, evaluation_threads)
+            print(rank_list)
 
-    print("End. Best Iteration %d:  HR = %.4f, NDCG = %.4f. " % (best_iter, best_hr, best_ndcg))
-    if args.out > 0:
-        print("The best MLP model is saved to %s" % (model_out_file))
+
+
+    # print("End. Best Iteration %d:  HR = %.4f, NDCG = %.4f. " % (best_iter, best_hr, best_ndcg))
+    # if args.out > 0:
+    #     print("The best MLP model is saved to %s" % (model_out_file))
 
