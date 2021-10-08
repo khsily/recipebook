@@ -1311,6 +1311,7 @@ class_to_color = {class_mapping[v]: np.random.randint(0, 255, 3) for v in class_
 test_imgs = os.listdir(test_base_path)
 
 imgs_path = []
+# test 이미지 많큼 설정하기 
 for i in range(12):
     idx = np.random.randint(len(test_imgs))
     imgs_path.append(test_imgs[idx])
