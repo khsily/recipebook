@@ -11,4 +11,4 @@ https://storage.googleapis.com/openimages/v5/class-descriptions-boxable.csv
 model , train, test 폴더 만들기 
 
 순서대로 (1) ~ (3) 실행
-1번 파일의 path는 수정이 필요함
+파일의 path는 수정이 필요함
