@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { registerRootComponent } from 'expo';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -35,13 +35,13 @@ const app = () => {
             <StatusBar barStyle="light-content" backgroundColor={MainTheme.colors.primary} />
             <ActionSheetProvider>
                 <Stack.Navigator>
-                    <>
+                    {/* <>
                         <Stack.Screen
                             name="Favor"
                             component={FavorScreen}
                             options={{ title: '선호 메뉴 선택', ...header_style, ...transition_style }} />
-                    </>
-                    {/* <>
+                    </> */}
+                    <>
                         <Stack.Screen
                             name="Home"
                             component={HomeScreen}
@@ -62,7 +62,7 @@ const app = () => {
                             name="Detection"
                             component={DetectionResultScreen}
                             options={{ presentation: 'modal', headerShown: false }} />
-                    </> */}
+                    </>
                 </Stack.Navigator>
             </ActionSheetProvider>
         </NavigationContainer>
