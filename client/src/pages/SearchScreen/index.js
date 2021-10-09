@@ -87,12 +87,13 @@ const SearchScreen = ({ route, navigation }) => {
         }
     }, [detectedIngredients])
 
+    // TODO: iphone8 이하는 keyboardVerticalOffset를 60 적용해야함. 방법 찾기
     return (
         <KeyboardAvoidingView
             style={styles.container}
             behavior={Platform.OS === 'ios' ? 'padding' : null}
             enabled
-            keyboardVerticalOffset={60}>
+            keyboardVerticalOffset={88}>
             <ScrollView
                 contentContainerStyle={styles.scrollview}
                 nestedScrollEnabled={true}
