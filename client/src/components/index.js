@@ -24,6 +24,11 @@ import SearchInput from './Search/SearchInput';
 import SearchForm from './Search/SearchForm';
 import SearchTag from './Search/SearchTag';
 
+// Favor
+import FavorSectionLayout from './Favor/FavorSectionLayout';
+import FavorSectionItem from './Favor/FavorSectionItem';
+import FavorFooter from './Favor/FavorFooter';
+
 export {
     // common
     RBLayout,
@@ -50,4 +55,9 @@ export {
     SearchInput,
     SearchForm,
     SearchTag,
+
+    // Favor
+    FavorSectionLayout,
+    FavorSectionItem,
+    FavorFooter,
 }
