@@ -172,7 +172,7 @@ export const recipes = {
                     id: 8,
                 },
             ],
-        
+
             insufficient: [
                 {
                     thumbnail: 'https://www.elmundoeats.com/wp-content/uploads/2021/02/FP-Quick-30-minutes-chicken-ramen.jpg',
@@ -250,3 +250,117 @@ export const recipes = {
         }
     }
 };
+
+
+export const favors = {
+    status: 200,
+    payload: {
+        data: [
+            {
+                category: '한식',
+                data: [
+                    {
+                        thumbnail: 'https://www.elmundoeats.com/wp-content/uploads/2021/02/FP-Quick-30-minutes-chicken-ramen.jpg',
+                        title: '라면',
+                        id: 1,
+                    },
+                    {
+                        thumbnail: 'https://mblogthumb-phinf.pstatic.net/MjAyMDAxMDZfMjEz/MDAxNTc4MzE2NTc2ODEw.b6IujcsSNNPhBWMs5moOBwSkmkMxZ6EEXy0V8FfBryEg.WPC2CZCowQJSuFfiyipT1Vea8jVr6BGHCdcL6PXVpdQg.PNG.llzzinll/SE-3ffe00fc-a9fb-48a3-89a2-1d0f8a934cef.png?type=w800',
+                        title: '김치찌개',
+                        id: 2,
+                    },
+                    {
+                        thumbnail: 'https://recipe1.ezmember.co.kr/cache/recipe/2015/05/27/38013d1dfd8fa46a871b9cda074b26341.jpg',
+                        title: '제육볶음',
+                        id: 3,
+                    },
+                    {
+                        thumbnail: 'https://www.elmundoeats.com/wp-content/uploads/2021/02/FP-Quick-30-minutes-chicken-ramen.jpg',
+                        title: '라면',
+                        id: 4,
+                    },
+                    {
+                        thumbnail: 'https://mblogthumb-phinf.pstatic.net/MjAyMDAxMDZfMjEz/MDAxNTc4MzE2NTc2ODEw.b6IujcsSNNPhBWMs5moOBwSkmkMxZ6EEXy0V8FfBryEg.WPC2CZCowQJSuFfiyipT1Vea8jVr6BGHCdcL6PXVpdQg.PNG.llzzinll/SE-3ffe00fc-a9fb-48a3-89a2-1d0f8a934cef.png?type=w800',
+                        title: '김치찌개',
+                        id: 5,
+                    },
+                    {
+                        thumbnail: 'https://recipe1.ezmember.co.kr/cache/recipe/2015/05/27/38013d1dfd8fa46a871b9cda074b26341.jpg',
+                        title: '제육볶음',
+                        id: 6,
+                    },
+                ],
+            },
+            {
+                category: '중식',
+                data: [
+                    {
+                        thumbnail: 'https://www.elmundoeats.com/wp-content/uploads/2021/02/FP-Quick-30-minutes-chicken-ramen.jpg',
+                        title: '라면',
+                        id: 7,
+                    },
+                    {
+                        thumbnail: 'https://mblogthumb-phinf.pstatic.net/MjAyMDAxMDZfMjEz/MDAxNTc4MzE2NTc2ODEw.b6IujcsSNNPhBWMs5moOBwSkmkMxZ6EEXy0V8FfBryEg.WPC2CZCowQJSuFfiyipT1Vea8jVr6BGHCdcL6PXVpdQg.PNG.llzzinll/SE-3ffe00fc-a9fb-48a3-89a2-1d0f8a934cef.png?type=w800',
+                        title: '김치찌개',
+                        id: 8,
+                    },
+                    {
+                        thumbnail: 'https://recipe1.ezmember.co.kr/cache/recipe/2015/05/27/38013d1dfd8fa46a871b9cda074b26341.jpg',
+                        title: '제육볶음',
+                        id: 9,
+                    },
+                    {
+                        thumbnail: 'https://www.elmundoeats.com/wp-content/uploads/2021/02/FP-Quick-30-minutes-chicken-ramen.jpg',
+                        title: '라면',
+                        id: 10,
+                    },
+                    {
+                        thumbnail: 'https://mblogthumb-phinf.pstatic.net/MjAyMDAxMDZfMjEz/MDAxNTc4MzE2NTc2ODEw.b6IujcsSNNPhBWMs5moOBwSkmkMxZ6EEXy0V8FfBryEg.WPC2CZCowQJSuFfiyipT1Vea8jVr6BGHCdcL6PXVpdQg.PNG.llzzinll/SE-3ffe00fc-a9fb-48a3-89a2-1d0f8a934cef.png?type=w800',
+                        title: '김치찌개',
+                        id: 11,
+                    },
+                    {
+                        thumbnail: 'https://recipe1.ezmember.co.kr/cache/recipe/2015/05/27/38013d1dfd8fa46a871b9cda074b26341.jpg',
+                        title: '제육볶음',
+                        id: 12,
+                    },
+                ],
+            },
+            {
+                category: '양식',
+                data: [
+                    {
+                        thumbnail: 'https://www.elmundoeats.com/wp-content/uploads/2021/02/FP-Quick-30-minutes-chicken-ramen.jpg',
+                        title: '라면',
+                        id: 13,
+                    },
+                    {
+                        thumbnail: 'https://mblogthumb-phinf.pstatic.net/MjAyMDAxMDZfMjEz/MDAxNTc4MzE2NTc2ODEw.b6IujcsSNNPhBWMs5moOBwSkmkMxZ6EEXy0V8FfBryEg.WPC2CZCowQJSuFfiyipT1Vea8jVr6BGHCdcL6PXVpdQg.PNG.llzzinll/SE-3ffe00fc-a9fb-48a3-89a2-1d0f8a934cef.png?type=w800',
+                        title: '김치찌개',
+                        id: 14,
+                    },
+                    {
+                        thumbnail: 'https://recipe1.ezmember.co.kr/cache/recipe/2015/05/27/38013d1dfd8fa46a871b9cda074b26341.jpg',
+                        title: '제육볶음',
+                        id: 15,
+                    },
+                    {
+                        thumbnail: 'https://www.elmundoeats.com/wp-content/uploads/2021/02/FP-Quick-30-minutes-chicken-ramen.jpg',
+                        title: '라면',
+                        id: 16,
+                    },
+                    {
+                        thumbnail: 'https://mblogthumb-phinf.pstatic.net/MjAyMDAxMDZfMjEz/MDAxNTc4MzE2NTc2ODEw.b6IujcsSNNPhBWMs5moOBwSkmkMxZ6EEXy0V8FfBryEg.WPC2CZCowQJSuFfiyipT1Vea8jVr6BGHCdcL6PXVpdQg.PNG.llzzinll/SE-3ffe00fc-a9fb-48a3-89a2-1d0f8a934cef.png?type=w800',
+                        title: '김치찌개',
+                        id: 17,
+                    },
+                    {
+                        thumbnail: 'https://recipe1.ezmember.co.kr/cache/recipe/2015/05/27/38013d1dfd8fa46a871b9cda074b26341.jpg',
+                        title: '제육볶음',
+                        id: 18,
+                    },
+                ],
+            },
+        ]
+    }
+}
