@@ -12,7 +12,7 @@ function FavorFooter({ selectedItems = [], onSubmit }) {
                     <Image
                         style={[styles.image, { left: i * 20 }]}
                         key={`selected_${v.id}`}
-                        source={{ uri: v.image }} />
+                        source={{ uri: v.thumbnail }} />
                 ))}
             </View>
             <RBButton style={styles.button} title='선택 완료' onPress={onSubmit} />
