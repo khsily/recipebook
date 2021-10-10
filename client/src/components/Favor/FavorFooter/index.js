@@ -3,7 +3,7 @@ import { View, Image, Text } from 'react-native';
 import RBButton from '../../Common/RBButton';
 import { styles } from './styles';
 
-function FavorFooter({ selectedItems = [] }) {
+function FavorFooter({ selectedItems = [], onSubmit }) {
     return (
         <View style={styles.contrainer}>
             <Text style={styles.text}>{selectedItems.length}개 선택됨</Text>
@@ -15,7 +15,7 @@ function FavorFooter({ selectedItems = [] }) {
                         source={{ uri: v.image }} />
                 ))}
             </View>
-            <RBButton style={styles.button} title='선택 완료' />
+            <RBButton style={styles.button} title='선택 완료' onPress={onSubmit} />
         </View>
     );
 }
