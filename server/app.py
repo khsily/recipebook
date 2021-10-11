@@ -1,12 +1,13 @@
 from flask import Flask
-import configparser
+import os
 
 from routes import api
 import db
 
-config = configparser.ConfigParser()
-config.read('config/server.cfg')
-config = config['default']
+config = {
+    'host': os.environ['SERVER_HOST'],
+    'port': os.environ['SERVER_PORT'],
+}
 
 
 def create_app():
