@@ -14,6 +14,7 @@ web-build/
 server/config/*
 server/db/migration/*
 server/data/*
+.env
 
 # keep
 !.gitkeep
