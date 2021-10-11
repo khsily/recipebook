@@ -21,11 +21,11 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Run NeuMF.")
     parser.add_argument('--path', nargs='?', default='D:\python\\tensorflow2.5\project_ratatouiille\data//',
                         help='Input data path.')
-    parser.add_argument('--dataset', nargs='?', default='ml-1m',
+    parser.add_argument('--dataset', nargs='?', default='recipe',
                         help='Choose a dataset.')
-    parser.add_argument('--epochs', type=int, default=1,
+    parser.add_argument('--epochs', type=int, default=100,
                         help='Number of epochs.')
-    parser.add_argument('--batch_size', type=int, default=256,
+    parser.add_argument('--batch_size', type=int, default=100,
                         help='Batch size.')
     parser.add_argument('--num_factors', type=int, default=8,
                         help='Embedding size of MF model.')
@@ -45,9 +45,9 @@ def parse_args():
                         help='Show performance per X iterations')
     parser.add_argument('--out', type=int, default=1,
                         help='Whether to save the trained model.')
-    parser.add_argument('--mf_pretrain', nargs='?', default=r'D:\python\tensorflow2.5\project_ratatouiille\model\Pretrain\ml-1m_GMF_8_1633489249.h5',
+    parser.add_argument('--mf_pretrain', nargs='?', default=r'D:\python\tensorflow2.5\project_ratatouiille\model\Pretrain\recipe_GMF_8_1633928818.h5',
                         help='Specify the pretrain model file for MF part. If empty, no pretrain will be used')
-    parser.add_argument('--mlp_pretrain', nargs='?', default=r'D:\python\tensorflow2.5\project_ratatouiille\model\Pretrain\ml-1m_MLP_[64,32,16,8]_1633488761.h5',
+    parser.add_argument('--mlp_pretrain', nargs='?', default=r'D:\python\tensorflow2.5\project_ratatouiille\model\Pretrain\recipe_MLP_[64,32,16,8]_1633929856.h5',
                         help='Specify the pretrain model file for MLP part. If empty, no pretrain will be used')
     return parser.parse_args()
 
@@ -177,10 +177,15 @@ if __name__ == '__main__':
 
     # Build model
     model = get_model(num_users, num_items, mf_dim, layers, reg_layers, reg_mf)
-    # model.compile(optimizer=Adagrad(learning_rate=learning_rate), loss='binary_crossentropy')
-    # model.compile(optimizer=RMSprop(learning_rate=learning_rate), loss='binary_crossentropy')
-    model.compile(optimizer=Adam(learning_rate=learning_rate), loss='binary_crossentropy')
-    # model.compile(optimizer=SGD(learning_rate=learning_rate), loss='binary_crossentropy')
+    if learner.lower() == "adagrad":
+        model.compile(optimizer=Adagrad(lr=learning_rate), loss='binary_crossentropy')
+    elif learner.lower() == "rmsprop":
+        model.compile(optimizer=RMSprop(lr=learning_rate), loss='binary_crossentropy')
+    elif learner.lower() == "adam":
+        model.compile(optimizer=Adam(lr=learning_rate), loss='binary_crossentropy')
+    else:
+        model.compile(optimizer=SGD(lr=learning_rate), loss='binary_crossentropy')
+    #print(model.summary())
 
     # Load pretrain model
     if mf_pretrain != '' and mlp_pretrain != '':
@@ -193,9 +198,32 @@ if __name__ == '__main__':
 
     # Init performance
     (hits, ndcgs) = evaluate_model(model, testRatings, testNegatives, topK, evaluation_threads)
-    exit()
     hr, ndcg = np.array(hits).mean(), np.array(ndcgs).mean()
     print('Init: HR = %.4f, NDCG = %.4f' % (hr, ndcg))
+
+    user_input, item_input, labels = get_train_instances(train, num_negatives)
+
+    # Training
+    checkpoint = tf.keras.callbacks.ModelCheckpoint(filepath=model_out_file,
+                                                    verbose=1,
+                                                    monitor='loss',
+                                                    save_weights_only=True,
+                                                    save_best_only=True,
+                                                    save_freq=num_epochs)
+
+    hist = model.fit([np.array(user_input), np.array(item_input)],  # input
+                     np.array(labels),  # labels
+                     batch_size=batch_size, epochs=num_epochs, verbose=1, shuffle=True,
+                     callbacks=[checkpoint])
+
+    model.save('test_model.h5', save_format='h5', overwrite=True)
+
+    (hits, ndcgs) = evaluate_model(model, testRatings, testNegatives, topK, evaluation_threads)
+    hr, ndcg, loss = np.array(hits).mean(), np.array(ndcgs).mean(), hist.history['loss'][0]
+    print('HR = %.4f, NDCG = %.4f, loss = %.4f' % (hr, ndcg, loss))
+
+    exit()
+
     best_hr, best_ndcg, best_iter = hr, ndcg, -1
     if args.out > 0:
         model.save_weights(model_out_file, overwrite=True)
@@ -218,7 +246,7 @@ if __name__ == '__main__':
                          batch_size=batch_size, epochs=1, verbose=0, shuffle=True,
                          callbacks=[checkpoint])
 
-        model.save('test_model.h5', save_format='h5')
+        model.save('test_model.h5', save_format='h5', overwrite=True)
 
         t2 = time()
 
