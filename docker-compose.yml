@@ -10,9 +10,16 @@ services:
       - ./server:/home/recipebook/server
       - ./models:/home/recipebook/models
     ports:
-      - "65323:65323"
+      - ${SERVER_PORT}:${SERVER_PORT}
     environment:
       - FLASK_ENV=${FLASK_ENV}
+      - SERVER_HOST=${SERVER_HOST}
+      - SERVER_PORT=${SERVER_PORT}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_PORT=${POSTGRES_PORT}
     deploy:
       resources:
         reservations:
@@ -26,7 +33,7 @@ services:
     restart: always
     command: "postgres -c config_file=/etc/postgresql/postgresql.conf"
     ports:
-      - "5432:5432"
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
     volumes:
       - ./database/initdb.d:/docker-entrypoint-initdb.d
       - ./database/data:/var/lib/postgresql/data
