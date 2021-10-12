@@ -8,11 +8,10 @@
 
 ## Run Development
 ```bash
-$ sh scripts/run-dev.sh
+$ export FLASK_ENV=development && docker-compose up
 ```
-
 
 ## Run Production
 ```bash
-$ sh scripts/run-prod.sh
+$ export docker-compose up -d
 ```
