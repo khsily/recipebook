@@ -18,8 +18,8 @@
 
 ## docker 실행
 ```bash
-$ export FLASK_ENV=development && docker-compose up -d
-$ export FLASK_ENV=production && docker-compose up -d
+$ export FLASK_ENV=development && docker-compose up
+$ export docker-compose up -d
 ```
 
 ## docker, db 변경사항 적용
