@@ -19,15 +19,15 @@ import argparse
 #################### Arguments ####################
 def parse_args():
     parser = argparse.ArgumentParser(description="Run GMF.")
-    parser.add_argument('--path', nargs='?', default='D:\python\\tensorflow2.5\project_ratatouiille\data//',
+    parser.add_argument('--path', nargs='?', default='data/',
                         help='Input data path.')
     parser.add_argument('--dataset', nargs='?', default='recipe',
                         help='Choose a dataset.')
     parser.add_argument('--epochs', type=int, default=100,
                         help='Number of epochs.')
-    parser.add_argument('--batch_size', type=int, default=256,
+    parser.add_argument('--batch_size', type=int, default=100,
                         help='Batch size.')
-    parser.add_argument('--num_factors', type=int, default=8,
+    parser.add_argument('--num_factors', type=int, default=16,
                         help='Embedding size.')
     parser.add_argument('--regs', nargs='?', default='[0,0]',
                         help="Regularization for user and item embeddings.")
@@ -106,7 +106,7 @@ if __name__ == '__main__':
     topK = 10
     evaluation_threads = 1  # mp.cpu_count()
     print("GMF arguments: %s" % (args))
-    model_out_file = 'D:\python\\tensorflow2.5\project_ratatouiille\model\Pretrain/%s_GMF_%d_%d.h5' \
+    model_out_file = 'pretrain/%s_GMF_%d_%d.h5' \
                      % (args.dataset, num_factors, time())
 
     # Loading data
@@ -152,8 +152,7 @@ if __name__ == '__main__':
                      callbacks=[checkpoint])
 
     model.save_weights(model_out_file, overwrite=True)
-    model.save('Pretrain/recipe_GMF.h5', overwrite=True)
-
+    model.save('pretrain/recipe_GMF.h5', overwrite=True)
 
     (hits, ndcgs) = evaluate_model(model, testRatings, testNegatives, topK, evaluation_threads)
     hr, ndcg, loss = np.array(hits).mean(), np.array(ndcgs).mean(), hist.history['loss'][0]
@@ -161,6 +160,7 @@ if __name__ == '__main__':
 
     exit()
 
+'''
     # Train model
     best_hr, best_ndcg, best_iter = hr, ndcg, -1
     for epoch in range(epochs):
@@ -196,3 +196,4 @@ if __name__ == '__main__':
     print("End. Best Iteration %d:  HR = %.4f, NDCG = %.4f. " % (best_iter, best_hr, best_ndcg))
     if args.out > 0:
         print("The best GMF model is saved to %s" % (model_out_file))
+'''

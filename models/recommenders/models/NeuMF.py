@@ -19,7 +19,7 @@ import argparse
 #################### Arguments ####################
 def parse_args():
     parser = argparse.ArgumentParser(description="Run NeuMF.")
-    parser.add_argument('--path', nargs='?', default='D:\python\\tensorflow2.5\project_ratatouiille\data//',
+    parser.add_argument('--path', nargs='?', default='data//',
                         help='Input data path.')
     parser.add_argument('--dataset', nargs='?', default='recipe',
                         help='Choose a dataset.')
@@ -27,7 +27,7 @@ def parse_args():
                         help='Number of epochs.')
     parser.add_argument('--batch_size', type=int, default=100,
                         help='Batch size.')
-    parser.add_argument('--num_factors', type=int, default=8,
+    parser.add_argument('--num_factors', type=int, default=16,
                         help='Embedding size of MF model.')
     parser.add_argument('--layers', nargs='?', default='[64,32,16,8]',
                         help="MLP layers. Note that the first layer is the concatenation of user and item embeddings. So layers[0]/2 is the embedding size.")
@@ -45,9 +45,9 @@ def parse_args():
                         help='Show performance per X iterations')
     parser.add_argument('--out', type=int, default=1,
                         help='Whether to save the trained model.')
-    parser.add_argument('--mf_pretrain', nargs='?', default=r'D:\python\tensorflow2.5\project_ratatouiille\model\Pretrain\recipe_GMF_8_1633928818.h5',
+    parser.add_argument('--mf_pretrain', nargs='?', default=r'pretrain\recipe_GMF_16_1634006621.h5',
                         help='Specify the pretrain model file for MF part. If empty, no pretrain will be used')
-    parser.add_argument('--mlp_pretrain', nargs='?', default=r'D:\python\tensorflow2.5\project_ratatouiille\model\Pretrain\recipe_MLP_[64,32,16,8]_1633929856.h5',
+    parser.add_argument('--mlp_pretrain', nargs='?', default=r'pretrain\recipe_MLP_[64,32,16,8]_1634007668.h5',
                         help='Specify the pretrain model file for MLP part. If empty, no pretrain will be used')
     return parser.parse_args()
 
@@ -164,7 +164,7 @@ if __name__ == '__main__':
     topK = 10
     evaluation_threads = 1  # mp.cpu_count()
     print("NeuMF arguments: %s " % (args))
-    model_out_file = 'D:\python\\tensorflow2.5\project_ratatouiille\model\Pretrain/%s_NeuMF_%d_%s_%d.h5' \
+    model_out_file = 'pretrain/%s_NeuMF_%d_%s_%d.h5' \
                      % (args.dataset, mf_dim, args.layers, time())
 
     # Loading data
@@ -224,6 +224,7 @@ if __name__ == '__main__':
 
     exit()
 
+'''
     best_hr, best_ndcg, best_iter = hr, ndcg, -1
     if args.out > 0:
         model.save_weights(model_out_file, overwrite=True)
@@ -264,5 +265,4 @@ if __name__ == '__main__':
     print("End. Best Iteration %d:  HR = %.4f, NDCG = %.4f. " % (best_iter, best_hr, best_ndcg))
     if args.out > 0:
         print("The best NeuMF model is saved to %s" % (model_out_file))
-
-
+'''
