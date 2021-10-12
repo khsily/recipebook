@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { registerRootComponent } from 'expo';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
 import { createSharedElementStackNavigator } from 'react-navigation-shared-element';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet'
 import { Platform, StatusBar } from 'react-native';
@@ -21,7 +20,7 @@ import { MainTheme } from './styles/themes';
 import { typography } from './utils';
 import { fetchInitalData, myFavorStore } from './store';
 
-const Stack = Platform.OS === 'ios' ? createStackNavigator() : createSharedElementStackNavigator();
+const Stack = createSharedElementStackNavigator();
 
 
 const app = () => {
@@ -33,7 +32,7 @@ const app = () => {
 
     // 초기 데이터 가져오기
     useEffect(() => {
-        myFavorStore.clear();   // 임시 (테스트용)
+        // myFavorStore.clear();   // 임시 (테스트용)
         fetchInitalData().then(() => setAppIsReady(true));
     }, []);
 
@@ -67,7 +66,8 @@ const app = () => {
                                 name="Recipe"
                                 component={RecipeScreen}
                                 options={{ title: '레시피 정보', ...header_style, ...transition_style }}
-                                sharedElements={(route, otherRoute, showing) => {
+                                sharedElements={(route, _, showing) => {
+                                    if (Platform.OS === 'ios' && !showing) return;
                                     const { recipe } = route.params;
                                     return [`recipe.${recipe.id}.photo`];
                                 }} />
