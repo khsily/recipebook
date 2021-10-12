@@ -15,3 +15,16 @@
 │   └── recommenders    : 레시피 추천 모델
 └── server              : Flask 기반 Rest-api 서버
 ```
+
+## docker 실행
+```bash
+$ export FLASK_ENV=development && docker-compose up
+$ export docker-compose up -d
+```
+
+## docker, db 변경사항 적용
+```bash
+$ rm -rf database/data
+$ docker-compose build
+$ docker-compose up -d
+```

@@ -12,14 +12,14 @@ export const styles = StyleSheet.create({
     },
 
     title: {
-        fontFamily: 'AppleSDGothicNeoB',
         fontSize: 20,
         marginLeft: 3,
         marginRight: 5,
+        fontWeight: 'bold',
     },
 
     subTitle: {
-        fontFamily: 'AppleSDGothicNeoB',
+        fontWeight: 'bold',
         fontSize: 15,
         color: '#CCCCCC',
         textAlignVertical: 'center',
