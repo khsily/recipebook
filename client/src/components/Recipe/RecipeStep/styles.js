@@ -13,7 +13,7 @@ export const styles = StyleSheet.create({
 
     no: {
         fontSize: 20,
-        fontFamily: 'AppleSDGothicNeoB',
+        fontWeight: 'bold',
         width: 20,
         textAlign: 'center',
     },

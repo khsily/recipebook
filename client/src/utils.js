@@ -42,15 +42,22 @@ export async function openCamera(options) {
 export const typography = () => {
     const styles = StyleSheet.create({
         defaultText: {
-            fontFamily: 'AppleSDGothicNeoM',//Default font family
+            fontFamily: 'AppleSDGothicNeoM',
+        },
+
+        defaultBoldText: {
+            fontFamily: 'AppleSDGothicNeoB',
         }
     });
 
     const oldTextRender = Text.render
     Text.render = function (...args) {
-        const origin = oldTextRender.call(this, ...args)
+        const origin = oldTextRender.call(this, ...args);
+        const isBold = origin.props.style.fontWeight === 'bold';
+        const fontStyle = isBold ? styles.defaultBoldText : styles.defaultText;
+
         return React.cloneElement(origin, {
-            style: [styles.defaultText, origin.props.style],
+            style: [fontStyle, origin.props.style],
         })
     }
 }
