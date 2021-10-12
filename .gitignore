@@ -16,6 +16,11 @@ server/db/migration/*
 server/data/*
 .env
 
+# models/recommenders
+# models/recommenders/models/data/
+*.csv
+recipe.*
+
 # keep
 !.gitkeep
 
