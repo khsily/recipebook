@@ -15,6 +15,11 @@ server/config/*
 server/db/migration/*
 server/data/*
 
+# models/recommenders
+# models/recommenders/models/data/
+*.csv
+recipe.*
+
 # keep
 !.gitkeep
 
