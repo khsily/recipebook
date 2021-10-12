@@ -1,17 +1,24 @@
 from flask import Flask
-import configparser
+import os
 
 from routes import api
 import db
 
-config = configparser.ConfigParser()
-config.read('config/server.cfg')
-config = config['default']
+config = {
+    'host': os.environ['SERVER_HOST'],
+    'port': os.environ['SERVER_PORT'],
+}
+
+
+@api.route("/test_db")
+def db_info():
+    return db.execute('server.sql')[0][0]
 
 
 def create_app():
     app = Flask(__name__)
     app.register_blueprint(api)
+
     return app
 
 

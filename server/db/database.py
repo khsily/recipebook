@@ -1,13 +1,16 @@
 import psycopg2
-import configparser
 import os
 import json
 
 SHCEMA_PATH = 'db/schema'
 
-config = configparser.ConfigParser()
-config.read('config/db.cfg')
-config = config[os.environ['FLASK_ENV']]
+config = {
+    'host': os.environ['POSTGRES_HOST'],
+    'dbname': os.environ['POSTGRES_DB'],
+    'user': os.environ['POSTGRES_USER'],
+    'password': os.environ['POSTGRES_PASSWORD'],
+    'port': os.environ['POSTGRES_PORT'],
+}
 
 db = psycopg2.connect(**config)
 cur = db.cursor()
@@ -32,6 +35,5 @@ def info():
 
 
 if __name__ == '__main__':
-    os.environ['FLASK_ENV'] = 'development'
     records = execute('server.sql')
     print(records)

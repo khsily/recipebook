@@ -8,6 +8,7 @@ export const header_style = {
     headerTintColor: '#fff',
     headerTitleStyle: {
         fontWeight: 'bold',
+        fontFamily: 'AppleSDGothicNeoB',
     },
     headerTitleAlign: 'center',
     headerBackTitleVisible: false,
