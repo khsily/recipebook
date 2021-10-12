@@ -19,7 +19,6 @@ import { MainTheme } from './styles/themes';
 import { typography } from './utils';
 import { fetchInitalData, myFavorStore } from './store';
 import { useSplash } from './customHook/useSplash';
-import './api';
 
 const Stack = createSharedElementStackNavigator();
 
