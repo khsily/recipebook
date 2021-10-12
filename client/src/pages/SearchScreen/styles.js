@@ -26,7 +26,7 @@ export const styles = StyleSheet.create({
     },
 
     searchButtonText: {
-        fontFamily: 'AppleSDGothicNeoB',
+        fontWeight: 'bold',
         fontSize: 18,
     },
 

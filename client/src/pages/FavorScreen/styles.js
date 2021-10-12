@@ -13,7 +13,7 @@ export const styles = StyleSheet.create({
 
     title: {
         fontSize: 20,
-        fontFamily: 'AppleSDGothicNeoB',
+        fontWeight: 'bold',
         marginBottom: 10,
     },
 
@@ -32,7 +32,7 @@ export const styles = StyleSheet.create({
 
     sectionTitle: {
         fontSize: 20,
-        fontFamily: 'AppleSDGothicNeoB',
+        fontWeight: 'bold',
         marginLeft: 5,
         marginBottom: 15,
     },
