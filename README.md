@@ -10,6 +10,7 @@
 ```
 .
 ├── client              : React Native 기반 Android/IOS 어플리케이션
+├── database            : postgresql 기반 데이터베이스
 ├── models
 │   ├── detection       : 식재료 인식 모델
 │   └── recommenders    : 레시피 추천 모델
