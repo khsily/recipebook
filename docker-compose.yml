@@ -1,0 +1,45 @@
+version: '3'
+services:
+  server:
+    build: ./server
+    container_name: recipebook_server_con
+    restart: always
+    depends_on:
+      - db
+    volumes:
+      - ./server:/home/recipebook/server
+      - ./models:/home/recipebook/models
+    ports:
+      - ${SERVER_PORT}:${SERVER_PORT}
+    environment:
+      - FLASK_ENV=${FLASK_ENV}
+      - SERVER_HOST=${SERVER_HOST}
+      - SERVER_PORT=${SERVER_PORT}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+    deploy:
+      resources:
+        reservations:
+          devices:
+          -  driver: nvidia
+             count: all
+             capabilities: [gpu]
+  db:
+    build: ./database
+    container_name: recipebook_db_con
+    restart: always
+    command: "postgres -c config_file=/etc/postgresql/postgresql.conf"
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    volumes:
+      - ./database/initdb.d:/docker-entrypoint-initdb.d
+      - ./database/data:/var/lib/postgresql/data
+      - ./database/log:/var/log/postgresql
+      - ./database/conf/postgresql.conf:/etc/postgresql/postgresql.conf
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
