@@ -14,6 +14,16 @@ web-build/
 server/config/*
 server/db/migration/*
 server/data/*
+.env
+
+# models/recommenders
+# models/recommenders/models/data/
+*.csv
+recipe.*
+
+# models/detection
+imgaug/save_image/data/*
+imgaug/save_image/chromedriver.exe
 
 # keep
 !.gitkeep
@@ -21,6 +31,8 @@ server/data/*
 # macOS
 .DS_Store
 __MAC_OSX
+__MACOSX
 
 # misc
 __pycache__
+.idea
