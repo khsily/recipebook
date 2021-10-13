@@ -1,7 +1,10 @@
 # XmlToTxt
 ImageNet file xml format to [Darknet](https://github.com/pjreddie/darknet) text format.
 Works well with directories and subdirectories.
-
+### Attention
+```
+You must start by creating an image, xml folder.
+```
 ### Installation
 ```bash
 sudo pip install -r requirements.txt
