@@ -1,0 +1,2 @@
+cd C:\Users\Administrator\PycharmProjects\imgaug\xml2yolo\XmlToTxt-master
+python xmltotxt.py -c classes.txt -xml xml -out out
