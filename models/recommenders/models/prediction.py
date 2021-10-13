@@ -66,22 +66,23 @@ def predictions(test_id, choose_category):
     return recommends
 
 
-user_idx, user_list = get_data('data\idx_id.csv')
-item_idx, item_list = get_data('data\idx_item.csv')
-theme, item = get_data('data\\theme_item.csv')
+if __name__ == '__main__':
+    user_idx, user_list = get_data('data\idx_id.csv')
+    item_idx, item_list = get_data('data\idx_item.csv')
+    theme, item = get_data('data\\theme_item.csv')
 
-idx2id, id2idx = make_idx2_st(user_idx, user_list)
-idx2item, item2idx = make_idx2_st(item_idx, item_list)
+    idx2id, id2idx = make_idx2_st(user_idx, user_list)
+    idx2item, item2idx = make_idx2_st(item_idx, item_list)
 
-category_name = ['한식', '양식', '일식', '중식', '퓨전', '분식', '다이어트']
+    category_name = ['한식', '양식', '일식', '중식', '퓨전', '분식', '다이어트']
 
-theme_item = theme_dic(category_name, theme, item)
+    theme_item = theme_dic(category_name, theme, item)
 
-random.seed(100)
-test_id = random.choice(user_idx)                   # input user_idx
-choose_category = ['한식', '분식', '다이어트']       # input category
+    random.seed(100)
+    test_id = random.choice(user_idx)                   # input user_idx
+    choose_category = ['한식', '분식', '다이어트']       # input category
 
-recommends_top10 = predictions(test_id, choose_category)
+    recommends_top10 = predictions(test_id, choose_category)
 
-print(recommends_top10)
+    print(recommends_top10)
 
