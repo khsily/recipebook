@@ -81,5 +81,7 @@ random.seed(100)
 test_id = random.choice(user_idx)                   # input user_idx
 choose_category = ['한식', '분식', '다이어트']       # input category
 
-predictions(test_id, choose_category)
+recommends_top10 = predictions(test_id, choose_category)
+
+print(recommends_top10)
 
