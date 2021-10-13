@@ -3,7 +3,6 @@ import SearchScreen from './SearchScreen';
 import RecipeScreen from './RecipeScreen';
 import DetectionResultScreen from './DetectionResultScreen';
 import FavorScreen from './FavorScreen';
-import SplashScreen from './SplashScreen';
 
 export {
     HomeScreen,
@@ -11,5 +10,4 @@ export {
     RecipeScreen,
     DetectionResultScreen,
     FavorScreen,
-    SplashScreen,
 }

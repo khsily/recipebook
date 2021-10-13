@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { registerRootComponent } from 'expo';
 import { NavigationContainer } from '@react-navigation/native';
 import { createSharedElementStackNavigator } from 'react-navigation-shared-element';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet'
 import { Platform, StatusBar } from 'react-native';
-import { useFonts } from 'expo-font';
+import * as Font from 'expo-font';
 import { observer } from 'mobx-react';
 
 import {
@@ -13,32 +13,30 @@ import {
     RecipeScreen,
     DetectionResultScreen,
     FavorScreen,
-    SplashScreen,
 } from './pages';
 import { header_style, transition_style } from './styles/common';
 import { MainTheme } from './styles/themes';
 import { typography } from './utils';
 import { fetchInitalData, myFavorStore } from './store';
+import { useSplash } from './customHook/useSplash';
 
 const Stack = createSharedElementStackNavigator();
 
 
 const app = () => {
-    const [appIsReady, setAppIsReady] = useState(false);
-    const [fontLoaded] = useFonts({
-        AppleSDGothicNeoM: require('../assets/fonts/AppleSDGothicNeoM.ttf'),
-        AppleSDGothicNeoB: require('../assets/fonts/AppleSDGothicNeoB.ttf'),
+    // 초기 데이터 가져오기
+    const appIsReady = useSplash(async () => {
+        await Font.loadAsync({
+            AppleSDGothicNeoM: require('../assets/fonts/AppleSDGothicNeoM.ttf'),
+            AppleSDGothicNeoB: require('../assets/fonts/AppleSDGothicNeoB.ttf'),
+        });
+
+        await myFavorStore.clear();   // 임시 (테스트용)
+        await fetchInitalData();
+        typography();
     });
 
-    // 초기 데이터 가져오기
-    useEffect(() => {
-        // myFavorStore.clear();   // 임시 (테스트용)
-        fetchInitalData().then(() => setAppIsReady(true));
-    }, []);
-
-    // TODO: expo splash screen 적용
-    if (!fontLoaded || !appIsReady) return null;
-    typography();
+    if (!appIsReady) return null;
 
     return (
         <NavigationContainer theme={MainTheme}>

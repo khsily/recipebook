@@ -24,7 +24,7 @@ export const styles = StyleSheet.create({
         borderWidth: 1,
         borderTopWidth: 0,
         borderColor: '#CCCCCC',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
         maxHeight: 150,
     },
 
@@ -33,7 +33,7 @@ export const styles = StyleSheet.create({
     },
 
     list: {
-        backgroundColor: '#FFFFFF',
+        backgroundColor: 'transparent',
         paddingVertical: 8,
         paddingHorizontal: 12,
         color: '#333333',

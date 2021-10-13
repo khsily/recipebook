@@ -33,7 +33,7 @@ const RecipeScreen = ({ route }) => {
                         <IngredientList text='청양고추' value='12g' buyLink={`https://www.coupang.com/np/search?component=&q=${'청양고추'}`} />
                         <IngredientList text='실파' value='4줄기' buyLink={`https://www.coupang.com/np/search?component=&q=${'실파'}`} />
                     </RecipeSection>
-                    <RecipeSection title='레시피' subTitle='Ingredients'>
+                    <RecipeSection title='레시피' subTitle='Recipe'>
                         <RecipeStep
                             no={1}
                             image='https://www.elmundoeats.com/wp-content/uploads/2021/02/FP-Quick-30-minutes-chicken-ramen.jpg'

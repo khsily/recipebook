@@ -1,4 +1,4 @@
-# GMF_2.py
+# GMF.py
 import numpy as np
 import tensorflow as tf
 
@@ -19,15 +19,15 @@ import argparse
 #################### Arguments ####################
 def parse_args():
     parser = argparse.ArgumentParser(description="Run GMF.")
-    parser.add_argument('--path', nargs='?', default='D:\python\\tensorflow2.5\project_ratatouiille\data//',
+    parser.add_argument('--path', nargs='?', default='data/',
                         help='Input data path.')
-    parser.add_argument('--dataset', nargs='?', default='ml-1m',
+    parser.add_argument('--dataset', nargs='?', default='recipe',
                         help='Choose a dataset.')
-    parser.add_argument('--epochs', type=int, default=1,
+    parser.add_argument('--epochs', type=int, default=100,
                         help='Number of epochs.')
-    parser.add_argument('--batch_size', type=int, default=256,
+    parser.add_argument('--batch_size', type=int, default=100,
                         help='Batch size.')
-    parser.add_argument('--num_factors', type=int, default=8,
+    parser.add_argument('--num_factors', type=int, default=16,
                         help='Embedding size.')
     parser.add_argument('--regs', nargs='?', default='[0,0]',
                         help="Regularization for user and item embeddings.")
@@ -68,7 +68,7 @@ def get_model(num_users, num_items, latent_dim, regs=[0, 0]):
     prediction = Dense(1, activation='sigmoid', name='prediction')(predict_vector)
 
     model = Model([user_input, item_input], prediction)
-    model.summary()
+    # model.summary()
 
     return model
 
@@ -106,7 +106,7 @@ if __name__ == '__main__':
     topK = 10
     evaluation_threads = 1  # mp.cpu_count()
     print("GMF arguments: %s" % (args))
-    model_out_file = 'D:\python\\tensorflow2.5\project_ratatouiille\model\Pretrain/%s_GMF_%d_%d.h5' \
+    model_out_file = 'pretrain/%s_GMF_%d_%d.h5' \
                      % (args.dataset, num_factors, time())
 
     # Loading data
@@ -119,11 +119,15 @@ if __name__ == '__main__':
 
     # Build model
     model = get_model(num_users, num_items, num_factors, regs)
-    # model.compile(optimizer=Adagrad(lr=learning_rate), loss='binary_crossentropy')
-    # model.compile(optimizer=RMSprop(lr=learning_rate), loss='binary_crossentropy')
-    model.compile(optimizer=Adam(lr=learning_rate), loss='binary_crossentropy')
-    # model.compile(optimizer=SGD(lr=learning_rate), loss='binary_crossentropy')
-    # print(model.summary())
+    if learner.lower() == "adagrad":
+        model.compile(optimizer=Adagrad(lr=learning_rate), loss='binary_crossentropy')
+    elif learner.lower() == "rmsprop":
+        model.compile(optimizer=RMSprop(lr=learning_rate), loss='binary_crossentropy')
+    elif learner.lower() == "adam":
+        model.compile(optimizer=Adam(lr=learning_rate), loss='binary_crossentropy')
+    else:
+        model.compile(optimizer=SGD(lr=learning_rate), loss='binary_crossentropy')
+    #print(model.summary())
 
     # Init performance
     t1 = time()
@@ -133,18 +137,40 @@ if __name__ == '__main__':
     # p_norm = np.linalg.norm(model.get_layer('prediction').get_weights()[0])
     print('Init: HR = %.4f, NDCG = %.4f\t [%.1f s]' % (hr, ndcg, time() - t1))
 
+    user_input, item_input, labels = get_train_instances(train, num_negatives)
+
+    checkpoint = tf.keras.callbacks.ModelCheckpoint(filepath=model_out_file,
+                                                    monitor='loss',
+                                                    verbose=1,
+                                                    save_weights_only=True,
+                                                    save_best_only=True,
+                                                    save_freq=epochs)
+
+    hist = model.fit([np.array(user_input), np.array(item_input)],  # input
+                     np.array(labels),  # labels
+                     batch_size=batch_size, epochs=epochs, verbose=1, shuffle=True,
+                     callbacks=[checkpoint])
+
+    model.save_weights(model_out_file, overwrite=True)
+    model.save('pretrain/recipe_GMF.h5', overwrite=True)
+
+    (hits, ndcgs) = evaluate_model(model, testRatings, testNegatives, topK, evaluation_threads)
+    hr, ndcg, loss = np.array(hits).mean(), np.array(ndcgs).mean(), hist.history['loss'][0]
+    print('HR = %.4f, NDCG = %.4f, loss = %.4f' % (hr, ndcg, loss))
+
+    exit()
+
+'''
     # Train model
     best_hr, best_ndcg, best_iter = hr, ndcg, -1
     for epoch in range(epochs):
         t1 = time()
         # Generate training instances
-
-
-
         user_input, item_input, labels = get_train_instances(train, num_negatives)
 
         # Training
         checkpoint = tf.keras.callbacks.ModelCheckpoint(filepath=model_out_file,
+                                                        monitor='loss',
                                                         verbose=1,
                                                         save_weights_only=True,
                                                         save_best_only=True,
@@ -152,7 +178,7 @@ if __name__ == '__main__':
 
         hist = model.fit([np.array(user_input), np.array(item_input)],  # input
                          np.array(labels),  # labels
-                         batch_size=batch_size, epochs=1, verbose=0, shuffle=True,
+                         batch_size=batch_size, epochs=1, verbose=1, shuffle=True,
                          callbacks=[checkpoint])
         t2 = time()
 
@@ -165,8 +191,9 @@ if __name__ == '__main__':
             if hr > best_hr:
                 best_hr, best_ndcg, best_iter = hr, ndcg, epoch
                 if args.out > 0:
-                    model.save_weights(model_out_file.format(epoch=0), overwrite=True)
+                    model.save_weights(model_out_file, overwrite=True)
 
     print("End. Best Iteration %d:  HR = %.4f, NDCG = %.4f. " % (best_iter, best_hr, best_ndcg))
     if args.out > 0:
         print("The best GMF model is saved to %s" % (model_out_file))
+'''

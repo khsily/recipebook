@@ -34,12 +34,14 @@ const SearchScreen = ({ route, navigation }) => {
 
     function handleDetection() {
         showAction(async (res) => {
+            if (res.cancelled) return;
+
             setIsDetectioning(true);
             // TODO: object detection 수행
             await fakeLoading(4000);
-
             // TODO: object detection 완료 결과 보여주기
             setIsDetectioning(false);
+            
             console.log(res);
             navigation.navigate('Detection', {
                 images: [res.uri],
