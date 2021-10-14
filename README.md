@@ -16,7 +16,6 @@
 │   └── recommenders    : 레시피 추천 모델
 └── server              : Flask 기반 Rest-api 서버
 ```
-<br/>
 
 ## 클라이언트
 ### Expo 실행
@@ -29,7 +28,6 @@ $ npm start
 ```bash
 $ expo build:android
 ```
-<br/>
 
 ## 서버
 ### docker 실행
@@ -44,7 +42,6 @@ $ rm -rf database/data
 $ docker-compose build
 $ docker-compose up -d
 ```
-<br/>
 
 ## 진행사항 정리
 ### 2021.10.14(금) 주간 진행사항
