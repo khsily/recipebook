@@ -40,7 +40,7 @@ def theme_dic(category_name, theme, item):
     return theme_item
 
 
-def predictions(test_id, choose_category):
+def predictions(theme_item, test_id, choose_category, model_path, idx2id, idx2item):
     user_id, item_id = [], []
     for i in choose_category:
         for j in theme_item[i]:
@@ -52,7 +52,7 @@ def predictions(test_id, choose_category):
 
     user_id, item_id = np.array(user_id, dtype=np.int32), np.array(item_id, dtype=np.int32)
 
-    model = tf.keras.models.load_model('test_model.h5')
+    model = tf.keras.models.load_model(model_path)
     preds = model.predict([user_id, item_id])
 
     predictions = []
@@ -67,9 +67,13 @@ def predictions(test_id, choose_category):
 
 
 if __name__ == '__main__':
-    user_idx, user_list = get_data('data\idx_id.csv')
-    item_idx, item_list = get_data('data\idx_item.csv')
-    theme, item = get_data('data\\theme_item.csv')
+    idx_id_path = 'D:\python\\tensorflow2.5\\recipebook\models\\recommenders\models\data\idx_id.csv'
+    idx_item_path = 'D:\python\\tensorflow2.5\\recipebook\models\\recommenders\models\data\idx_item.csv'
+    theme_item = 'D:\python\\tensorflow2.5\\recipebook\models\\recommenders\models\data\\theme_item.csv'
+
+    user_idx, user_list = get_data(idx_id_path)
+    item_idx, item_list = get_data(idx_item_path)
+    theme, item = get_data(theme_item)
 
     idx2id, id2idx = make_idx2_st(user_idx, user_list)
     idx2item, item2idx = make_idx2_st(item_idx, item_list)
@@ -82,7 +86,9 @@ if __name__ == '__main__':
     test_id = random.choice(user_idx)                   # input user_idx
     choose_category = ['한식', '분식', '다이어트']       # input category
 
-    recommends_top10 = predictions(test_id, choose_category)
+    model_path = 'D:\python\\tensorflow2.5\\recipebook\models\\recommenders\models\\test_model.h5'
+
+    recommends_top10 = predictions(theme_item, test_id, choose_category, model_path, idx2id, idx2item)
 
     print(recommends_top10)
 

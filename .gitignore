@@ -19,6 +19,7 @@ server/data/*
 # models/recommenders
 # models/recommenders/models/data/
 *.csv
+*.h5
 recipe.*
 
 # models/detection

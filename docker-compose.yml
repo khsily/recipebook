@@ -8,7 +8,7 @@ services:
       - db
     volumes:
       - ./server:/home/recipebook/server
-      - ./models:/home/recipebook/models
+      - ./models:/home/recipebook/server/models
     ports:
       - ${SERVER_PORT}:${SERVER_PORT}
     environment:
