@@ -38,9 +38,14 @@ $ docker-compose up -d
 
 ### docker, db 변경사항 적용
 ```bash
-$ rm -rf database/data
+$ sudo chown -R $USER database/data/
 $ docker-compose build
 $ docker-compose up -d
+```
+
+## docker server logging
+```
+docker-compose logs -f server
 ```
 
 ## 진행사항 정리
