@@ -83,6 +83,7 @@ const data = [
 
 const HomeScreen = ({ navigation }) => {
     const [active, setActive] = useState(0);
+    const [isRefreshing, setIsRefreshing] = useState(false);
     const [isDetectioning, setIsDetectioning] = useState(false);
     const showAction = useCameraAction();
 
@@ -94,12 +95,21 @@ const HomeScreen = ({ navigation }) => {
         });
     }, [navigation]);
 
+    async function handleRefresh() {
+        setIsRefreshing(true);
+        await fakeLoading(2000);
+        console.log('refreshed');
+        setIsRefreshing(false);
+    }
+
     return (
         <>
             <FlatList
                 contentContainerStyle={{ padding: 14, paddingBottom: 70 }}
                 data={data}
                 keyExtractor={item => `recipe_${item.id}`}
+                refreshing={isRefreshing}
+                onRefresh={handleRefresh}
                 ListHeaderComponent={() => (
                     <RBChoiceGroup
                         style={{ marginBottom: 14 }}
