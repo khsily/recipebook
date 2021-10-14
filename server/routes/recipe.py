@@ -1,5 +1,6 @@
-from flask import Blueprint, request
-from models.recommenders.models.prediction import predictions, get_data, theme_dic
+import os
+from flask import Blueprint, request, jsonify
+from models.recommenders.models.prediction_final import predictions
 
 recipe = Blueprint('recipe', __name__, url_prefix='/recipe')
 
@@ -25,12 +26,11 @@ def fetch_list(type, page):
     ingredients = body.get('ingredients')
     categories = body.get('categories')
 
-    # print('*' * 30, flush=True)
-    # print(sys.path, flush=True)
-    # recommends_top10 = predictions(597, ['한식', '분식', '다이어트'])
-    # print(recommends_top10, flush=True)
-
-    return f'fetch_list {type} {page} {ingredients} {categories}'
+    model_path = 'models/recommenders/models/test_model.h5'
+    user_id = [3]                       # 하나만 들어오면 요리 갯수 만큼 곱해주는 함수 위에 있음.
+    item_id = [2, 6, 199, 235]          # 카테고리에 속한 요리 갯수 만큼 중복되지 않게 들어와야 함.
+    recommends_top10 = predictions(user_id, item_id, model_path)
+    return jsonify(recommends_top10)
 
 
 @recipe.get('/<id>')
