@@ -1,4 +1,5 @@
 from flask import Blueprint, request
+from models.recommenders.models.prediction import predictions, get_data, theme_dic
 
 recipe = Blueprint('recipe', __name__, url_prefix='/recipe')
 
@@ -9,10 +10,13 @@ def fetch_list(type, page):
 
     ingredients = body.get('ingredients')
     categories = body.get('categories')
-    gender = body.get('gender')
-    theme = body.get('theme')
 
-    return f'fetch_list {type} {page} {ingredients} {categories} {gender} {theme}'
+    # print('*' * 30, flush=True)
+    # print(sys.path, flush=True)
+    # recommends_top10 = predictions(597, ['한식', '분식', '다이어트'])
+    # print(recommends_top10, flush=True)
+
+    return f'fetch_list {type} {page} {ingredients} {categories}'
 
 
 @recipe.get('/<id>')
