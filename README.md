@@ -3,7 +3,7 @@
 <img src="./hamster.png" width='300px' />
 
 한컴 아카데미 딥러닝 교육과정 파이널 프로젝트. Project Recipebook
-
+<br/><br/>
 
 
 ## 프로젝트 구조
@@ -16,19 +16,35 @@
 │   └── recommenders    : 레시피 추천 모델
 └── server              : Flask 기반 Rest-api 서버
 ```
+<br/>
 
-## docker 실행
+## 클라이언트
+### Expo 실행
 ```bash
-$ export FLASK_ENV=development && docker-compose up
-$ export docker-compose up -d
+$ cd client
+$ npm start
 ```
 
-## docker, db 변경사항 적용
+### 안드로이드 빌드
+```bash
+$ expo build:android
+```
+<br/>
+
+## 서버
+### docker 실행
+```bash
+$ export FLASK_ENV=development && docker-compose up
+$ docker-compose up -d
+```
+
+### docker, db 변경사항 적용
 ```bash
 $ rm -rf database/data
 $ docker-compose build
 $ docker-compose up -d
 ```
+<br/>
 
 ## 진행사항 정리
 ### 2021.10.14(금) 주간 진행사항
