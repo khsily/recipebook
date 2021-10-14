@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { observer } from 'mobx-react';
-import { Button, FlatList } from 'react-native';
+import { FlatList } from 'react-native';
 
 import {
     FloatingCameraButton,

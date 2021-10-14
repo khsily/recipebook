@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, Text, FlatList, TouchableOpacity, ScrollView } from 'react-native';
+import { View, TextInput, Text, TouchableOpacity, ScrollView } from 'react-native';
 
 import { styles } from './styles';
 
