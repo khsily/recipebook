@@ -43,7 +43,7 @@ $ docker-compose build
 $ docker-compose up -d
 ```
 
-## docker server logging
+### docker server logging
 ```
 docker-compose logs -f server
 ```
