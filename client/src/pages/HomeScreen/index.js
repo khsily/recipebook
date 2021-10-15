@@ -113,7 +113,7 @@ const HomeScreen = ({ navigation }) => {
                 ListHeaderComponent={() => (
                     <RBChoiceGroup
                         style={{ marginBottom: 14 }}
-                        choices={['추천', '식재료 충분', '식재료 부족']}
+                        choices={['추천', '검색 결과']}
                         active={active}
                         onChange={(i) => setActive(i)} />
                 )}
