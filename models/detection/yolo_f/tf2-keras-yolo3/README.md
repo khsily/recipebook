@@ -2,20 +2,19 @@
 ```
 모든 파일과 터미널은 주소를 변경을 할것 
 ```
-## 1 번 폴더 위치 이동
+## 2 번 아래 파일을 실행
 ```
-cd .\tf2-keras-yolo3\
+create_train_txt.py
 ```
-## 2 번 아래 파일을 터미널 실행
+## 3 번 실행 및 학습 시작
 ```
-python create_train_txt.py
+settings 부분 수정
+yolo_train.py
 ```
-## 3 번 터미널로 학습 시작
+## 4 번 주소 변경 및 실행
 ```
-python train.py
-```
-## 4 번 아래 파일을 터미널 실행
-```
-python yolo_video_input.py
+settings 부분 수정
+execute_object_dictation 함수에 input 수정
+yolo_test_image.py
 ```
 
