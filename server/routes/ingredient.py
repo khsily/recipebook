@@ -15,8 +15,8 @@ def fetch_list():
 def detection():
     base_path = os.path.join(root_path, 'models/detection/yolo_f/tf2_keras_yolo3')
 
-    save_path = os.path.join(root_path, 'temp/id_187, id_144_id_187_id_144.jpg')
-    img_path = os.path.join(root_path, 'temp/test.jpg')
+    save_path = os.path.join(root_path, 'temp/detection.jpg')
+    img_path = os.path.join(root_path, 'temp/smaple.jpg')
     model_name = 'model_final.h5'
 
     img = request.files.get('image', '')
@@ -26,5 +26,9 @@ def detection():
 
     res = send_file(save_path, mimetype='image/jpeg')
     res.set_cookie('ingredients', str(ingredients))
+
+    # 디텍션 완료 후 삭제
+    os.remove(img_path)
+    os.remove(save_path)
 
     return res
