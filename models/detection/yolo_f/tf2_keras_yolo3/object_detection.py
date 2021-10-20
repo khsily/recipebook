@@ -578,7 +578,7 @@ def yolo_loss(args, anchors, num_classes, ignore_thresh=.5, print_loss=False):
 
 # --- model --- #
 
-def execute_object_dictation(save_path, image_path, root_path, model_pt, image_save_path):
+def execute_object_dictation(save_path, image_path, root_path, model_pt):
     # --- settings --- #
     # DEFAULT_MODEL_PATH = model_pt
     # DEFAULT_ANCHORS_PATH = 'model_data/yolo_anchors.txt'
@@ -791,7 +791,6 @@ def execute_object_dictation(save_path, image_path, root_path, model_pt, image_s
     FLAGS = parser.parse_args()
 
     yolo = YOLO(**vars(FLAGS))
-    create_folder(save_path)
 
     image = Image.open(image_path)
     print("Image detection mode")
@@ -799,8 +798,7 @@ def execute_object_dictation(save_path, image_path, root_path, model_pt, image_s
     r_image, name = yolo.detect_image(image)
     print(name)
     print('*' * 100, flush=True)
-    # image.convert('RGB').save(f'{save_path}/{name}.jpg')
-    image.convert('RGB').save(image_save_path)
+    image.convert('RGB').save(save_path)
 
     r_image.show()
     print(f'{save_path} 폴더에 저장되었습니다')
@@ -812,5 +810,5 @@ if __name__ == '__main__':
     root = 'C:/Users/Administrator/PycharmProjects/yolo_f/tf2_keras_yolo3'
     o = os.path.join(root, 'test/20211018_152904.jpg')
     s = os.path.join(root, 'save_image/sdsd.jpg')
-    execute_object_dictation('save_image', o, root, 'logs/000/model_final.h5', s)
+    execute_object_dictation('save_image/sdsd.jpg', o, root, 'logs/000/model_final.h5')
 
