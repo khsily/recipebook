@@ -585,7 +585,7 @@ def create_folder(directory):
         print('Error: Creating directory. ' + directory)
 
 
-def execute_object_dictation(save_path, image_path, root_path, model_pt):
+def execute_object_dictation(save_path, image_path, root_path, model_pt, image_save_path):
     # --- settings --- #
     # DEFAULT_MODEL_PATH = model_pt
     # DEFAULT_ANCHORS_PATH = 'model_data/yolo_anchors.txt'
@@ -742,12 +742,10 @@ def execute_object_dictation(save_path, image_path, root_path, model_pt):
 
             end = timer()
             print(end - start)
-            name_set = str(set(name))
-            name_set = name_set.replace("{'", '')
-            name_set = name_set.replace("'}", '')
-            name_set = name_set.replace("'", '')
-            input_name = name_set.replace(", ", "_")
-            return image, name_set, input_name
+            name = set(name)
+            name_set = list(name)
+
+            return image, name_set
 
     # ---------------------------- #
 
@@ -805,10 +803,12 @@ def execute_object_dictation(save_path, image_path, root_path, model_pt):
     image = Image.open(image_path)
     print("Image detection mode")
     print('&' * 100, flush=True)
-    r_image, name, in_name = yolo.detect_image(image)
+    r_image, name = yolo.detect_image(image)
     print(name)
     print('*' * 100, flush=True)
-    image.convert('RGB').save(f'{save_path}/{name}_{in_name}.jpg')
+    # image.convert('RGB').save(f'{save_path}/{name}.jpg')
+    image.convert('RGB').save(image_save_path)
+
     r_image.show()
     print(f'{save_path} 폴더에 저장되었습니다')
 
@@ -817,5 +817,7 @@ def execute_object_dictation(save_path, image_path, root_path, model_pt):
 
 if __name__ == '__main__':
     root = 'C:/Users/Administrator/PycharmProjects/yolo_f/tf2_keras_yolo3'
-    execute_object_dictation('save_image', 'test/test_2.jpg', root, 'logs/000/model_final.h5')
+    o = os.path.join(root, 'test/20211018_152904.jpg')
+    s = os.path.join(root, 'save_image/sdsd.jpg')
+    execute_object_dictation('save_image', o, root, 'logs/000/model_final.h5', s)
 
