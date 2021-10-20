@@ -3,6 +3,7 @@ import { SERVER_URL, SERVER_PORT } from '@env';
 
 const baseURL = `${SERVER_URL}:${SERVER_PORT}/api`;
 
+const headerFormData = { 'Content-Type': 'multipart/form-data' };
 const instance = axios.create({
     baseURL: baseURL,
     timeout: 10000,
@@ -44,12 +45,13 @@ class Api {
 
         // 멀티파트인경우 요청 데이터를 FormData 객체로 감싼 후 전달
         let data = multipart ? this.createFormData(payload) : payload;
+        let responseType = multipart ? 'blob' : undefined;
 
         // GET 요청인 경우 body로 데이터가 전달되지 않도록 data 를 undefined로 초기화
         if (method === 'GET') data = undefined;
 
         return new Promise((resolve, reject) => {
-            instance({ url, method, headers, data })
+            instance({ url, method, headers, data, responseType })
                 .then((res) => {
                     if (res.status === 200) resolve(res.data); // 요청 성공
                     else if (res.status === 404) reject(null); // 요청 실패 (NOT FOUND)

@@ -13,6 +13,7 @@ import {
 import { useCameraAction } from '../../customHook/useCameraAction';
 import ic_search from '../../../assets/icon/ic_search.png';
 import { fakeLoading } from '../../utils';
+import { detectIngredientFromImage } from '../../api/models/ingredient';
 
 const data = [
     {
@@ -126,15 +127,35 @@ const HomeScreen = ({ navigation }) => {
             <FloatingCameraButton onPress={() => {
                 showAction(async (res) => {
                     if (res.cancelled) return;
-                    
+
+                    const fileReaderInstance = new FileReader();
                     setIsDetectioning(true);
-                    // TODO: object detection 수행
-                    await fakeLoading(4000);
-                    // TODO: object detection 완료 결과 보여주기
+
+                    try {
+                        const localUri = res.uri;
+                        const filename = localUri.split('/').pop();
+
+                        // Infer the type of the image
+                        const match = /\.(\w+)$/.exec(filename);
+                        const type = match ? `image/${match[1]}` : `image`;
+
+                        const data = await detectIngredientFromImage({
+                            uri: localUri,
+                            name: filename,
+                            type,
+                        });
+
+                        fileReaderInstance.readAsDataURL(data);
+                    } catch (e) {
+                        console.log(e);
+                    }
+
                     setIsDetectioning(false);
 
-                    console.log(res);
-                    navigation.navigate('Detection', { images: [res.uri] });
+                    fileReaderInstance.onload = () => {
+                        const base64data = fileReaderInstance.result;
+                        navigation.navigate('Detection', { images: [base64data] });
+                    }
                 });
             }} />
         </>
