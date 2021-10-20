@@ -583,11 +583,16 @@ def create_folder(directory):
         print('Error: Creating directory. ' + directory)
 
 
-def execute_object_dictation(save_path, image_path, model_pt):
+def execute_object_dictation(save_path, image_path, root_path ,model_pt):
     # --- settings --- #
-    DEFAULT_MODEL_PATH = model_pt
-    DEFAULT_ANCHORS_PATH = 'model_data/yolo_anchors.txt'
-    DEFAULT_CLASSES_PATH = 'model_data/coco_classes.txt'
+    # DEFAULT_MODEL_PATH = model_pt
+    # DEFAULT_ANCHORS_PATH = 'model_data/yolo_anchors.txt'
+    # DEFAULT_CLASSES_PATH = 'model_data/coco_classes.txt'
+
+    DEFAULT_MODEL_PATH = os.path.join(root_path, model_pt)
+    DEFAULT_ANCHORS_PATH = os.path.join(root_path,'model_data/yolo_anchors.txt')
+    DEFAULT_CLASSES_PATH = os.path.join(root_path, 'model_data/coco_classes.txt')
+
     SCORE = 0.3
     IOU = 0.45
     MODEL_IMAGE_SIZE = (416, 416)
@@ -744,67 +749,69 @@ def execute_object_dictation(save_path, image_path, model_pt):
 
 # ---------------------------- #
 
-    if __name__ == '__main__':
+    # if __name__ == '__main__':
         # class YOLO defines the default value, so suppress any default here
-        parser = argparse.ArgumentParser(argument_default=argparse.SUPPRESS)
-        '''
-        Command line options
-        '''
-        parser.add_argument(
-            '--model_path', type=str,
-            help='path to model weight file, default ' +
-            YOLO.get_defaults("model_path")
-        )
+    parser = argparse.ArgumentParser(argument_default=argparse.SUPPRESS)
+    '''
+    Command line options
+    '''
+    parser.add_argument(
+        '--model_path', type=str,
+        help='path to model weight file, default ' +
+        YOLO.get_defaults("model_path")
+    )
 
-        parser.add_argument(
-            '--anchors_path', type=str,
-            help='path to anchor definitions, default ' +
-            YOLO.get_defaults("anchors_path")
-        )
+    parser.add_argument(
+        '--anchors_path', type=str,
+        help='path to anchor definitions, default ' +
+        YOLO.get_defaults("anchors_path")
+    )
 
-        parser.add_argument(
-            '--classes_path', type=str,
-            help='path to class definitions, default ' +
-            YOLO.get_defaults("classes_path")
-        )
+    parser.add_argument(
+        '--classes_path', type=str,
+        help='path to class definitions, default ' +
+        YOLO.get_defaults("classes_path")
+    )
 
-        parser.add_argument(
-            '--gpu_num', type=int,
-            help='Number of GPU to use, default ' +
-            str(YOLO.get_defaults("gpu_num"))
-        )
+    parser.add_argument(
+        '--gpu_num', type=int,
+        help='Number of GPU to use, default ' +
+        str(YOLO.get_defaults("gpu_num"))
+    )
 
-        parser.add_argument(
-            '--image', default=False, action="store_true",
-            help='Image detection mode, will ignore all positional arguments'
-        )
-        '''
-        Command line positional arguments -- for video detection mode
-        '''
-        parser.add_argument(
-            "--input", nargs='?', type=str, required=False, default='./path2your_video',
-            help="Video input path"
-        )
+    parser.add_argument(
+        '--image', default=False, action="store_true",
+        help='Image detection mode, will ignore all positional arguments'
+    )
+    '''
+    Command line positional arguments -- for video detection mode
+    '''
+    parser.add_argument(
+        "--input", nargs='?', type=str, required=False, default='./path2your_video',
+        help="Video input path"
+    )
 
-        parser.add_argument(
-            "--output", nargs='?', type=str, default="",
-            help="[Optional] Video output path"
-        )
-        FLAGS = parser.parse_args()
-
-
-        yolo = YOLO(**vars(FLAGS))
-        create_folder(save_path)
-        image_path = image_path
-        image = Image.open(image_path)
-        print("Image detection mode")
-        r_image, name, in_name = yolo.detect_image(image)
-        print(name)
-        # print(in_name)
-        image.save(f'{save_path}/{name}_{in_name}.jpg')
-        r_image.show()
-        print(f'{save_path} 폴더에 저장되었습니다')
+    parser.add_argument(
+        "--output", nargs='?', type=str, default="",
+        help="[Optional] Video output path"
+    )
+    FLAGS = parser.parse_args()
 
 
-execute_object_dictation('save_image', 'test/food2.JPG', 'logs/000/ep053-loss1185.750-val_loss1358.644.h5')
+    yolo = YOLO(**vars(FLAGS))
+    create_folder(save_path)
+    image_path = os.path.join(root_path, image_path)
+    image = Image.open(image_path)
+    print("Image detection mode")
+    r_image, name, in_name = yolo.detect_image(image)
+    print(name)
+    # print(in_name)
+    image.save(f'{save_path}/{name}_{in_name}.jpg')
+    r_image.show()
+    print(f'{save_path} 폴더에 저장되었습니다')
+
+    return name
+
+root = 'C:/Users/Administrator/PycharmProjects/yolo_f/tf2_keras_yolo3'
+execute_object_dictation('save_image', 'test/test_2.jpg', root,'logs/000/model_final.h5')
 
