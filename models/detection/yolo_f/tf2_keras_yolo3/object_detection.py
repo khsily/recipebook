@@ -577,13 +577,6 @@ def yolo_loss(args, anchors, num_classes, ignore_thresh=.5, print_loss=False):
 
 
 # --- model --- #
-def create_folder(directory):
-    try:
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-    except OSError:
-        print('Error: Creating directory. ' + directory)
-
 
 def execute_object_dictation(save_path, image_path, root_path, model_pt, image_save_path):
     # --- settings --- #
