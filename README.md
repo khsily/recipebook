@@ -30,6 +30,9 @@ $ expo build:android
 ```
 
 ## 서버
+
+endpoint 정보: https://documenter.getpostman.com/view/2590101/UUxzCTjY
+
 ### docker 실행
 ```bash
 $ export FLASK_ENV=development && docker-compose up
