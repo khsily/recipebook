@@ -12,8 +12,8 @@ import {
 
 import { useCameraAction } from '../../customHook/useCameraAction';
 import ic_search from '../../../assets/icon/ic_search.png';
-import { fakeLoading } from '../../utils';
-import { detectIngredientFromImage } from '../../api/models/ingredient';
+import { blob2base54, cookie2obj, fakeLoading } from '../../utils';
+import { Ingredient } from '../../api';
 
 const data = [
     {
@@ -128,34 +128,14 @@ const HomeScreen = ({ navigation }) => {
                 showAction(async (res) => {
                     if (res.cancelled) return;
 
-                    const fileReaderInstance = new FileReader();
                     setIsDetectioning(true);
-
-                    try {
-                        const localUri = res.uri;
-                        const filename = localUri.split('/').pop();
-
-                        // Infer the type of the image
-                        const match = /\.(\w+)$/.exec(filename);
-                        const type = match ? `image/${match[1]}` : `image`;
-
-                        const data = await detectIngredientFromImage({
-                            uri: localUri,
-                            name: filename,
-                            type,
-                        });
-
-                        fileReaderInstance.readAsDataURL(data);
-                    } catch (e) {
-                        console.log(e);
-                    }
-
+                    const result = await Ingredient.detectIngredientFromImage(res.uri);
+                    const cookie = result.headers['set-cookie'][0];
+                    const { ingredients } = cookie2obj(cookie);
+                    const base54 = await blob2base54(result.data);
                     setIsDetectioning(false);
 
-                    fileReaderInstance.onload = () => {
-                        const base64data = fileReaderInstance.result;
-                        navigation.navigate('Detection', { images: [base64data] });
-                    }
+                    navigation.navigate('Detection', { images: [base54], ingredients });
                 });
             }} />
         </>

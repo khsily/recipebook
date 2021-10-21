@@ -53,9 +53,9 @@ class Api {
         return new Promise((resolve, reject) => {
             instance({ url, method, headers, data, responseType })
                 .then((res) => {
-                    if (res.status === 200) resolve(res.data); // 요청 성공
+                    if (res.status === 200) resolve(res); // 요청 성공
                     else if (res.status === 404) reject(null); // 요청 실패 (NOT FOUND)
-                    else reject(res.data); // 요청 실패
+                    else reject(res); // 요청 실패
                 }).catch((err) => { // 요청 실패
                     const defaultErr = { status: 503, msg: 'Service Unavailable' };
                     const res = err.response;
