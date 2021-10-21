@@ -12,7 +12,8 @@ import {
 
 import { useCameraAction } from '../../customHook/useCameraAction';
 import ic_search from '../../../assets/icon/ic_search.png';
-import { fakeLoading } from '../../utils';
+import { blob2base54, cookie2obj, fakeLoading } from '../../utils';
+import { Ingredient } from '../../api';
 
 const data = [
     {
@@ -126,15 +127,15 @@ const HomeScreen = ({ navigation }) => {
             <FloatingCameraButton onPress={() => {
                 showAction(async (res) => {
                     if (res.cancelled) return;
-                    
+
                     setIsDetectioning(true);
-                    // TODO: object detection 수행
-                    await fakeLoading(4000);
-                    // TODO: object detection 완료 결과 보여주기
+                    const result = await Ingredient.detectIngredientFromImage(res.uri);
+                    const cookie = result.headers['set-cookie'][0];
+                    const { ingredients } = cookie2obj(cookie);
+                    const base54 = await blob2base54(result.data);
                     setIsDetectioning(false);
 
-                    console.log(res);
-                    navigation.navigate('Detection', { images: [res.uri] });
+                    navigation.navigate('Detection', { images: [base54], ingredients });
                 });
             }} />
         </>

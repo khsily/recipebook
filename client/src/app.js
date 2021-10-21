@@ -31,7 +31,7 @@ const app = () => {
             AppleSDGothicNeoB: require('../assets/fonts/AppleSDGothicNeoB.ttf'),
         });
 
-        await myFavorStore.clear();   // 임시 (테스트용)
+        // await myFavorStore.clear();   // 임시 (테스트용)
         await fetchInitalData();
         typography();
     });

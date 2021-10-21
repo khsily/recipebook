@@ -1,11 +1,11 @@
 import React from 'react';
-import { View, TouchableOpacity, Text } from 'react-native';
+import { View, TouchableOpacity, Text, Platform } from 'react-native';
 import ImageView from "react-native-image-viewing";
 
 import { styles } from './styles';
 
 const DetectionResultScreen = ({ route, navigation }) => {
-    const { images, from } = route.params;
+    const { images, from, ingredients } = route.params;
 
     function onCancel() {
         navigation.goBack()
@@ -16,10 +16,10 @@ const DetectionResultScreen = ({ route, navigation }) => {
             navigation.navigate({
                 name: 'Search',
                 merge: true,
-                params: { ingredients: ['대파', '고구마', '당근'] }
+                params: { ingredients }
             });
         } else {
-            navigation.replace('Search', { ingredients: ['대파', '고구마', '당근'] });
+            navigation.replace('Search', { ingredients });
         }
     }
 
@@ -29,7 +29,7 @@ const DetectionResultScreen = ({ route, navigation }) => {
                 images={images.map(v => ({ uri: v }))}
                 imageIndex={0}
                 visible={true}
-                animationType='slide'
+                animationType={Platform.OS === 'ios' ? 'none' : 'slide'}
                 onRequestClose={onCancel}
                 FooterComponent={() => (
                     <View style={styles.buttonWrapper}>
