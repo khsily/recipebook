@@ -25,7 +25,7 @@ def detection():
     ingredients = execute_object_dictation(save_path, img_path, base_path, model_name)
 
     res = send_file(save_path, mimetype='image/jpeg', as_attachment=True)
-    res.set_cookie('ingredients', str(ingredients))
+    res.set_cookie('ingredients', ','.join(ingredients))
 
     # 디텍션 완료 후 삭제
     os.remove(img_path)
