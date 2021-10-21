@@ -39,6 +39,7 @@ export async function openCamera(options) {
     }
 }
 
+
 export const typography = () => {
     const styles = StyleSheet.create({
         defaultText: {
@@ -53,7 +54,8 @@ export const typography = () => {
     const oldTextRender = Text.render
     Text.render = function (...args) {
         const origin = oldTextRender.call(this, ...args);
-        const isBold = origin.props.style.fontWeight === 'bold';
+
+        const isBold = origin && origin.props && origin.props.style && (origin.props.style.fontWeight === 'bold');
         const fontStyle = isBold ? styles.defaultBoldText : styles.defaultText;
 
         return React.cloneElement(origin, {
@@ -62,8 +64,31 @@ export const typography = () => {
     }
 }
 
+
 export function fakeLoading(time = 1000) {
     return new Promise((resolve) => {
         window.setTimeout(resolve, time);
     });
+}
+
+
+export function cookie2obj(cookieStr) {
+    return cookieStr.split('; ').reduce((prev, current) => {
+        const [name, ...value] = current.split('=');
+        prev[name] = value.join('=').replace(/"/g, '');
+        prev[name] = prev[name].replace(/\\054/g, ',').split(',');
+        if (prev[name].length <= 1) prev[name] = prev[name][0]
+        return prev;
+    }, {});
+}
+
+
+export async function blob2base54(blob) {
+    const fr = new FileReader();
+    fr.readAsDataURL(blob);
+
+    return new Promise((resolve, reject) => {
+        fr.onload = () => resolve(fr.result);
+        fr.onerror = () => reject;
+    })
 }

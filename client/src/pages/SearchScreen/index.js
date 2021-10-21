@@ -1,14 +1,15 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react';
-import { View, Text, KeyboardAvoidingView, ScrollView, Platform, LayoutAnimation, Keyboard, NativeModules } from 'react-native';
+import { View, Text, KeyboardAvoidingView, ScrollView, Platform, LayoutAnimation, Keyboard } from 'react-native';
 import Constants from 'expo-constants';
 
 import { HeaderButton, LoadingModal, RBButton, SearchForm, SearchInput, SearchTag } from '../../components';
 import { useCameraAction } from '../../customHook/useCameraAction';
 
 import ic_camera from '../../../assets/icon/ic_camera.png';
-import { fakeLoading } from '../../utils';
+import { blob2base54, cookie2obj } from '../../utils';
 import { layoutAnimConfig } from '../../animation';
 import { styles } from './styles';
+import { Ingredient } from '../../api';
 
 Keyboard.addListener('keyboardDidHide', () => {
     Keyboard.dismiss(); // lose focus
@@ -16,8 +17,6 @@ Keyboard.addListener('keyboardDidHide', () => {
 
 const ingredientData = ['파프리카', '닭고기', '양파', '양배추', '대파', '고구마', '당근', '돼지고기', '소고기', '고추', '오이'].sort();
 const categoryData = ['메인요리', '밑반찬', '간식', '간단요리', '초대요리', '채식', '한식', '양식', '일식', '중식', '퓨전', '분식', '안주', '베이킹', '다이어트', '도시락'].sort();
-
-const { StatusBarManager } = NativeModules;
 
 const SearchScreen = ({ route, navigation }) => {
     const params = route.params;
@@ -37,15 +36,16 @@ const SearchScreen = ({ route, navigation }) => {
             if (res.cancelled) return;
 
             setIsDetectioning(true);
-            // TODO: object detection 수행
-            await fakeLoading(4000);
-            // TODO: object detection 완료 결과 보여주기
+            const result = await Ingredient.detectIngredientFromImage(res.uri);
+            const cookie = result.headers['set-cookie'][0];
+            const { ingredients } = cookie2obj(cookie);
+            const base54 = await blob2base54(result.data);
             setIsDetectioning(false);
-            
-            console.log(res);
+
             navigation.navigate('Detection', {
-                images: [res.uri],
+                images: [base54],
                 from: 'Search',
+                ingredients,
             });
         })
     }

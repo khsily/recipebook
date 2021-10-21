@@ -1,6 +1,6 @@
 import glob
-from settings import TRAIN_DATASET_PATH
 
+TRAIN_DATASET_PATH = 'dataset'
 
 def yolo2bbox(box, img_size):
     img_width, img_height = img_size
@@ -19,13 +19,13 @@ def yolo2bbox(box, img_size):
 
 
 data = glob.glob(f'{TRAIN_DATASET_PATH}/*.jpg')
-f = open('train.txt', 'w')
+f = open('train.txt', 'w', encoding='utf-8')
 
 for path in data:
     print(path, file=f, end=' ')
     label_path = path.replace('.jpg', '.txt')
 
-    labels = open(label_path, 'r')
+    labels = open(label_path, 'r', encoding='utf-8')
 
     for label in labels.readlines():
         label = label.strip()
