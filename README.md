@@ -30,6 +30,9 @@ $ expo build:android
 ```
 
 ## 서버
+
+endpoint 정보: https://documenter.getpostman.com/view/2590101/UUxzCTjY
+
 ### docker 실행
 ```bash
 $ export FLASK_ENV=development && docker-compose up
@@ -39,6 +42,7 @@ $ docker-compose up -d
 ### docker, db 변경사항 적용
 ```bash
 $ sudo chown -R $USER database/data/
+$ sudo rm -rf database/data/
 $ docker-compose build
 $ docker-compose up -d
 ```
@@ -47,18 +51,3 @@ $ docker-compose up -d
 ```
 docker-compose logs -f server
 ```
-
-## 진행사항 정리
-### 2021.10.14(금) 주간 진행사항
-1. 식재료 인식 모델
-    - 모델 변경 (faster-rcnn -> keras-yolov3)
-    - 모델 고도화 진행
-    - Augmentation
-2. 레시피 추천 모델
-    - 반복 training 진행 (하이퍼 파라미터 수정)
-    - 미니 데이터 테스트 / 데이터 검증 진행
-3. 데이터베이스
-    - DB 학습 진행
-4. 앱/서버
-    - 앱 버그 수정 및 변동 작업
-    - docker 배포 완료

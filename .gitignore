@@ -17,6 +17,9 @@ server/data/*
 server/temp/*
 .env
 
+# database
+database/data/*
+
 # models/recommenders
 # models/recommenders/models/data/
 *.csv
