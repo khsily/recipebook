@@ -20,5 +20,13 @@ JOIN
 JOIN
 	ingredient AS i 
 	ON ri.ingredient_id = i.id
+WHERE 
+	(r.category_id = ANY (%(categories)s) OR %(categories)s IS NULL)
+AND 
+	r.id = ANY (
+		SELECT recipe_id FROM recipe_ingredient
+		WHERE (ingredient_id = ANY (%(ingredients)s) OR %(ingredients)s IS NULL)
+	)
 GROUP BY r.id, c.name
-LIMIT 20 OFFSET 0;
+ORDER BY r.id ASC
+LIMIT %(limit)s OFFSET %(offset)s;

@@ -2,6 +2,7 @@ from flask import Blueprint, request, send_file
 from flask.json import jsonify
 from utils import root_path
 import os
+import json
 import db
 
 from models.detection.yolo_f.tf2_keras_yolo3.object_detection import execute_object_dictation
@@ -11,8 +12,8 @@ ingredient = Blueprint('ingredient', __name__, url_prefix='/ingredient')
 
 @ingredient.get('/')
 def fetch_list():
-    res = db.execute('fetchIngredient.sql')
-    return jsonify(res)
+    ingredients = db.execute('fetchIngredient.sql', {'ingredients': None})
+    return jsonify(ingredients)
 
 
 @ingredient.post('/detection')
@@ -27,6 +28,10 @@ def detection():
     img.save(img_path)
 
     ingredients = execute_object_dictation(save_path, img_path, base_path, model_name)
+    ingredients = [int(id.split('_')[-1]) for id in ingredients]
+
+    ingredients = db.execute('fetchIngredient.sql', {'ingredients': ingredients})
+    ingredients = json.dumps(ingredients, ensure_ascii=False)
 
     res = send_file(save_path, mimetype='image/jpeg', as_attachment=True)
     res.set_cookie('ingredients', ','.join(ingredients))
