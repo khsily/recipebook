@@ -1,4 +1,5 @@
 import psycopg2
+import psycopg2.extras
 import os
 import json
 
@@ -13,12 +14,12 @@ config = {
 }
 
 db = psycopg2.connect(**config)
-cur = db.cursor()
+cur = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
 
-def execute(sql_file):
+def execute(sql_file, params=None):
     sql = open(os.path.join(SHCEMA_PATH, sql_file), 'r')
-    cur.execute(sql.read())
+    cur.execute(sql.read(), params)
     sql.close()
 
     return cur.fetchall()
