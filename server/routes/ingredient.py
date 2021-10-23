@@ -1,6 +1,9 @@
 from flask import Blueprint, request, send_file
+from flask.json import jsonify
 from utils import root_path
 import os
+import db
+
 from models.detection.yolo_f.tf2_keras_yolo3.object_detection import execute_object_dictation
 
 ingredient = Blueprint('ingredient', __name__, url_prefix='/ingredient')
@@ -8,7 +11,8 @@ ingredient = Blueprint('ingredient', __name__, url_prefix='/ingredient')
 
 @ingredient.get('/')
 def fetch_list():
-    return f'fetch_list'
+    res = db.execute('fetchIngredient.sql')
+    return jsonify(res)
 
 
 @ingredient.post('/detection')
