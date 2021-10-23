@@ -38,6 +38,7 @@ services:
       - ./database/initdb.d:/docker-entrypoint-initdb.d
       - ./database/data:/var/lib/postgresql/data
       - ./database/log:/var/log/postgresql
+      - ./database/csvs:/var/lib/postgresql/csvs
       - ./database/conf/postgresql.conf:/etc/postgresql/postgresql.conf
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
