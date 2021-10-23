@@ -1,8 +1,10 @@
 from flask import Blueprint, jsonify
+import db
 
 category = Blueprint('category', __name__, url_prefix='/category')
 
 
 @category.get('/')
 def fetch_list():
-    return jsonify(['카테고리', '리스트', 'test'])
+    res = db.execute('fetchCategory.sql')
+    return jsonify(res)
