@@ -25,6 +25,13 @@ def execute(sql_file, params=None):
     return cur.fetchall()
 
 
+def update(sql_file, params=None):
+    sql = open(os.path.join(SHCEMA_PATH, sql_file), 'r')
+    cur.execute(sql.read(), params)
+    db.commit()
+    sql.close()
+
+
 def info():
     db_info = dict(config)
     del db_info['password']
