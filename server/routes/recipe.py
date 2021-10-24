@@ -61,6 +61,12 @@ def fetch_list(page):
     return jsonify(recipes)
 
 
+@recipe.get('/favor')
+def fetch_favor():
+    favors = db.execute('fetchFavor.sql')
+    return jsonify(favors)
+
+
 @recipe.get('/<id>')
 def fetch_detail(id):
     # view count 올리기
