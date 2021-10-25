@@ -1,6 +1,8 @@
 import categoryStore from './category';
 import ingredientStore from './ingredient';
 import recipeStore from './recipe';
+import recommendRecipeStore from './recommendRecipe';
+import recipeDetailStore from './recipeDetail';
 import favorStore from './favor';
 import myFavorStore from './myFavor';
 import countStore from './counter';
@@ -21,6 +23,8 @@ export {
     categoryStore,
     ingredientStore,
     recipeStore,
+    recommendRecipeStore,
+    recipeDetailStore,
     favorStore,
     myFavorStore,
     countStore,

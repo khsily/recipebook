@@ -2,7 +2,7 @@ import { makeAutoObservable } from 'mobx';
 import { fakeLoading } from '../utils';
 import * as dummy from './dummyData';
 
-class Recipe {
+class RecipeStore {
     recommend = []
     sufficient = []
     insufficient = []
@@ -33,6 +33,6 @@ class Recipe {
     }
 }
 
-const recipeStore = new Recipe();
+const recipeStore = new RecipeStore();
 export default recipeStore;
 

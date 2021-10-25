@@ -5,8 +5,9 @@ import { SharedElement } from 'react-navigation-shared-element';
 import RBCard from '../../Common/RBCard';
 import { styles } from './styles';
 
-function RecipeList({ id, title, thumbnail, ingredients = [], rating, views = 0, category, ...props }) {
-    views = views.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+function RecipeList({ id, title, thumbnail, ingredients = '', rating, view = 0, category, ...props }) {
+    view = view.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    ingredients = ingredients.split(',');
 
     return (
         <RBCard style={styles.container} touchable {...props}>
@@ -26,7 +27,7 @@ function RecipeList({ id, title, thumbnail, ingredients = [], rating, views = 0,
                 </View>
                 <View style={styles.info}>
                     <Text style={styles.info_text}>{category}</Text>
-                    <Text style={styles.info_text}>{views} views</Text>
+                    <Text style={styles.info_text}>{view} views</Text>
                 </View>
             </View>
         </RBCard>
