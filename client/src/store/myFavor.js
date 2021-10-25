@@ -1,9 +1,11 @@
 import { makeAutoObservable } from 'mobx';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Recipe } from '../api';
 
 class MyFavor {
     storageKey = '@my_favor';
     favors = [];
+    combinationId = 0;
     isFetching = false;
 
     constructor() {
@@ -12,6 +14,10 @@ class MyFavor {
 
     _setFavors(favors) {
         this.favors = favors;
+    }
+
+    _setCombinationId(id) {
+        this.combinationId = id;
     }
 
     _setIsFetching(isFetching) {
@@ -28,9 +34,20 @@ class MyFavor {
         this._setIsFetching(true);
 
         const jsonValue = await AsyncStorage.getItem(this.storageKey);
-        this._setFavors(jsonValue ? JSON.parse(jsonValue) : []);
+        const favors = jsonValue ? JSON.parse(jsonValue) : [];
+        this._setFavors(favors);
+        await this.fetchId(favors);
 
         this._setIsFetching(false);
+    }
+
+    async fetchId(favors) {
+        if (favors.length === 0) return;
+
+        const favorTitles = favors.map((v) => v.title);
+        const combination = await Recipe.fetchCombinationId(favorTitles);
+        const id = combination.data.id;
+        this._setCombinationId(id);
     }
 
     async clear() {

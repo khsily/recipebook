@@ -9,6 +9,8 @@ import countStore from './counter';
 // 초기 데이터 로드
 export async function fetchInitalData() {
     return Promise.all([
+        categoryStore.fetchList(),
+        ingredientStore.fetchList(),
         myFavorStore.fetchList(),
         favorStore.fetchList(),
     ]);

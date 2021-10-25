@@ -1,8 +1,7 @@
 import { makeAutoObservable } from 'mobx';
-import { fakeLoading } from '../utils';
-import * as dummy from './dummyData';
+import { Ingredient } from '../api';
 
-class Ingredient {
+class IngredientStore {
     ingredients = []
     isFetching = false;
 
@@ -12,14 +11,11 @@ class Ingredient {
 
     async fetchList() {
         this.isFetching = true;
-
-        await fakeLoading(500);
-        this.ingredients = dummy.ingredients.payload.data;
-
+        this.ingredients = await Ingredient.fetchIngredientList();
         this.isFetching = false;
     }
 }
 
-const ingredientStore = new Ingredient();
+const ingredientStore = new IngredientStore();
 export default ingredientStore;
 
