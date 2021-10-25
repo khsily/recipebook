@@ -21,3 +21,7 @@ DELIMITER ',' CSV HEADER;
 COPY recipe_step (id, recipe_id, step, content, images, thumbnails)
 FROM '/var/lib/postgresql/csvs/recipe_step.csv'
 DELIMITER ',' CSV QUOTE '"' HEADER;
+
+COPY combination (id, combination)
+FROM '/var/lib/postgresql/csvs/combination.csv'
+DELIMITER ',' CSV QUOTE '"' HEADER;
