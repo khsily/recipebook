@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { observer } from 'mobx-react';
 import { FlatList } from 'react-native';
 
@@ -14,6 +14,7 @@ import { useCameraAction } from '../../customHook/useCameraAction';
 import ic_search from '../../../assets/icon/ic_search.png';
 import { blob2base54, cookie2obj, fakeLoading } from '../../utils';
 import { Ingredient } from '../../api';
+import { recommendRecipeStore } from '../../store';
 
 const data = [
     {
@@ -96,6 +97,14 @@ const HomeScreen = ({ navigation }) => {
         });
     }, [navigation]);
 
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    async function fetchData() {
+        await recommendRecipeStore.fetchList(1);
+    }
+
     async function handleRefresh() {
         setIsRefreshing(true);
         await fakeLoading(2000);
@@ -107,7 +116,7 @@ const HomeScreen = ({ navigation }) => {
         <>
             <FlatList
                 contentContainerStyle={{ padding: 14, paddingBottom: 70 }}
-                data={data}
+                data={recommendRecipeStore.recipes}
                 keyExtractor={item => `recipe_${item.id}`}
                 refreshing={isRefreshing}
                 onRefresh={handleRefresh}

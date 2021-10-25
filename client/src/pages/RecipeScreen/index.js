@@ -1,71 +1,79 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ScrollView, Text, View, Image, TouchableOpacity } from 'react-native';
 import { SharedElement } from 'react-navigation-shared-element';
 import ImageView from "react-native-image-viewing";
+import { observer } from 'mobx-react';
 
 import { IngredientList, RecipeSection, RecipeStep } from '../../components';
 
 import { styles } from './styles';
+import { recipeDetailStore } from '../../store';
 
 const RecipeScreen = ({ route }) => {
-    const { recipe } = route.params;
-
+    const [recipe, setRecipe] = useState(route.params.recipe);
+    const [images, setImages] = useState([]);
     const [imageViewerVisible, setImageViewerVisible] = useState(false);
+
+    async function fetchData() {
+        await recipeDetailStore.reset();
+        await recipeDetailStore.fetchDetail(recipe.id);
+        setRecipe(recipeDetailStore.detail);
+    }
+
+    function showImageViewer(images = []) {
+        setImages(images.map((v) => ({ uri: v.replace('\'', '') })));
+        setImageViewerVisible(true);
+    }
+
+    useEffect(() => {
+        fetchData();
+    }, []);
 
     return (
         <>
             <ScrollView>
-                <TouchableOpacity activeOpacity={0.8} onPress={() => setImageViewerVisible(true)}>
+                <TouchableOpacity activeOpacity={0.8} onPress={() => showImageViewer([recipe.image])}>
                     <SharedElement id={`recipe.${recipe.id}.photo`}>
                         <Image style={styles.image} source={{ uri: recipe.thumbnail }} />
                     </SharedElement>
                 </TouchableOpacity>
                 <View style={styles.container}>
-                    <Text style={styles.title}>참치김치찌개 황금레시피 맛있게 끓여먹어요</Text>
+                    <Text style={styles.title}>{recipe.title}</Text>
                     <View style={styles.info}>
-                        <Text style={styles.infoText}>1,123 views</Text>
-                        <Text style={styles.infoText}>한식</Text>
+                        <Text style={styles.infoText}>{recipe.view} views</Text>
+                        <Text style={styles.infoText}>{recipe.category}</Text>
                     </View>
                     <RecipeSection style={styles.ingredients} title='재료' subTitle='Ingredients'>
-                        <IngredientList text='느타리버섯' value='110g' buyLink={`https://www.coupang.com/np/search?component=&q=${'느타리버섯'}`} />
-                        <IngredientList text='더덕' value='110g' buyLink={`https://www.coupang.com/np/search?component=&q=${'더덕'}`} />
-                        <IngredientList text='파프리카' value='24g' buyLink={`https://www.coupang.com/np/search?component=&q=${'파프리카'}`} />
-                        <IngredientList text='청양고추' value='12g' buyLink={`https://www.coupang.com/np/search?component=&q=${'청양고추'}`} />
-                        <IngredientList text='실파' value='4줄기' buyLink={`https://www.coupang.com/np/search?component=&q=${'실파'}`} />
+                        {typeof recipe.ingredients !== 'string' && recipe.ingredients.map((v) => (
+                            <IngredientList
+                                key={`ingredient_${v.ingredient_id}`}
+                                text={v.name}
+                                value={v.amount}
+                                buyLink={`https://www.coupang.com/np/search?component=&q=${v.default_name}`} />
+                        ))}
                     </RecipeSection>
                     <RecipeSection title='레시피' subTitle='Recipe'>
-                        <RecipeStep
-                            no={1}
-                            image='https://www.elmundoeats.com/wp-content/uploads/2021/02/FP-Quick-30-minutes-chicken-ramen.jpg'
-                            text='깔끔하고 예쁜 버섯 3종 모둠 셋트입니다. 백색 버섯 이름이 백선이고, 노란 버섯이 순정이고, 기존 느타리 버섯과 같은색 버섯이 곤지 7호입니다.'
-                            onImagePress={() => setImageViewerVisible(true)} />
-                        <RecipeStep
-                            no={2}
-                            image='https://www.elmundoeats.com/wp-content/uploads/2021/02/FP-Quick-30-minutes-chicken-ramen.jpg'
-                            text='깔끔하고 예쁜 버섯 3종 모둠 셋트입니다. 백색 버섯 이름이 백선이고, 노란 버섯이 순정이고, 기존 느타리 버섯과 같은색 버섯이 곤지 7호입니다.'
-                            onImagePress={() => setImageViewerVisible(true)} />
-                        <RecipeStep
-                            no={3}
-                            image='https://www.elmundoeats.com/wp-content/uploads/2021/02/FP-Quick-30-minutes-chicken-ramen.jpg'
-                            text='깔끔하고 예쁜 버섯 3종 모둠 셋트입니다. 백색 버섯 이름이 백선이고, 노란 버섯이 순정이고, 기존 느타리 버섯과 같은색 버섯이 곤지 7호입니다.'
-                            onImagePress={() => setImageViewerVisible(true)} />
-                        <RecipeStep
-                            no={4}
-                            image='https://www.elmundoeats.com/wp-content/uploads/2021/02/FP-Quick-30-minutes-chicken-ramen.jpg'
-                            text='깔끔하고 예쁜 버섯 3종 모둠 셋트입니다. 백색 버섯 이름이 백선이고, 노란 버섯이 순정이고, 기존 느타리 버섯과 같은색 버섯이 곤지 7호입니다.'
-                            onImagePress={() => setImageViewerVisible(true)} />
+                        {recipe.steps && recipe.steps.map((v) => (
+                            <RecipeStep
+                                key={`step_${v.step}`}
+                                no={v.step}
+                                image={v.thumbnails[0].replace('\'', '')}
+                                text={v.content}
+                                onImagePress={() => showImageViewer(v.thumbnails)} />
+                        ))}
                     </RecipeSection>
                 </View>
             </ScrollView>
 
             <ImageView
-                images={[{ uri: 'https://www.elmundoeats.com/wp-content/uploads/2021/02/FP-Quick-30-minutes-chicken-ramen.jpg' }]}
+                images={images}
                 imageIndex={0}
                 visible={imageViewerVisible}
                 animationType='fade'
-                onRequestClose={() => setImageViewerVisible(false)} />
+                onRequestClose={() => setImageViewerVisible(false)}
+                swipeToCloseEnabled={false} />
         </>
     );
 }
 
-export default RecipeScreen;
+export default observer(RecipeScreen);
