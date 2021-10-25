@@ -67,6 +67,17 @@ def fetch_favor():
     return jsonify(favors)
 
 
+@recipe.get('/combination')
+def fetch_combination_id():
+    favors = request.args.get('favors')
+    favors = favors and favors.split(',')
+
+    combination_id = db.execute('fetchCombinationId.sql', {
+        'combination': favors
+    })
+    return jsonify(combination_id)
+
+
 @recipe.get('/<id>')
 def fetch_detail(id):
     # view count 올리기

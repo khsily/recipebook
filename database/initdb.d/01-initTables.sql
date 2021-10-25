@@ -41,3 +41,8 @@ CREATE TABLE IF NOT EXISTS favor (
 	id SERIAL PRIMARY KEY,
 	recipe_id INTEGER REFERENCES recipe (id)
 );
+
+CREATE TABLE IF NOT EXISTS combination (
+	id SERIAL PRIMARY KEY,
+	combination TEXT[] NOT NULL
+);
