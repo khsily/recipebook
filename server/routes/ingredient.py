@@ -28,13 +28,10 @@ def detection():
     img.save(img_path)
 
     ingredients = execute_object_dictation(save_path, img_path, base_path, model_name)
-    ingredients = [int(id.split('_')[-1]) for id in ingredients]
-
-    ingredients = db.execute('fetchIngredient.sql', {'ingredients': ingredients})
-    ingredients = json.dumps(ingredients, ensure_ascii=False)
+    ingredients = json.dumps(','.join(ingredients), ensure_ascii=False)
 
     res = send_file(save_path, mimetype='image/jpeg', as_attachment=True)
-    res.set_cookie('ingredients', ','.join(ingredients))
+    res.set_cookie('ingredients', ingredients)
 
     # 디텍션 완료 후 삭제
     os.remove(img_path)
