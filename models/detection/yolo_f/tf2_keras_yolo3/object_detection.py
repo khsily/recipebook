@@ -697,7 +697,7 @@ def execute_object_dictation(save_path, image_path, root_path, model_pt):
 
             print('Found {} boxes for {}'.format(len(out_boxes), 'img'))
 
-            font = ImageFont.truetype(font=os.path.join(root_path, 'font/FiraMono-Medium.otf'),
+            font = ImageFont.truetype(font=os.path.join(root_path, 'font/malgun.ttf'),
                                       size=np.floor(3e-2 * image.size[1] + 0.5).astype('int32'))
             thickness = (image.size[0] + image.size[1]) // 300
             name = []
@@ -705,6 +705,36 @@ def execute_object_dictation(save_path, image_path, root_path, model_pt):
                 predicted_class = self.class_names[c]
                 box = out_boxes[i]
                 score = out_scores[i]
+                if predicted_class == 'id_36':
+                    predicted_class = '달걀'
+                if predicted_class == 'id_2':
+                    predicted_class = '감자'
+                if predicted_class == 'id_144':
+                    predicted_class = '두부'
+                if predicted_class == 'id_219':
+                    predicted_class = '베이컨'
+                if predicted_class == 'id_8':
+                    predicted_class = '새우'
+                if predicted_class == 'id_212':
+                    predicted_class = '오징어'
+                if predicted_class == 'id_172':
+                    predicted_class = '가지'
+                if predicted_class == 'id_182':
+                    predicted_class = '콩나물'
+                if predicted_class == 'id_275':
+                    predicted_class = '쇠고기'
+                if predicted_class == 'id_93':
+                    predicted_class = '닭다리 살'
+                if predicted_class == 'id_130':
+                    predicted_class = '닭가슴 살'
+                if predicted_class == 'id_393':
+                    predicted_class = '식빵'
+                if predicted_class == 'id_371':
+                    predicted_class = '바게트'
+                if predicted_class == 'id_185':
+                    predicted_class = '삼겹살'
+                if predicted_class == 'id_127':
+                    predicted_class = '고구마'
                 name.append(predicted_class)
                 label = '{} {:.2f}'.format(predicted_class, score)
                 draw = ImageDraw.Draw(image)
@@ -715,8 +745,9 @@ def execute_object_dictation(save_path, image_path, root_path, model_pt):
                 left = max(0, np.floor(left + 0.5).astype('int32'))
                 bottom = min(image.size[1], np.floor(bottom + 0.5).astype('int32'))
                 right = min(image.size[0], np.floor(right + 0.5).astype('int32'))
-                print(label, (left, top), (right, bottom))
 
+                print(label, (left, top), (right, bottom))
+                print(type(label))
                 if top - label_size[1] >= 0:
                     text_origin = np.array([left, top - label_size[1]])
                 else:
@@ -807,8 +838,8 @@ def execute_object_dictation(save_path, image_path, root_path, model_pt):
 
 
 if __name__ == '__main__':
-    root = 'C:/Users/Administrator/PycharmProjects/yolo_f/tf2_keras_yolo3'
-    o = os.path.join(root, 'test/20211018_152904.jpg')
+    root = '/Users/iyein/PycharmProjects/recipebook/models/detection/yolo_f/tf2_keras_yolo3'
+    o = os.path.join(root, 'test/12test.jpeg')
     s = os.path.join(root, 'save_image/sdsd.jpg')
-    execute_object_dictation('save_image/sdsd.jpg', o, root, 'logs/000/model_final.h5')
+    execute_object_dictation('save_image/sdsd.jpg', o, root, 'model_data/model_final.h5')
 
