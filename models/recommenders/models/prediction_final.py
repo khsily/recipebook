@@ -15,6 +15,9 @@ def predictions(user_id, item_id, model_path):
 
     user_id, item_id = np.array(user_id, dtype=np.int32), np.array(item_id, dtype=np.int32)
 
+    user_id = user_id - 1
+    item_id = item_id - 1
+
     model = tf.keras.models.load_model(model_path)
     preds = model.predict([user_id, item_id])
 
