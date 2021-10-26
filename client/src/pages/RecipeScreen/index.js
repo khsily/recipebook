@@ -44,9 +44,9 @@ const RecipeScreen = ({ route }) => {
                         <Text style={styles.infoText}>{recipe.category}</Text>
                     </View>
                     <RecipeSection style={styles.ingredients} title='재료' subTitle='Ingredients'>
-                        {typeof recipe.ingredients !== 'string' && recipe.ingredients.map((v) => (
+                        {typeof recipe.ingredients !== 'string' && recipe.ingredients.map((v, i) => (
                             <IngredientList
-                                key={`ingredient_${v.ingredient_id}`}
+                                key={`ingredient_${i}_${v.ingredient_id}`}
                                 text={v.name}
                                 value={v.amount}
                                 buyLink={`https://www.coupang.com/np/search?component=&q=${v.default_name}`} />
