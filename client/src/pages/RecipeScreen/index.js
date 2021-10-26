@@ -20,8 +20,12 @@ const RecipeScreen = ({ route }) => {
         setRecipe(recipeDetailStore.detail);
     }
 
+    function formatImages(images) {
+        return images.map((v) => ({ uri: v.replace('\'', '') }));
+    }
+
     function showImageViewer(images = []) {
-        setImages(images.map((v) => ({ uri: v.replace('\'', '') })));
+        setImages(formatImages(images));
         setImageViewerVisible(true);
     }
 
@@ -38,10 +42,11 @@ const RecipeScreen = ({ route }) => {
                     </SharedElement>
                 </TouchableOpacity>
                 <View style={styles.container}>
+                    <Text style={styles.title_desc}>{recipe.title_desc}</Text>
                     <Text style={styles.title}>{recipe.title}</Text>
                     <View style={styles.info}>
+                        <Text style={styles.infoText}>{recipe.category},</Text>
                         <Text style={styles.infoText}>{recipe.view} views</Text>
-                        <Text style={styles.infoText}>{recipe.category}</Text>
                     </View>
                     <RecipeSection style={styles.ingredients} title='재료' subTitle='Ingredients'>
                         {typeof recipe.ingredients !== 'string' && recipe.ingredients.map((v, i) => (
@@ -57,7 +62,7 @@ const RecipeScreen = ({ route }) => {
                             <RecipeStep
                                 key={`step_${v.step}`}
                                 no={v.step}
-                                image={v.thumbnails[0].replace('\'', '')}
+                                images={formatImages(v.thumbnails)}
                                 text={v.content}
                                 onImagePress={() => showImageViewer(v.thumbnails)} />
                         ))}
