@@ -13,13 +13,15 @@ import {
 import { useCameraAction } from '../../customHook/useCameraAction';
 import { blob2base54, cookie2obj, fakeLoading } from '../../utils';
 import { Ingredient } from '../../api';
-import { recommendRecipeStore } from '../../store';
+import { recipeStore, recommendRecipeStore } from '../../store';
 
 import ic_search from '../../../assets/icon/ic_search.png';
 import no_result from '../../../assets/no_result.png';
 
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({ route, navigation }) => {
+    const params = route.params || {};
+
     const [active, setActive] = useState(0);
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [isDetectioning, setIsDetectioning] = useState(false);
@@ -37,6 +39,10 @@ const HomeScreen = ({ navigation }) => {
         fetchData();
     }, []);
 
+    useEffect(() => {
+        if (params.search) setActive(1);
+    }, [params]);
+
     async function fetchData() {
         await recommendRecipeStore.fetchList(1);
     }
@@ -52,7 +58,7 @@ const HomeScreen = ({ navigation }) => {
         <>
             <FlatList
                 contentContainerStyle={{ padding: 14, paddingBottom: 70, minHeight: '100%' }}
-                data={active === 0 ? recommendRecipeStore.recipes : []}
+                data={active === 0 ? recommendRecipeStore.recipes : recipeStore.recipes}
                 keyExtractor={item => `recipe_${item.id}`}
                 refreshing={isRefreshing}
                 onRefresh={handleRefresh}
