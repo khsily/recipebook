@@ -17,6 +17,11 @@ export const styles = StyleSheet.create({
         width: Dimensions.get('window').width - 120,
     },
 
+    addButton: {
+        width: '100%',
+        alignItems: 'center',
+    },
+
     searchButton: {
         width: '100%',
         height: 45,

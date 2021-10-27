@@ -29,6 +29,9 @@ import FavorSectionLayout from './Favor/FavorSectionLayout';
 import FavorSectionItem from './Favor/FavorSectionItem';
 import FavorFooter from './Favor/FavorFooter';
 
+// Add
+import AddItem from './Add/AddItem';
+
 export {
     // common
     RBLayout,
@@ -60,4 +63,7 @@ export {
     FavorSectionLayout,
     FavorSectionItem,
     FavorFooter,
+
+    // Add
+    AddItem,
 }
