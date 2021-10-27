@@ -79,7 +79,7 @@ const AddScreen = ({ route, navigation }) => {
                 <RBButton
                     style={styles.submitButton}
                     textStyle={styles.submitButtonText}
-                    title='선택 완료'
+                    title={`선택 완료 (${selectedItems.size})`}
                     onPress={handleSubmit} />
             </View>
         </KeyboardAvoidingView>

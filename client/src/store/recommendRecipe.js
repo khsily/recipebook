@@ -5,6 +5,7 @@ class RecipeDetailStore {
     recipes = [];
     page = 0;
     isFetching = false;
+    favors = [];
 
     constructor() {
         makeAutoObservable(this)
@@ -27,10 +28,11 @@ class RecipeDetailStore {
         this._setRecipes([]);
     }
 
-    async fetchList(page) {
+    async fetchList(page, favors) {
         this._setIsFetching(true);
-
         if (this.page >= page) return;
+
+        this.favors = favors;
 
         this._setPage(page);
         let recipes = await Recipe.fetchRecommendList(this.page);

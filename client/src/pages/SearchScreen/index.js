@@ -23,19 +23,19 @@ const SearchScreen = ({ route, navigation }) => {
     const [categories, setCategories] = useState([]);
     const [ingredients, setIngredients] = useState([]);
 
-    const [isDetectioning, setIsDetectioning] = useState(false);
+    const [isDetecting, setIsDetecting] = useState(false);
     const showAction = useCameraAction();
 
     function handleDetection() {
         showAction(async (res) => {
             if (res.cancelled) return;
 
-            setIsDetectioning(true);
+            setIsDetecting(true);
             const result = await Ingredient.detectIngredientFromImage(res.uri);
             const cookie = result.headers['set-cookie'][0];
             const { ingredients } = cookie2obj(cookie);
             const base54 = await blob2base54(result.data);
-            setIsDetectioning(false);
+            setIsDetecting(false);
 
             navigation.navigate('Detection', {
                 images: [base54],
@@ -64,11 +64,18 @@ const SearchScreen = ({ route, navigation }) => {
     }
 
     async function handleSearch() {
+        recipeStore.reset();
         await recipeStore.fetchList({
             page: 1,
             favors: [],
-            ingredients: ingredients.map(v => v.id),
-            categories: categories.map(v => v.id),
+            ingredients,
+            categories,
+        });
+
+        navigation.navigate({
+            name: 'Home',
+            merge: true,
+            params: { search: true },
         });
     }
 
@@ -92,6 +99,11 @@ const SearchScreen = ({ route, navigation }) => {
             setCategories(params.categories);
         }
     }, [params.categories]);
+
+    useEffect(() => {
+        setIngredients(recipeStore.ingredients);
+        setCategories(recipeStore.categories);
+    }, [navigation]);
 
     return (
         <KeyboardAvoidingView
@@ -149,7 +161,7 @@ const SearchScreen = ({ route, navigation }) => {
                 textStyle={styles.searchButtonText}
                 onPress={handleSearch}
                 title='검색' />
-            <LoadingModal visible={isDetectioning} text='식재료를 확인하고 있어요' />
+            <LoadingModal visible={isDetecting} text='식재료를 확인하고 있어요' />
         </KeyboardAvoidingView>
     );
 }

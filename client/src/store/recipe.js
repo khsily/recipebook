@@ -7,6 +7,9 @@ class RecipeStore {
     recipes = []
     page = 0;
     isFetching = false;
+    favors = [];
+    ingredients = [];
+    categories = [];
 
     constructor() {
         makeAutoObservable(this)
@@ -34,12 +37,16 @@ class RecipeStore {
 
         if (this.page >= page) return;
 
+        this.favors = favors;
+        this.ingredients = ingredients;
+        this.categories = categories;
+
         this._setPage(page);
         let recipes = await Recipe.searchList({
             page: this.page,
             favors,
-            ingredients,
-            categories,
+            ingredients: ingredients.map(v => v.id),
+            categories: categories.map(v => v.id),
         });
         recipes = [...this.recipes, ...recipes.data];
         this._setRecipes(recipes);
