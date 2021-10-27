@@ -11,7 +11,8 @@ class IngredientStore {
 
     async fetchList() {
         this.isFetching = true;
-        this.ingredients = await Ingredient.fetchIngredientList();
+        const ingredients = await Ingredient.fetchIngredientList();
+        this.ingredients = ingredients.data;
         this.isFetching = false;
     }
 }
