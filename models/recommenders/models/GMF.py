@@ -131,7 +131,7 @@ if __name__ == '__main__':
 
     # Init performance
     t1 = time()
-    (hits, ndcgs) = evaluate_model(model, topK, testPredictions, testLabels)
+    (hits, ndcgs) = evaluate_model(model, topK, testPredictions, testLabels, evaluation_threads)
     hr, ndcg = np.array(hits).mean(), np.array(ndcgs).mean()
     print('Init: HR = %.4f, NDCG = %.4f\t [%.1f s]' % (hr, ndcg, time() - t1))
 
@@ -160,7 +160,7 @@ if __name__ == '__main__':
 
         # Evaluation
         if epoch % verbose == 0:
-            (hits, ndcgs) = evaluate_model(model, topK, testPredictions, testLabels)
+            (hits, ndcgs) = evaluate_model(model, topK, testPredictions, testLabels, evaluation_threads)
             hr, ndcg, loss = np.array(hits).mean(), np.array(ndcgs).mean(), hist.history['loss'][0]
             print('Iteration %d [%.1f s]: HR = %.4f, NDCG = %.4f, loss = %.4f [%.1f s]'
                   % (epoch, t2 - t1, hr, ndcg, loss, time() - t2))

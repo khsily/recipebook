@@ -1,7 +1,10 @@
 # evaluate.py
 import math
+import random
 import numpy as np
+import multiprocessing
 import tensorflow as tf
+
 
 # Global variables that are shared across processes
 _model, _K = None, None
@@ -9,7 +12,7 @@ _testPredictions = None
 _testLabels = None
 
 
-def evaluate_model(model, K, testPredictions, testLabels):
+def evaluate_model(model, K, testPredictions, testLabels, num_thread):
     """
     Evaluate the performance (Hit_Ratio, NDCG) of top-K recommendation
     Return: score of each test rating.
@@ -23,13 +26,22 @@ def evaluate_model(model, K, testPredictions, testLabels):
     _testLabels = testLabels
 
     hits, ndcgs = [], []
-    for idx in range(len(_testPredictions)):
-        preds = predictions(idx)
-        item = get_label(idx)
-        hr = getHitRatio(preds, item)
-        ndcg = getNDCG(preds, item)
+    if num_thread > 1:          # Multi-thread
+        pool = multiprocessing.Pool(processes=num_thread)
+        res = pool.map(predictions, range(len(_testPredictions)))
+        pool.close()
+        pool.join()
+        hits = [r[0] for r in res]
+        ndcgs = [r[1] for r in res]
+        return (hits, ndcgs)
+
+    n = 0
+    for idx in random.choices(range(len(_testPredictions)), k=10000):
+        print(n)
+        (hr, ndcg) = predictions(idx)
         hits.append(hr)
         ndcgs.append(ndcg)
+        n += 1
 
     return (hits, ndcgs)
 
@@ -43,20 +55,22 @@ def predictions(idx):
 
     preds = _model.predict([user_id, item_id])
 
-    predictions = []
+    prediction = []
     for i, p in zip(item_id, preds):
         i, p = str(i), float(p)
-        predictions.append([i, p])
+        prediction.append([i, p])
 
-    predictions = sorted(predictions, reverse=True, key=lambda x: x[1])
+    prediction = sorted(prediction, reverse=True, key=lambda x: x[1])
 
-    return [int(p[0]) for p in predictions[:_K]]
+    preds = [int(p[0]) for p in prediction[:_K]]
 
-
-def get_label(idx):
     labels = _testLabels[idx][1:]
-    labels = labels[0]
-    return labels
+    item = labels[0]
+
+    hr = getHitRatio(preds, item)
+    ndcg = getNDCG(preds, item)
+
+    return (hr, ndcg)
 
 
 def getHitRatio(preds, item):
