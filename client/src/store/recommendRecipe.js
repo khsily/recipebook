@@ -28,18 +28,25 @@ class RecipeDetailStore {
         this._setRecipes([]);
     }
 
-    async fetchList(page, favors) {
-        this._setIsFetching(true);
+    async fetchList(page, favors, reset) {
         if (this.page >= page) return;
+        this._setIsFetching(true);
 
         this.favors = favors;
 
         this._setPage(page);
         let recipes = await Recipe.fetchRecommendList(this.page);
-        recipes = [...this.recipes, ...recipes.data];
+
+        if (reset) recipes = [...recipes.data];
+        else recipes = [...this.recipes, ...recipes.data];
+
         this._setRecipes(recipes);
 
         this._setIsFetching(false);
+    }
+
+    async refresh() {
+        await this.fetchList(1, this.favors, true);
     }
 }
 

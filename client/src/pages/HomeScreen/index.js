@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { observer } from 'mobx-react';
-import { FlatList, Image, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, Image, Text, View } from 'react-native';
 
 import {
     FloatingCameraButton,
@@ -17,6 +17,7 @@ import { recipeStore, recommendRecipeStore } from '../../store';
 
 import ic_search from '../../../assets/icon/ic_search.png';
 import no_result from '../../../assets/no_result.png';
+import { MainTheme } from '../../styles/themes';
 
 
 const HomeScreen = ({ route, navigation }) => {
@@ -49,8 +50,13 @@ const HomeScreen = ({ route, navigation }) => {
 
     async function handleRefresh() {
         setIsRefreshing(true);
-        await fakeLoading(2000);
-        console.log('refreshed');
+
+        if (active === 0) {
+            await recommendRecipeStore.refresh();
+        } else if (active === 1) {
+            await recipeStore.refresh();
+        }
+
         setIsRefreshing(false);
     }
 
@@ -71,8 +77,18 @@ const HomeScreen = ({ route, navigation }) => {
                 )}
                 ListEmptyComponent={() => (
                     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                        <Image style={{ width: 100, height: 100, marginTop: -10 }} source={no_result} />
-                        <Text style={{ padding: 15, fontSize: 16, color: '#777777', fontWeight: 'bold' }}>레시피가 없어요</Text>
+                        {!(recipeStore.isFetching || recommendRecipeStore.isFetching) &&
+                            <>
+                                <Image style={{ width: 100, height: 100, marginTop: -10 }} source={no_result} />
+                                <Text style={{ padding: 15, fontSize: 16, color: '#777777', fontWeight: 'bold' }}>레시피가 없어요</Text>
+                            </>
+                        }
+                        {(recipeStore.isFetching || recommendRecipeStore.isFetching) &&
+                            <ActivityIndicator
+                                animating={true}
+                                size='large'
+                                color={MainTheme.colors.primary} />
+                        }
                     </View>
                 )}
                 renderItem={({ item }) => (

@@ -1,7 +1,5 @@
 import { makeAutoObservable } from 'mobx';
 import { Recipe } from '../api';
-import { fakeLoading } from '../utils';
-import * as dummy from './dummyData';
 
 class RecipeStore {
     recipes = []
@@ -32,10 +30,11 @@ class RecipeStore {
         this._setRecipes([]);
     }
 
-    async fetchList({ page, favors, ingredients, categories }) {
+    async fetchList({ page, favors, ingredients, categories }, reset) {
+        if (this.page >= page) return;
+        
         this._setIsFetching(true);
 
-        if (this.page >= page) return;
 
         this.favors = favors;
         this.ingredients = ingredients;
@@ -48,10 +47,24 @@ class RecipeStore {
             ingredients: ingredients.map(v => v.id),
             categories: categories.map(v => v.id),
         });
-        recipes = [...this.recipes, ...recipes.data];
+
+        if (reset) recipes = [...recipes.data];
+        else recipes = [...this.recipes, ...recipes.data];
+
         this._setRecipes(recipes);
 
         this._setIsFetching(false);
+    }
+
+    async refresh() {
+        if (this.recipes.length === 0) return;
+
+        await this.fetchList({
+            page: 1,
+            favors: this.favors,
+            ingredients: this.ingredients,
+            categories: this.categories,
+        }, true);
     }
 }
 
