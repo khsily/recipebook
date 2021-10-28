@@ -8,7 +8,8 @@ SELECT
 	r.view,
 	r.level,
 	r.thumbnail,
-	STRING_AGG(i.name, ',') AS ingredients
+	COUNT(ri.ingredient_id) FILTER (WHERE ri.ingredient_id = ANY(%(ingredients)s)) as counts,
+	ARRAY_AGG(i.name ORDER BY ri.ingredient_id = ANY(%(ingredients)s) DESC) AS ingredients
 FROM 
 	recipe AS r
 JOIN 
@@ -28,5 +29,5 @@ AND
 		WHERE (ingredient_id = ANY (%(ingredients)s) OR %(ingredients)s IS NULL)
 	)
 GROUP BY r.id, c.name
-ORDER BY r.id ASC
+ORDER BY counts DESC
 LIMIT %(limit)s OFFSET %(offset)s;
