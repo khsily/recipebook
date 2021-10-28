@@ -11,7 +11,7 @@ import {
 } from '../../components';
 
 import { useCameraAction } from '../../customHook/useCameraAction';
-import { blob2base54, cookie2obj, fakeLoading } from '../../utils';
+import { blob2base54, cookie2obj } from '../../utils';
 import { Ingredient } from '../../api';
 import { recipeStore, recommendRecipeStore } from '../../store';
 
@@ -80,7 +80,7 @@ const HomeScreen = ({ route, navigation }) => {
             <FlatList
                 contentContainerStyle={{ padding: 14, paddingBottom: 70, minHeight: '100%' }}
                 data={active === 0 ? recommendRecipeStore.recipes : recipeStore.recipes}
-                keyExtractor={item => `recipe_${item.id}`}
+                keyExtractor={(item, idx) => `recipe_${item.id}_${idx}`}
                 refreshing={isRefreshing}
                 onRefresh={handleRefresh}
                 onEndReached={handleLoadMore}
@@ -111,7 +111,10 @@ const HomeScreen = ({ route, navigation }) => {
                     </View>
                 )}
                 renderItem={({ item }) => (
-                    <RecipeList {...item} onPress={() => navigation.navigate('Recipe', { recipe: item })} />
+                    <RecipeList
+                        {...item}
+                        searchIngredients={active === 1 ? recipeStore.ingredients.map(v => v.name) : []}
+                        onPress={() => navigation.navigate('Recipe', { recipe: item })} />
                 )} />
 
             <LoadingModal visible={isDetectioning} text='식재료를 확인하고 있어요' />
