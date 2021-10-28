@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import { MainTheme } from "../../../styles/themes";
 
 export const styles = StyleSheet.create({
     container: {
@@ -54,6 +55,15 @@ export const styles = StyleSheet.create({
     ingredientText: {
         fontSize: 10,
         color: '#555555',
+    },
+
+    ingredientActive: {
+        backgroundColor: MainTheme.colors.primary,
+        borderColor: MainTheme.colors.primary,
+    },
+
+    ingredientTextActive: {
+        color: '#FFF',
     },
 
     info: {

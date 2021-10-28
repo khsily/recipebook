@@ -5,9 +5,9 @@ import { SharedElement } from 'react-navigation-shared-element';
 import RBCard from '../../Common/RBCard';
 import { styles } from './styles';
 
-function RecipeList({ id, title, thumbnail, ingredients = '', rating, view = 0, category, ...props }) {
+function RecipeList({ id, title, thumbnail, ingredients = [], searchIngredients = [], rating, view = 0, category, ...props }) {
     view = view.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    ingredients = ingredients.split(',');
+    searchIngredients = new Set(searchIngredients);
 
     return (
         <RBCard style={styles.container} touchable {...props}>
@@ -19,8 +19,8 @@ function RecipeList({ id, title, thumbnail, ingredients = '', rating, view = 0, 
                 <View style={styles.ingredientsWrapper}>
                     <View style={styles.ingredients}>
                         {ingredients.map((v, i) => (
-                            <View style={styles.ingredient} key={`ingredient_${i}`}>
-                                <Text style={styles.ingredientText}>{v}</Text>
+                            <View style={[styles.ingredient, searchIngredients.has(v) && styles.ingredientActive]} key={`ingredient_${i}`}>
+                                <Text style={[styles.ingredientText, searchIngredients.has(v) && styles.ingredientTextActive]}>{v}</Text>
                             </View>
                         ))}
                     </View>
