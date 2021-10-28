@@ -12,7 +12,7 @@ class CategoryStore {
     async fetchList() {
         this.isFetching = true;
 
-        let categories = await Category.fetchCategoryList();
+        const categories = await Category.fetchCategoryList();
         this.categories = categories.data;
 
         this.isFetching = false;
