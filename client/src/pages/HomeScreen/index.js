@@ -60,6 +60,21 @@ const HomeScreen = ({ route, navigation }) => {
         setIsRefreshing(false);
     }
 
+    async function handleLoadMore() {
+        if (active === 0) {
+            console.log(recommendRecipeStore.page);
+            await recommendRecipeStore.fetchList(recommendRecipeStore.page + 1);
+        } else {
+            console.log(recipeStore.page);
+            await recipeStore.fetchList({
+                page: recipeStore.page + 1,
+                favors: recipeStore.favors,
+                ingredients: recipeStore.ingredients,
+                categories: recipeStore.categories,
+            });
+        }
+    }
+
     return (
         <>
             <FlatList
@@ -68,6 +83,10 @@ const HomeScreen = ({ route, navigation }) => {
                 keyExtractor={item => `recipe_${item.id}`}
                 refreshing={isRefreshing}
                 onRefresh={handleRefresh}
+                onEndReached={handleLoadMore}
+                onEndReachedThreshold={2}
+                removeClippedSubviews={true}
+                legacyImplementation={true}
                 ListHeaderComponent={() => (
                     <RBChoiceGroup
                         style={{ marginBottom: 14 }}

@@ -34,4 +34,4 @@ function RecipeList({ id, title, thumbnail, ingredients = '', rating, view = 0, 
     );
 }
 
-export default RecipeList;
+export default React.memo(RecipeList);
