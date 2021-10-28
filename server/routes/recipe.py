@@ -27,29 +27,35 @@ def fetch_recommend(page):
     body = request.form
     favors = body.get('favors') or '[]'  # TODO: favors 사용
 
-    model_path = 'models/recommenders/models/test_model.h5'
-    user_id = [3]                       # 하나만 들어오면 요리 갯수 만큼 곱해주는 함수 위에 있음.
-    item_id = [2, 6, 199, 235]          # 카테고리에 속한 요리 갯수 만큼 중복되지 않게 들어와야 함.
-    recommends_top10 = predictions(user_id, item_id, model_path)
+    limit = 20
+    offset = (int(page) - 1) * limit
 
-    return jsonify(recommends_top10)
+    # model_path = 'models/recommenders/models/test_model.h5'
+    # user_id = [3]                       # 하나만 들어오면 요리 갯수 만큼 곱해주는 함수 위에 있음.
+    # item_id = [2, 6, 199, 235]          # 카테고리에 속한 요리 갯수 만큼 중복되지 않게 들어와야 함.
+    # recommends_top10 = predictions(user_id, item_id, model_path)
+
+    # TODO: 나중에 추천모델 사용하도록 변경하기
+    recipes = db.execute('fetchRecipeList.sql', {
+        'categories': None,
+        'ingredients': None,
+        'limit': limit,
+        'offset': offset,
+    })
+
+    return jsonify(recipes)
 
 
 # 검색 (검색 리스트 + 추천 리스트)
 @recipe.post('/<page>')
 def fetch_list(page):
-    body = request.form
-    ingredients = body.get('ingredients') or '[]'
-    categories = body.get('categories') or '[]'
-    favors = body.get('favors') or '[]'  # TODO: favors 사용
+    body = request.json
+    ingredients = body['ingredients'] or None
+    categories = body['categories'] or None
+    favors = body['favors'] or None  # TODO: favors 사용
 
-    num_per_page = 20
-    offset = (int(page) - 1) * num_per_page
-    limit = offset + num_per_page
-
-    # 값이 존재하면 list로, 없으면 None(전체선택)으로
-    ingredients = json.loads(ingredients) or None
-    categories = json.loads(categories) or None
+    limit = 20
+    offset = (int(page) - 1) * limit
 
     recipes = db.execute('fetchRecipeList.sql', {
         'categories': categories,

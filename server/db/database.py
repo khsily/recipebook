@@ -14,22 +14,18 @@ config = {
 }
 
 db = psycopg2.connect(**config)
-cur = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
 
 def execute(sql_file, params=None):
-    sql = open(os.path.join(SHCEMA_PATH, sql_file), 'r')
-    cur.execute(sql.read(), params)
-    sql.close()
-
-    return cur.fetchall()
+    with db.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+        cur.execute(open(os.path.join(SHCEMA_PATH, sql_file), 'r').read(), params)
+        return cur.fetchall()
 
 
 def update(sql_file, params=None):
-    sql = open(os.path.join(SHCEMA_PATH, sql_file), 'r')
-    cur.execute(sql.read(), params)
-    db.commit()
-    sql.close()
+    with db.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+        cur.execute(open(os.path.join(SHCEMA_PATH, sql_file), 'r').read(), params)
+        db.commit()
 
 
 def info():
