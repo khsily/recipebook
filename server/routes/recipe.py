@@ -1,6 +1,8 @@
 import os
+import json
 from flask import Blueprint, request, jsonify
 from models.recommenders.models.prediction_final import predictions
+import db
 
 recipe = Blueprint('recipe', __name__, url_prefix='/recipe')
 
@@ -19,23 +21,84 @@ item2idx: 카테고리에서 레시피 리스트를 가져오면, 레시피들�
 '''
 
 
-@recipe.post('/<type>/<page>')
-def fetch_list(type, page):
+# 추천 리스트
+@recipe.post('/recommend/<page>')
+def fetch_recommend(page):
     body = request.form
+    favors = body.get('favors') or '[]'  # TODO: favors 사용
 
-    ingredients = body.get('ingredients')
-    categories = body.get('categories')
+    limit = 20
+    offset = (int(page) - 1) * limit
 
-    model_path = 'models/recommenders/models/test_model.h5'
-    user_id = [3]                       # 하나만 들어오면 요리 갯수 만큼 곱해주는 함수 위에 있음.
-    item_id = [2, 6, 199, 235]          # 카테고리에 속한 요리 갯수 만큼 중복되지 않게 들어와야 함.
-    recommends_top10 = predictions(user_id, item_id, model_path)
-    return jsonify(recommends_top10)
+    # model_path = 'models/recommenders/models/test_model.h5'
+    # user_id = [3]                       # 하나만 들어오면 요리 갯수 만큼 곱해주는 함수 위에 있음.
+    # item_id = [2, 6, 199, 235]          # 카테고리에 속한 요리 갯수 만큼 중복되지 않게 들어와야 함.
+    # recommends_top10 = predictions(user_id, item_id, model_path)
+
+    # TODO: 나중에 추천모델 사용하도록 변경하기
+    recipes = db.execute('fetchRecipeList.sql', {
+        'categories': None,
+        'ingredients': None,
+        'limit': limit,
+        'offset': offset,
+    })
+
+    return jsonify(recipes)
+
+
+# 검색 (검색 리스트 + 추천 리스트)
+@recipe.post('/<page>')
+def fetch_list(page):
+    body = request.json
+    ingredients = body['ingredients'] or None
+    categories = body['categories'] or None
+    favors = body['favors'] or None  # TODO: favors 사용
+
+    limit = 20
+    offset = (int(page) - 1) * limit
+
+    recipes = db.execute('fetchRecipeList.sql', {
+        'categories': categories,
+        'ingredients': ingredients,
+        'limit': limit,
+        'offset': offset,
+    })
+
+    return jsonify(recipes)
+
+
+@recipe.get('/favor')
+def fetch_favor():
+    favors = db.execute('fetchFavor.sql')
+    return jsonify(favors)
+
+
+@recipe.get('/combination')
+def fetch_combination_id():
+    favors = request.args.get('favors')
+    favors = favors and favors.split(',')
+
+    combination_id = db.execute('fetchCombinationId.sql', {
+        'combination': favors
+    })
+    return jsonify(combination_id)
 
 
 @recipe.get('/<id>')
 def fetch_detail(id):
-    return f'fetch_detail {id}'
+    # view count 올리기
+    db.update('updateRecipeView.sql', {'id': id})
+
+    # detail, ingredients, steps 합치기
+    detail = db.execute('fetchRecipeDetail.sql', {'id': id})
+    ingredients = db.execute('fetchRecipeIngredient.sql', {'id': id})
+    steps = db.execute('fetchRecipeStep.sql', {'id': id})
+
+    detail = detail and dict(detail[0])
+    detail['ingredients'] = ingredients
+    detail['steps'] = steps
+
+    return jsonify(detail)
 
 
 @recipe.post('/<id>')

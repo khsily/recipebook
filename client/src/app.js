@@ -13,6 +13,7 @@ import {
     RecipeScreen,
     DetectionResultScreen,
     FavorScreen,
+    AddScreen,
 } from './pages';
 import { header_style, transition_style } from './styles/common';
 import { MainTheme } from './styles/themes';
@@ -60,6 +61,10 @@ const app = () => {
                                 name="Search"
                                 component={SearchScreen}
                                 options={{ title: '검색 설정', ...header_style, ...transition_style }} />
+                            <Stack.Screen
+                                name="Add"
+                                component={AddScreen}
+                                options={{ title: '추가', ...header_style, ...transition_style }} />
                             <Stack.Screen
                                 name="Recipe"
                                 component={RecipeScreen}

@@ -1,4 +1,5 @@
 import psycopg2
+import psycopg2.extras
 import os
 import json
 
@@ -13,15 +14,18 @@ config = {
 }
 
 db = psycopg2.connect(**config)
-cur = db.cursor()
 
 
-def execute(sql_file):
-    sql = open(os.path.join(SHCEMA_PATH, sql_file), 'r')
-    cur.execute(sql.read())
-    sql.close()
+def execute(sql_file, params=None):
+    with db.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+        cur.execute(open(os.path.join(SHCEMA_PATH, sql_file), 'r').read(), params)
+        return cur.fetchall()
 
-    return cur.fetchall()
+
+def update(sql_file, params=None):
+    with db.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+        cur.execute(open(os.path.join(SHCEMA_PATH, sql_file), 'r').read(), params)
+        db.commit()
 
 
 def info():

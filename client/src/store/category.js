@@ -1,8 +1,7 @@
 import { makeAutoObservable } from 'mobx';
-import { fakeLoading } from '../utils';
-import * as dummy from './dummyData';
+import { Category } from '../api';
 
-class Category {
+class CategoryStore {
     categories = []
     isFetching = false;
 
@@ -13,13 +12,13 @@ class Category {
     async fetchList() {
         this.isFetching = true;
 
-        await fakeLoading(500);
-        this.categories = dummy.categories.payload.data;
+        const categories = await Category.fetchCategoryList();
+        this.categories = categories.data;
 
         this.isFetching = false;
     }
 }
 
-const categoryStore = new Category();
+const categoryStore = new CategoryStore();
 export default categoryStore;
 

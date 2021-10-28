@@ -2,31 +2,44 @@ import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
     container: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#F4F4F4',
-        padding: 10,
-        paddingLeft: 5,
-        borderBottomWidth: 1,
-        borderBottomColor: '#DDDDDD',
+        paddingVertical: 10,
     },
 
     no: {
         fontSize: 20,
         fontWeight: 'bold',
-        width: 20,
-        textAlign: 'center',
+        marginBottom: 5,
     },
 
     image: {
-        width: 100,
-        height: 100,
-        marginLeft: 5,
-        marginRight: 10,
+        width: '100%',
+        height: 300,
+        resizeMode: 'cover',
+        borderWidth: 1,
+        borderColor: '#EEEEEE',
+    },
+
+    sub_images_wrapper: {
+        position: 'absolute',
+        right: 0,
+        bottom: 0,
+        flexDirection: 'row',
+        padding: 10,
+    },
+
+    sub_image: {
+        width: 50,
+        height: 50,
+        borderWidth: 1,
+        borderColor: '#FFF',
+        marginLeft: 10,
     },
 
     content: {
         flex: 1,
         color: '#333333',
+        paddingVertical: 10,
+        paddingHorizontal: 5,
+        lineHeight: 20,
     },
 });

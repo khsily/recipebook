@@ -11,13 +11,20 @@ export const styles = StyleSheet.create({
         resizeMode: 'cover',
     },
 
+    title_desc: {
+        fontSize: 14,
+        color: '#333333',
+    },
+
     title: {
         fontSize: 20,
         fontWeight: 'bold',
+        paddingVertical: 3,
     },
 
     info: {
         flexDirection: 'row',
+        marginBottom: 10,
     },
 
     infoText: {

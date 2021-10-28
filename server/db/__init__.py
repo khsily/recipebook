@@ -1,1 +1,1 @@
-from .database import info, execute
+from .database import info, execute, update

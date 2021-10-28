@@ -31,6 +31,7 @@ const DetectionResultScreen = ({ route, navigation }) => {
                 visible={true}
                 animationType={Platform.OS === 'ios' ? 'none' : 'slide'}
                 onRequestClose={onCancel}
+                swipeToCloseEnabled={false}
                 FooterComponent={() => (
                     <View style={styles.buttonWrapper}>
                         <TouchableOpacity

@@ -6,7 +6,7 @@ export const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: '#EEEEEE',
         padding: 8,
-        width: '50%',
+        width: '100%',
     },
 
     text: {
@@ -15,10 +15,11 @@ export const styles = StyleSheet.create({
     },
 
     value: {
-        fontSize: 12,
+        fontSize: 13,
         color: '#AAAAAA',
         flex: 1,
-        lineHeight: 20,
+        textAlign: 'right',
+        marginRight: 10,
     },
 
     basket: {

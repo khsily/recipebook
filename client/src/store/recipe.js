@@ -1,38 +1,73 @@
 import { makeAutoObservable } from 'mobx';
-import { fakeLoading } from '../utils';
-import * as dummy from './dummyData';
+import { Recipe } from '../api';
 
-class Recipe {
-    recommend = []
-    sufficient = []
-    insufficient = []
+class RecipeStore {
+    recipes = []
+    page = 0;
     isFetching = false;
+    favors = [];
+    ingredients = [];
+    categories = [];
 
     constructor() {
         makeAutoObservable(this)
     }
 
-    async fetchRecoomend() {
-        this.isFetching = true;
-
-        await fakeLoading(2000);
-        this.recommend = dummy.recommends.payload.data;
-
-        this.isFetching = false;
+    _setPage(page) {
+        this.page = page;
     }
 
-    async fetchList() {
-        this.isFetching = true;
+    _setRecipes(recipes) {
+        this.recipes = recipes;
+    }
 
-        await fakeLoading(2000);
-        const { sufficient, insufficient } = dummy.recipes.payload.data
-        this.sufficient = sufficient;
-        this.insufficient = insufficient;
+    _setIsFetching(isFetching) {
+        this.isFetching = isFetching;
+    }
 
-        this.isFetching = false;
+    reset() {
+        this._setPage(0);
+        this._setRecipes([]);
+    }
+
+    async fetchList({ page, favors, ingredients, categories }, reset) {
+        if (this.page >= page) return;
+        
+        this._setIsFetching(true);
+
+
+        this.favors = favors;
+        this.ingredients = ingredients;
+        this.categories = categories;
+
+        this._setPage(page);
+        let recipes = await Recipe.searchList({
+            page: this.page,
+            favors,
+            ingredients: ingredients.map(v => v.id),
+            categories: categories.map(v => v.id),
+        });
+
+        if (reset) recipes = [...recipes.data];
+        else recipes = [...this.recipes, ...recipes.data];
+
+        this._setRecipes(recipes);
+
+        this._setIsFetching(false);
+    }
+
+    async refresh() {
+        if (this.recipes.length === 0) return;
+
+        await this.fetchList({
+            page: 1,
+            favors: this.favors,
+            ingredients: this.ingredients,
+            categories: this.categories,
+        }, true);
     }
 }
 
-const recipeStore = new Recipe();
+const recipeStore = new RecipeStore();
 export default recipeStore;
 

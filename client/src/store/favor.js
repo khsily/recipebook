@@ -1,8 +1,7 @@
 import { makeAutoObservable } from 'mobx';
-import { fakeLoading } from '../utils';
-import * as dummy from './dummyData';
+import { Category, Recipe } from '../api';
 
-class Favor {
+class FavorStore {
     favors = [];
     isFetching = false;
 
@@ -29,13 +28,22 @@ class Favor {
     async fetchList() {
         this._setIsFetching(true);
 
-        await fakeLoading(1000);
-        this._setFavors(dummy.favors.payload.data);
+        let categories = await Category.fetchCategoryList();
+        categories = categories.data.map((v) => v.name);
+
+        let favors = await Recipe.fetchFavorList();
+        favors = favors.data.reduce((prev, curr) => {
+            if (!prev[curr.category]) prev[curr.category] = [];
+            prev[curr.category].push(curr);
+            return prev;
+        }, {});
+        favors = Object.entries(favors).map(([category, data]) => ({ category, data }));
+        this._setFavors(favors);
 
         this._setIsFetching(false);
     }
 }
 
-const favorStore = new Favor();
+const favorStore = new FavorStore();
 export default favorStore;
 

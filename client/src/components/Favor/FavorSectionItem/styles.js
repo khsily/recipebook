@@ -44,5 +44,6 @@ export const styles = StyleSheet.create({
 
     name: {
         fontSize: 14,
+        textAlign: 'center',
     },
 });

@@ -2,76 +2,81 @@ import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { View, Text, KeyboardAvoidingView, ScrollView, Platform, LayoutAnimation, Keyboard } from 'react-native';
 import Constants from 'expo-constants';
 
-import { HeaderButton, LoadingModal, RBButton, SearchForm, SearchInput, SearchTag } from '../../components';
+import { HeaderButton, LoadingModal, RBButton, SearchForm, SearchTag } from '../../components';
 import { useCameraAction } from '../../customHook/useCameraAction';
 
 import ic_camera from '../../../assets/icon/ic_camera.png';
 import { blob2base54, cookie2obj } from '../../utils';
 import { layoutAnimConfig } from '../../animation';
 import { styles } from './styles';
+import { observer } from 'mobx-react';
+import { recipeStore } from '../../store';
 import { Ingredient } from '../../api';
 
 Keyboard.addListener('keyboardDidHide', () => {
     Keyboard.dismiss(); // lose focus
-})
+});
 
-const ingredientData = ['파프리카', '닭고기', '양파', '양배추', '대파', '고구마', '당근', '돼지고기', '소고기', '고추', '오이'].sort();
-const categoryData = ['메인요리', '밑반찬', '간식', '간단요리', '초대요리', '채식', '한식', '양식', '일식', '중식', '퓨전', '분식', '안주', '베이킹', '다이어트', '도시락'].sort();
 
 const SearchScreen = ({ route, navigation }) => {
-    const params = route.params;
-    const detectedIngredients = params ? params.ingredients : [];
+    const params = route.params || {};
+    const [categories, setCategories] = useState([]);
+    const [ingredients, setIngredients] = useState([]);
 
-    const [isDetectioning, setIsDetectioning] = useState(false);
-    const [query, setQuery] = useState({ ingredient: '', category: '' });
-    const [data, setData] = useState({ ingredient: new Set(detectedIngredients), category: new Set() });
+    const [isDetecting, setIsDetecting] = useState(false);
     const showAction = useCameraAction();
-
-    const categories = Array.from(data.category);
-    const ingredients = Array.from(data.ingredient);
-
 
     function handleDetection() {
         showAction(async (res) => {
             if (res.cancelled) return;
 
-            setIsDetectioning(true);
+            setIsDetecting(true);
             const result = await Ingredient.detectIngredientFromImage(res.uri);
             const cookie = result.headers['set-cookie'][0];
             const { ingredients } = cookie2obj(cookie);
             const base54 = await blob2base54(result.data);
-            setIsDetectioning(false);
+            setIsDetecting(false);
 
             navigation.navigate('Detection', {
                 images: [base54],
                 from: 'Search',
-                ingredients,
+                ingredients: [{ id: 1, name: '사과' }],
             });
         })
     }
 
-
-    function handleSubmit(type) {
-        setQuery({ ...query, [type]: '' });
-
-        const baseData = type === 'ingredient' ? ingredientData : categoryData;
-        const queryText = query[type];
-        if (!queryText) return;
-
-        const hasQuery = baseData.includes(queryText);
-        if (!hasQuery) {
-            alert(`"${queryText}" 은/는 사용할 수 없습니다`);
-            return;
-        }
-
-        data[type].add(queryText);
-        setData({ ...data });
+    function handleDeleteCategory(item) {
+        LayoutAnimation.configureNext(layoutAnimConfig);
+        setCategories(categories.filter(v => v.id !== item.id));
     }
 
-    function handleDelete(type, target) {
-        data[type].delete(target);
-        setData({ ...data });
+    function handleDeleteIngredient(item) {
         LayoutAnimation.configureNext(layoutAnimConfig);
+        setIngredients(ingredients.filter(v => v.id !== item.id));
+    }
+
+    function handleAdd(type) {
+        navigation.navigate('Add', {
+            type,
+            ingredients,
+            categories,
+        })
+    }
+
+    async function handleSearch() {
+        recipeStore.reset();
+        await recipeStore.fetchList({
+            page: 1,
+            favors: [],
+            ingredients,
+            categories,
+        });
+
+        navigation.navigate({
+            name: 'Home',
+            merge: true,
+            params: { search: true },
+        });
     }
 
 
@@ -84,11 +89,21 @@ const SearchScreen = ({ route, navigation }) => {
     }, [navigation]);
 
     useEffect(() => {
-        if (detectedIngredients && detectedIngredients.length > 0) {
-            detectedIngredients.forEach(item => data.ingredient.add(item));
-            setData({ ...data });
+        if (params.ingredients && params.ingredients.length > 0) {
+            setIngredients(params.ingredients);
         }
-    }, [detectedIngredients]);
+    }, [params.ingredients]);
+
+    useEffect(() => {
+        if (params.categories && params.categories.length > 0) {
+            setCategories(params.categories);
+        }
+    }, [params.categories]);
+
+    useEffect(() => {
+        setIngredients(recipeStore.ingredients);
+        setCategories(recipeStore.categories);
+    }, [navigation]);
 
     return (
         <KeyboardAvoidingView
@@ -101,23 +116,15 @@ const SearchScreen = ({ route, navigation }) => {
                 nestedScrollEnabled={true}
                 keyboardShouldPersistTaps='handled'>
                 <SearchForm title='식재료'>
-                    <SearchInput
-                        style={styles.searchInput}
-                        data={ingredientData}
-                        value={query.ingredient}
-                        placeholder='식재료 입력...'
-                        blurOnSubmit={false}
-                        onChangeText={(text) => setQuery({ ...query, ingredient: text })}
-                        onSelect={(text) => setQuery({ ...query, ingredient: text })}
-                        onSubmit={() => handleSubmit('ingredient')} />
+                    <RBButton style={styles.addButton} title='추가' onPress={() => handleAdd('ingredients')} />
                     {ingredients.length > 0 &&
                         <View style={styles.tags}>
                             {ingredients.map((v) => (
                                 <SearchTag
                                     style={styles.tag}
-                                    key={`ingredient_${v}`}
-                                    onDelete={() => handleDelete('ingredient', v)}
-                                    text={v} />
+                                    key={`ingredient_${v.id}`}
+                                    onDelete={() => handleDeleteIngredient(v)}
+                                    text={v.name} />
                             ))}
                         </View>
                     }
@@ -129,23 +136,15 @@ const SearchScreen = ({ route, navigation }) => {
                 </SearchForm>
 
                 <SearchForm title='카테고리'>
-                    <SearchInput
-                        style={styles.searchInput}
-                        data={categoryData}
-                        value={query.category}
-                        placeholder='카테고리 입력...'
-                        blurOnSubmit={false}
-                        onChangeText={(text) => setQuery({ ...query, category: text })}
-                        onSelect={(text) => setQuery({ ...query, category: text })}
-                        onSubmit={() => handleSubmit('category')} />
+                    <RBButton style={styles.addButton} title='추가' onPress={() => handleAdd('categories')} />
                     {categories.length > 0 &&
                         <View style={styles.tags}>
                             {categories.map((v) => (
                                 <SearchTag
                                     style={styles.tag}
-                                    key={`category_${v}`}
-                                    onDelete={() => handleDelete('category', v)}
-                                    text={v} />
+                                    key={`category_${v.id}`}
+                                    onDelete={() => handleDeleteCategory(v)}
+                                    text={v.name} />
                             ))}
                         </View>
                     }
@@ -160,10 +159,11 @@ const SearchScreen = ({ route, navigation }) => {
             <RBButton
                 style={styles.searchButton}
                 textStyle={styles.searchButtonText}
+                onPress={handleSearch}
                 title='검색' />
-            <LoadingModal visible={isDetectioning} text='식재료를 확인하고 있어요...' />
+            <LoadingModal visible={isDetecting} text='식재료를 확인하고 있어요' />
         </KeyboardAvoidingView>
     );
 }
 
-export default SearchScreen;
+export default observer(SearchScreen);
