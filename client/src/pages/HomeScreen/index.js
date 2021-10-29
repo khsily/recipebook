@@ -24,7 +24,6 @@ const HomeScreen = ({ route, navigation }) => {
     const params = route.params || {};
 
     const [active, setActive] = useState(0);
-    const [isRefreshing, setIsRefreshing] = useState(false);
     const [isDetectioning, setIsDetectioning] = useState(false);
     const showAction = useCameraAction();
 
@@ -48,18 +47,6 @@ const HomeScreen = ({ route, navigation }) => {
         await recommendRecipeStore.fetchList(1);
     }
 
-    async function handleRefresh() {
-        setIsRefreshing(true);
-
-        if (active === 0) {
-            await recommendRecipeStore.refresh();
-        } else if (active === 1) {
-            await recipeStore.refresh();
-        }
-
-        setIsRefreshing(false);
-    }
-
     async function handleLoadMore() {
         if (active === 0) {
             await recommendRecipeStore.fetchList(recommendRecipeStore.page + 1);
@@ -79,8 +66,6 @@ const HomeScreen = ({ route, navigation }) => {
                 contentContainerStyle={{ padding: 14, paddingBottom: 70, minHeight: '100%' }}
                 data={active === 0 ? recommendRecipeStore.recipes : recipeStore.recipes}
                 keyExtractor={(item, idx) => `recipe_${item.id}_${idx}`}
-                refreshing={isRefreshing}
-                onRefresh={handleRefresh}
                 onEndReached={handleLoadMore}
                 onEndReachedThreshold={2}
                 removeClippedSubviews={true}
