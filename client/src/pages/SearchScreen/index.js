@@ -6,11 +6,11 @@ import { HeaderButton, LoadingModal, RBButton, SearchForm, SearchTag } from '../
 import { useCameraAction } from '../../customHook/useCameraAction';
 
 import ic_camera from '../../../assets/icon/ic_camera.png';
-import { blob2base54, cookie2obj } from '../../utils';
+import { blob2base54, cookie2obj, decodeUnicode } from '../../utils';
 import { layoutAnimConfig } from '../../animation';
 import { styles } from './styles';
 import { observer } from 'mobx-react';
-import { recipeStore } from '../../store';
+import { ingredientStore, recipeStore } from '../../store';
 import { Ingredient } from '../../api';
 
 Keyboard.addListener('keyboardDidHide', () => {
@@ -33,14 +33,18 @@ const SearchScreen = ({ route, navigation }) => {
             setIsDetecting(true);
             const result = await Ingredient.detectIngredientFromImage(res.uri);
             const cookie = result.headers['set-cookie'][0];
-            const { ingredients } = cookie2obj(cookie);
             const base54 = await blob2base54(result.data);
             setIsDetecting(false);
+
+            let { ingredients } = cookie2obj(cookie);
+            ingredients = decodeUnicode(ingredients);
+            ingredients = ingredients.split(',');
+            ingredients = ingredientStore.ingredients.filter(v => ingredients.indexOf(v.name) > -1);
 
             navigation.navigate('Detection', {
                 images: [base54],
                 from: 'Search',
-                ingredients: [{ id: 1, name: '사과' }],
+                ingredients,
             });
         })
     }
@@ -86,6 +90,9 @@ const SearchScreen = ({ route, navigation }) => {
                 <HeaderButton icon={ic_camera} onPress={handleDetection} />
             )
         });
+
+        setIngredients(recipeStore.ingredients);
+        setCategories(recipeStore.categories);
     }, [navigation]);
 
     useEffect(() => {
@@ -99,11 +106,6 @@ const SearchScreen = ({ route, navigation }) => {
             setCategories(params.categories);
         }
     }, [params.categories]);
-
-    useEffect(() => {
-        setIngredients(recipeStore.ingredients);
-        setCategories(recipeStore.categories);
-    }, [navigation]);
 
     return (
         <KeyboardAvoidingView

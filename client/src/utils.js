@@ -76,10 +76,17 @@ export function cookie2obj(cookieStr) {
     return cookieStr.split('; ').reduce((prev, current) => {
         const [name, ...value] = current.split('=');
         prev[name] = value.join('=').replace(/"/g, '');
-        prev[name] = prev[name].replace(/\\054/g, ',').split(',');
-        if (prev[name].length <= 1) prev[name] = prev[name][0]
+        prev[name] = prev[name].replace(/\\054/g, ',');
         return prev;
     }, {});
+}
+
+export function decodeUnicode(unicodeString) {
+    const r = /\\u([\d\w]{4})/gi;
+    unicodeString = unicodeString.replace(r, (_, grp) => {
+        return String.fromCharCode(parseInt(grp, 16));
+    });
+    return unicodeString.replace(/\\/g, '');
 }
 
 

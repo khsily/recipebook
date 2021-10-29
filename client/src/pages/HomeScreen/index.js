@@ -11,9 +11,9 @@ import {
 } from '../../components';
 
 import { useCameraAction } from '../../customHook/useCameraAction';
-import { blob2base54, cookie2obj } from '../../utils';
+import { blob2base54, cookie2obj, decodeUnicode } from '../../utils';
 import { Ingredient } from '../../api';
-import { recipeStore, recommendRecipeStore } from '../../store';
+import { ingredientStore, recipeStore, recommendRecipeStore } from '../../store';
 
 import ic_search from '../../../assets/icon/ic_search.png';
 import no_result from '../../../assets/no_result.png';
@@ -62,10 +62,8 @@ const HomeScreen = ({ route, navigation }) => {
 
     async function handleLoadMore() {
         if (active === 0) {
-            console.log(recommendRecipeStore.page);
             await recommendRecipeStore.fetchList(recommendRecipeStore.page + 1);
         } else {
-            console.log(recipeStore.page);
             await recipeStore.fetchList({
                 page: recipeStore.page + 1,
                 favors: recipeStore.favors,
@@ -126,11 +124,15 @@ const HomeScreen = ({ route, navigation }) => {
                     setIsDetectioning(true);
                     const result = await Ingredient.detectIngredientFromImage(res.uri);
                     const cookie = result.headers['set-cookie'][0];
-                    const { ingredients } = cookie2obj(cookie);
                     const base54 = await blob2base54(result.data);
                     setIsDetectioning(false);
 
-                    navigation.navigate('Detection', { images: [base54], ingredients: [{ id: 1, name: '사과' }] });
+                    let { ingredients } = cookie2obj(cookie);
+                    ingredients = decodeUnicode(ingredients);
+                    ingredients = ingredients.split(',');
+                    ingredients = ingredientStore.ingredients.filter(v => ingredients.indexOf(v.name) > -1);
+
+                    navigation.navigate('Detection', { images: [base54], ingredients });
                 });
             }} />
         </>

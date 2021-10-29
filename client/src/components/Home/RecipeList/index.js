@@ -7,7 +7,7 @@ import { styles } from './styles';
 
 function RecipeList({ id, title, thumbnail, ingredients = [], searchIngredients = [], rating, view = 0, category, ...props }) {
     view = view.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    searchIngredients = new Set(searchIngredients);
+    const sIngredients = new Set(searchIngredients);
 
     return (
         <RBCard style={styles.container} touchable {...props}>
@@ -19,8 +19,8 @@ function RecipeList({ id, title, thumbnail, ingredients = [], searchIngredients 
                 <View style={styles.ingredientsWrapper}>
                     <View style={styles.ingredients}>
                         {ingredients.map((v, i) => (
-                            <View style={[styles.ingredient, searchIngredients.has(v) && styles.ingredientActive]} key={`ingredient_${i}`}>
-                                <Text style={[styles.ingredientText, searchIngredients.has(v) && styles.ingredientTextActive]}>{v}</Text>
+                            <View style={[styles.ingredient, sIngredients.has(v) && styles.ingredientActive]} key={`ingredient_${i}`}>
+                                <Text style={[styles.ingredientText, sIngredients.has(v) && styles.ingredientTextActive]}>{v}</Text>
                             </View>
                         ))}
                     </View>
