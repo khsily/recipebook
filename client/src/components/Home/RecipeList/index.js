@@ -18,7 +18,7 @@ function RecipeList({ id, title, thumbnail, ingredients = [], searchIngredients 
                 <Text style={styles.title} numberOfLines={1}>{title}</Text>
                 <View style={styles.ingredientsWrapper}>
                     <View style={styles.ingredients}>
-                        {ingredients.map((v, i) => (
+                        {[...new Set(ingredients)].map((v, i) => (
                             <View style={[styles.ingredient, sIngredients.has(v) && styles.ingredientActive]} key={`ingredient_${i}`}>
                                 <Text style={[styles.ingredientText, sIngredients.has(v) && styles.ingredientTextActive]}>{v}</Text>
                             </View>
