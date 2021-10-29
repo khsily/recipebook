@@ -9,7 +9,7 @@ import { styles } from './styles';
 const FavorScreen = () => {
     const [selectedItems, setSelectedItems] = useState([]);
 
-    function selectItem(item, maxSize = 5) {
+    function selectItem(item, maxSize = 4) {
         const index = getIndexOfSelectedItem(item.id);
 
         if (index > -1) {
