@@ -8,7 +8,7 @@ SELECT
 	r.view,
 	r.level,
 	r.thumbnail,
-	COUNT(ri.ingredient_id) FILTER (WHERE ri.ingredient_id = ANY(%(ingredients)s)) as counts,
+	COUNT(DISTINCT ri.ingredient_id) FILTER (WHERE ri.ingredient_id = ANY(%(ingredients)s)) as counts,
 	ARRAY_AGG(i.name ORDER BY ri.ingredient_id = ANY(%(ingredients)s) DESC) AS ingredients
 FROM 
 	recipe AS r
