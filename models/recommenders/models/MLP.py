@@ -25,9 +25,9 @@ def parse_args():
                         help='Input data path.')
     parser.add_argument('--dataset', nargs='?', default='recipe',
                         help='Choose a dataset.')
-    parser.add_argument('--epochs', type=int, default=100,
+    parser.add_argument('--epochs', type=int, default=2,
                         help='Number of epochs.')
-    parser.add_argument('--batch_size', type=int, default=256,
+    parser.add_argument('--batch_size', type=int, default=512,
                         help='Batch size.')
     parser.add_argument('--layers', nargs='?', default='[64,32,16,8]',
                         help="Size of each layer. Note that the first layer is the concatenation of user and item embeddings. So layers[0]/2 is the embedding size.")
@@ -144,7 +144,7 @@ if __name__ == '__main__':
 
     # Check Init performance
     t1 = time()
-    (hits, ndcgs) = evaluate_model(model, topK, testPredictions, testLabels)
+    (hits, ndcgs) = evaluate_model(model, topK, testPredictions, testLabels, evaluation_threads)
     hr, ndcg = np.array(hits).mean(), np.array(ndcgs).mean()
     print('Init: HR = %.4f, NDCG = %.4f [%.1f]' % (hr, ndcg, time() - t1))
 
@@ -172,7 +172,7 @@ if __name__ == '__main__':
 
         # Evaluation
         if epoch % verbose == 0:
-            (hits, ndcgs) = evaluate_model(model, topK, testPredictions, testLabels)
+            (hits, ndcgs) = evaluate_model(model, topK, testPredictions, testLabels, evaluation_threads)
             hr, ndcg, loss = np.array(hits).mean(), np.array(ndcgs).mean(), hist.history['loss'][0]
             print('Iteration %d [%.1f s]: HR = %.4f, NDCG = %.4f, loss = %.4f [%.1f s]'
                   % (epoch, t2 - t1, hr, ndcg, loss, time() - t2))

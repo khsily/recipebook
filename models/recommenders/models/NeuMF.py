@@ -45,9 +45,9 @@ def parse_args():
                         help='Show performance per X iterations')
     parser.add_argument('--out', type=int, default=1,
                         help='Whether to save the trained model.')
-    parser.add_argument('--mf_pretrain', nargs='?', default=r'pretrain\recipe_GMF_8_1634794440.h5',
+    parser.add_argument('--mf_pretrain', nargs='?', default=r'pretrain\recipe_GMF_8_1635387732.h5',
                         help='Specify the pretrain model file for MF part. If empty, no pretrain will be used')
-    parser.add_argument('--mlp_pretrain', nargs='?', default=r'pretrain\recipe_MLP_[64,32,16,8]_1634856130.h5',
+    parser.add_argument('--mlp_pretrain', nargs='?', default=r'pretrain\recipe_MLP_[64,32,16,8]_1635466304.h5',
                         help='Specify the pretrain model file for MLP part. If empty, no pretrain will be used')
     return parser.parse_args()
 
@@ -200,7 +200,7 @@ if __name__ == '__main__':
         print("Load pretrained GMF (%s) and MLP (%s) models done. " % (mf_pretrain, mlp_pretrain))
 
     # Init performance
-    (hits, ndcgs) = evaluate_model(model, topK, testPredictions, testLabels)
+    (hits, ndcgs) = evaluate_model(model, topK, testPredictions, testLabels, evaluation_threads)
     hr, ndcg = np.array(hits).mean(), np.array(ndcgs).mean()
     print('Init: HR = %.4f, NDCG = %.4f' % (hr, ndcg))
 
@@ -233,7 +233,7 @@ if __name__ == '__main__':
 
         # Evaluation
         if epoch % verbose == 0:
-            (hits, ndcgs) = evaluate_model(model, topK, testPredictions, testLabels)
+            (hits, ndcgs) = evaluate_model(model, topK, testPredictions, testLabels, evaluation_threads)
             hr, ndcg, loss = np.array(hits).mean(), np.array(ndcgs).mean(), hist.history['loss'][0]
             print('Iteration %d [%.1f s]: HR = %.4f, NDCG = %.4f, loss = %.4f [%.1f s]'
                   % (epoch, t2 - t1, hr, ndcg, loss, time() - t2))

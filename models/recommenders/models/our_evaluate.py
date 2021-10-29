@@ -28,7 +28,7 @@ def evaluate_model(model, K, testPredictions, testLabels, num_thread):
     hits, ndcgs = [], []
     if num_thread > 1:          # Multi-thread
         pool = multiprocessing.Pool(processes=num_thread)
-        res = pool.map(predictions, range(len(_testPredictions)))
+        res = pool.map(predictions, range(len(_testLabels)))
         pool.close()
         pool.join()
         hits = [r[0] for r in res]
@@ -36,7 +36,7 @@ def evaluate_model(model, K, testPredictions, testLabels, num_thread):
         return (hits, ndcgs)
 
     n = 0
-    for idx in random.choices(range(len(_testPredictions)), k=10000):
+    for idx in random.choices(range(len(_testLabels)), k=10000):
         print(n)
         (hr, ndcg) = predictions(idx)
         hits.append(hr)
