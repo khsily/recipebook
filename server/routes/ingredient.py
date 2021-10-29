@@ -28,7 +28,7 @@ def detection():
     img.save(img_path)
 
     ingredients = execute_object_dictation(save_path, img_path, base_path, model_name)
-    ingredients = json.dumps(','.join(ingredients), ensure_ascii=False)
+    ingredients = json.dumps(','.join(ingredients))
 
     res = send_file(save_path, mimetype='image/jpeg', as_attachment=True)
     res.set_cookie('ingredients', ingredients)
