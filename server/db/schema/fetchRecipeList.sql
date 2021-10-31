@@ -9,6 +9,7 @@ SELECT
 	r.level,
 	r.thumbnail,
 	COUNT(DISTINCT ri.ingredient_id) FILTER (WHERE ri.ingredient_id = ANY(%(ingredients)s)) as counts,
+	SUM(DISTINCT i.score) FILTER (WHERE ri.ingredient_id = ANY(%(ingredients)s)) as score,
 	ARRAY_AGG(i.name ORDER BY ri.ingredient_id = ANY(%(ingredients)s) DESC) AS ingredients
 FROM 
 	recipe AS r
@@ -29,5 +30,5 @@ AND
 		WHERE (ingredient_id = ANY (%(ingredients)s) OR %(ingredients)s IS NULL)
 	)
 GROUP BY r.id, c.name
-ORDER BY counts DESC
+ORDER BY counts DESC, score DESC
 LIMIT %(limit)s OFFSET %(offset)s;

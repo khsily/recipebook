@@ -7,6 +7,7 @@ import db
 config = {
     'host': os.environ['SERVER_HOST'],
     'port': os.environ['SERVER_PORT'],
+    'threaded': True,
 }
 
 

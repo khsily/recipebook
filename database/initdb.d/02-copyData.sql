@@ -2,7 +2,7 @@ COPY category (id, name)
 FROM '/var/lib/postgresql/csvs/category.csv'
 DELIMITER ',' CSV HEADER;
 
-COPY ingredient (id, name)
+COPY ingredient (id, name, score)
 FROM '/var/lib/postgresql/csvs/ingredient.csv'
 DELIMITER ',' CSV HEADER;
 
