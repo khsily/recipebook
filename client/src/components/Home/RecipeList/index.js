@@ -34,4 +34,4 @@ function RecipeList({ id, title, thumbnail, ingredients = [], searchIngredients 
     );
 }
 
-export default React.memo(RecipeList);
+export default RecipeList;
