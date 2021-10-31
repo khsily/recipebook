@@ -1,6 +1,7 @@
 import React from 'react'
 import { Text, StyleSheet } from 'react-native'
 import * as ImagePicker from 'expo-image-picker';
+import { manipulateAsync } from 'expo-image-manipulator';
 
 
 export async function openGallery(options) {
@@ -30,13 +31,27 @@ export async function openCamera(options) {
     }
 
     try {
-        return await ImagePicker.launchCameraAsync({
+        const image = await ImagePicker.launchCameraAsync({
+            quality: 0.5,
             mediaTypes: ImagePicker.MediaTypeOptions.All,
             ...options,
         });
+        const resizedImage = await resizeImage(image, 800);
+        return { ...image, ...resizedImage };
     } catch (e) {
         console.error(e);
     }
+}
+
+
+export async function resizeImage(image, width) {
+    const resizedImage = await manipulateAsync(
+        image.localUri || image.uri,
+        [{ resize: { width } }],
+        { compress: 1, format: 'jpeg' },
+    );
+
+    return resizedImage;
 }
 
 
