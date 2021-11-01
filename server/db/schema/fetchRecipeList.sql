@@ -24,6 +24,8 @@ JOIN
 	ON ri.ingredient_id = i.id
 WHERE 
 	(r.category_id = ANY (%(categories)s) OR %(categories)s IS NULL)
+AND
+	(r.id = ANY (%(ids)s) OR %(ids)s IS NULL)
 AND 
 	r.id = ANY (
 		SELECT recipe_id FROM recipe_ingredient
