@@ -31,7 +31,7 @@ def get_recommend_ids(id):
     model_path = 'models/recommenders/models/test_model.h5'
     user_id = [id]   # 하나만 들어오면 요리 갯수 만큼 곱해주는 함수 위에 있음.
     item_id = recipe_ids            # 카테고리에 속한 요리 갯수 만큼 중복되지 않게 들어와야 함.
-    recommends = predictions(user_id, item_id, model_path)
+    recommends = predictions(user_id, item_id, model_path, Top_K=50)
     recommends = list(map(int, recommends))
 
     print('recommends:', recommends, flush=True)
@@ -42,7 +42,7 @@ def get_recommend_ids(id):
 # 추천 리스트
 @recipe.post('/recommend/<page>')
 def fetch_recommend(page):
-    body = request.json
+    body = request.json or {}
     combination_id = 'combinationId' in body and body['combinationId'] or None
 
     limit = 20
@@ -65,7 +65,7 @@ def fetch_recommend(page):
 # 검색 (검색 리스트 + 추천 리스트)
 @recipe.post('/<page>')
 def fetch_list(page):
-    body = request.json
+    body = request.json or {}
     ingredients = body['ingredients'] or None
     categories = body['categories'] or None
     combination_id = 'combinationId' in body and body['combinationId'] or None
