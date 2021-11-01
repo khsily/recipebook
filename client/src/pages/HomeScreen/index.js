@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { observer } from 'mobx-react';
-import { ActivityIndicator, FlatList, Image, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, Image, Text, View, ScrollView } from 'react-native';
 
 import {
     FloatingCameraButton,
@@ -14,11 +14,14 @@ import { useCameraAction } from '../../customHook/useCameraAction';
 import { useScrollTop } from '../../customHook/useScrollTop';
 import { blob2base54, cookie2obj, decodeUnicode } from '../../utils';
 import { Ingredient } from '../../api';
-import { favorStore, ingredientStore, myFavorStore, recipeStore, recommendRecipeStore } from '../../store';
+import { ingredientStore, myFavorStore, recipeStore, recommendRecipeStore } from '../../store';
 
 import ic_search from '../../../assets/icon/ic_search.png';
 import no_result from '../../../assets/no_result.png';
 import { MainTheme } from '../../styles/themes';
+import { styles } from './styles';
+
+let lastScroll = 0;
 
 
 const HomeScreen = ({ route, navigation }) => {
@@ -28,6 +31,7 @@ const HomeScreen = ({ route, navigation }) => {
     const [isDetectioning, setIsDetectioning] = useState(false);
 
     const showAction = useCameraAction();
+    const pageRef = useRef();
     const [recommendScrollRef, recScrollToTop] = useScrollTop();
     const [searchScrollRef, searchScrollToTop] = useScrollTop();
 
@@ -47,24 +51,34 @@ const HomeScreen = ({ route, navigation }) => {
     }, []);
 
     useEffect(() => {
-        if (params.search) setActive(1);
+        if (params.search) {
+            setActive(1);
+            pageRef.current.scrollToEnd({ animated: false });
+        }
     }, [params]);
 
     async function fetchData() {
         await recommendRecipeStore.fetchList(1, myFavorStore.combinationId);
     }
 
-    async function handleLoadMore() {
-        if (active === 0) {
-            await recommendRecipeStore.fetchList(recommendRecipeStore.page + 1, myFavorStore.combinationId);
-        } else {
-            await recipeStore.fetchList({
-                page: recipeStore.page + 1,
-                combinationId: myFavorStore.combinationId,
-                ingredients: recipeStore.ingredients,
-                categories: recipeStore.categories,
-            });
-        }
+    async function recommendLoadMore() {
+        await recommendRecipeStore.fetchList(recommendRecipeStore.page + 1, myFavorStore.combinationId);
+    }
+
+    async function searchLoadMore() {
+        await recipeStore.fetchList({
+            page: recipeStore.page + 1,
+            combinationId: myFavorStore.combinationId,
+            ingredients: recipeStore.ingredients,
+            categories: recipeStore.categories,
+        });
+    }
+
+    function handlePagination(e) {
+        const offset = e.nativeEvent.contentOffset.x;
+        const isScrollRight = offset > lastScroll;
+        lastScroll = offset;
+        setActive(Number(!!isScrollRight))
     }
 
     function scrollToTop(currentActive) {
@@ -91,15 +105,15 @@ const HomeScreen = ({ route, navigation }) => {
         );
     }
 
-    function renderList(store, ref, search, visible) {
+    function renderList(store, items, ref, search, loadMore) {
         return (
             <FlatList
                 ref={ref}
-                style={{ display: visible ? 'flex' : 'none' }}
-                contentContainerStyle={{ padding: 14, paddingTop: 0, paddingBottom: 70, minHeight: '100%' }}
+                style={[styles.listContainer]}
+                contentContainerStyle={[styles.listContent]}
                 data={store.recipes}
                 keyExtractor={(item, idx) => `recipe_${search ? 'search' : 'recommend'}_${item.id}_${idx}`}
-                onEndReached={handleLoadMore}
+                onEndReached={loadMore}
                 onEndReachedThreshold={2}
                 removeClippedSubviews={true}
                 legacyImplementation={true}
@@ -119,7 +133,7 @@ const HomeScreen = ({ route, navigation }) => {
                         }
                     </View>
                 )}
-                renderItem={active === 0 ? memorizedRecoomeds : memorizedSearchs} />
+                renderItem={items} />
         );
     }
 
@@ -130,12 +144,20 @@ const HomeScreen = ({ route, navigation }) => {
                     choices={['추천', '검색 결과']}
                     active={active}
                     onChange={(i) => {
-                        setActive(i);
                         scrollToTop(i);
+                        if (i)  pageRef.current.scrollToEnd();
+                        else  pageRef.current.scrollTo({ x: 0, y: 0, animated: true });
                     }} />
             </View>
-            {renderList(recommendRecipeStore, recommendScrollRef, false, active === 0)}
-            {renderList(recipeStore, searchScrollRef, true, active === 1)}
+
+            <ScrollView
+                ref={pageRef}
+                horizontal
+                pagingEnabled
+                onScroll={(e) => handlePagination(e)}>
+                {renderList(recommendRecipeStore, memorizedRecoomeds, recommendScrollRef, false, recommendLoadMore)}
+                {renderList(recipeStore, memorizedSearchs, searchScrollRef, true, searchLoadMore)}
+            </ScrollView>
 
             <LoadingModal visible={isDetectioning} text='식재료를 확인하고 있어요' />
 

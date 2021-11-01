@@ -18,4 +18,4 @@ function RBChoiceGroup({ choices = [], active = 0, onChange = () => { }, ...prop
     );
 }
 
-export default RBChoiceGroup;
+export default React.memo(RBChoiceGroup);
