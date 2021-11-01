@@ -35,7 +35,6 @@ class RecipeStore {
         
         this._setIsFetching(true);
 
-
         this.combinationId = combinationId;
         this.ingredients = ingredients;
         this.categories = categories;
