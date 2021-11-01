@@ -3,12 +3,13 @@ import tensorflow as tf
 import numpy as np
 
 
-def predictions(user_id, item_id, model_path):
+def predictions(user_id, item_id, model_path, Top_K):
     '''
     prediction func
     :param user_id: user_id list [3]
     :param item_id: item_id list [4, 985, ...]
     :param model_path: path
+    :param Top_K: Top rank
     :return: recommends list [985, 4, ...]
     '''
     user_id = user_id * len(item_id)
@@ -27,13 +28,13 @@ def predictions(user_id, item_id, model_path):
         predictions.append([i, p])
 
     predictions = sorted(predictions, reverse=True, key=lambda x: x[1])
-    recommends = [p[0] for p in predictions[:10]]
+    recommends = [p[0] for p in predictions[:Top_K]]
 
     return recommends
 
 
 if __name__ == '__main__':
-    model_path = 'D:\python\\tensorflow2.5\\recipebook\models\\recommenders\models\\test_model.h5'
+    model_path = 'D:\python\\tensorflow2.5\\recipebook\models\\recommenders\models\\recipe_test_model.h5'
     user_id = [3]                       # 하나만 들어오면 요리 갯수 만큼 곱해주는 함수 위에 있음.
     item_id = [2, 6, 199, 235]          # 카테고리에 속한 요리 갯수 만큼 중복되지 않게 들어와야 함.
 
