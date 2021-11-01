@@ -12,11 +12,13 @@ export async function openGallery(options) {
     }
 
     try {
-        return await ImagePicker.launchImageLibraryAsync({
+        const image = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.All,
             quality: 1,
             ...options,
         });
+        const resizedImage = await resizeImage(image, 800);
+        return { ...image, ...resizedImage };
     } catch (e) {
         console.error(e);
     }

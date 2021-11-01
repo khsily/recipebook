@@ -1,36 +1,38 @@
 import React from 'react';
-import { Image, Text, View } from 'react-native';
-import { SharedElement } from 'react-navigation-shared-element';
+import { Text, View, FlatList, ActivityIndicator, Image } from 'react-native';
+import { MainTheme } from '../../../styles/themes';
 
-import RBCard from '../../Common/RBCard';
 import { styles } from './styles';
+import no_result from '../../../../assets/no_result.png';
 
-function RecipeList({ id, title, thumbnail, ingredients = [], searchIngredients = [], rating, view = 0, category, ...props }) {
-    view = view.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    const sIngredients = new Set(searchIngredients);
-
+function RecipeList({ scrollRef, data, renderItem, isFetching, loadMore, search = false }) {
     return (
-        <RBCard style={styles.container} touchable {...props}>
-            <SharedElement style={styles.thumbnailWrapper} id={`recipe.${id}.photo`}>
-                <Image style={styles.thumbnail} source={{ uri: thumbnail }} />
-            </SharedElement>
-            <View style={styles.content}>
-                <Text style={styles.title} numberOfLines={1}>{title}</Text>
-                <View style={styles.ingredientsWrapper}>
-                    <View style={styles.ingredients}>
-                        {[...new Set(ingredients)].map((v, i) => (
-                            <View style={[styles.ingredient, sIngredients.has(v) && styles.ingredientActive]} key={`ingredient_${i}`}>
-                                <Text style={[styles.ingredientText, sIngredients.has(v) && styles.ingredientTextActive]}>{v}</Text>
-                            </View>
-                        ))}
-                    </View>
+        <FlatList
+            ref={scrollRef}
+            style={[styles.listContainer]}
+            contentContainerStyle={[styles.listContent]}
+            data={data}
+            keyExtractor={(item, idx) => `recipe_${search ? 'search' : 'recommend'}_${item.id}_${idx}`}
+            onEndReached={loadMore}
+            onEndReachedThreshold={2}
+            removeClippedSubviews={true}
+            legacyImplementation={true}
+            ListEmptyComponent={() => (
+                <View style={styles.emptyContainer}>
+                    {isFetching ?
+                        <ActivityIndicator
+                            animating={true}
+                            size='large'
+                            color={MainTheme.colors.primary} />
+                        :
+                        <>
+                            <Image style={styles.emptyImage} source={no_result} />
+                            <Text style={styles.emptyText}>레시피가 없어요</Text>
+                        </>
+                    }
                 </View>
-                <View style={styles.info}>
-                    <Text style={styles.info_text}>{category}</Text>
-                    <Text style={styles.info_text}>{view} views</Text>
-                </View>
-            </View>
-        </RBCard>
+            )}
+            renderItem={renderItem} />
     );
 }
 

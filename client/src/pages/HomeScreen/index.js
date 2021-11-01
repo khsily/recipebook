@@ -1,12 +1,13 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { observer } from 'mobx-react';
-import { ActivityIndicator, FlatList, Image, Text, View, ScrollView, Dimensions } from 'react-native';
+import { View, ScrollView } from 'react-native';
 
 import {
     FloatingCameraButton,
     HeaderButton,
     LoadingModal,
     RBChoiceGroup,
+    RecipeItem,
     RecipeList,
 } from '../../components';
 
@@ -17,9 +18,6 @@ import { Ingredient } from '../../api';
 import { ingredientStore, myFavorStore, recipeStore, recommendRecipeStore } from '../../store';
 
 import ic_search from '../../../assets/icon/ic_search.png';
-import no_result from '../../../assets/no_result.png';
-import { MainTheme } from '../../styles/themes';
-import { styles } from './styles';
 
 let lastScroll = 0;
 
@@ -61,10 +59,6 @@ const HomeScreen = ({ route, navigation }) => {
         await recommendRecipeStore.fetchList(1, myFavorStore.combinationId);
     }
 
-    async function recommendLoadMore() {
-        await recommendRecipeStore.fetchList(recommendRecipeStore.page + 1, myFavorStore.combinationId);
-    }
-
     async function searchLoadMore() {
         await recipeStore.fetchList({
             page: recipeStore.page + 1,
@@ -91,7 +85,7 @@ const HomeScreen = ({ route, navigation }) => {
 
     function renderRecommendItem({ item }) {
         return (
-            <RecipeList
+            <RecipeItem
                 {...item}
                 searchIngredients={[]}
                 onPress={() => navigation.navigate('Recipe', { recipe: item })} />
@@ -100,42 +94,10 @@ const HomeScreen = ({ route, navigation }) => {
 
     function renderSearchItem({ item }) {
         return (
-            <RecipeList
+            <RecipeItem
                 {...item}
                 searchIngredients={recipeStore.ingredients.map(v => v.name)}
                 onPress={() => navigation.navigate('Recipe', { recipe: item })} />
-        );
-    }
-
-    function renderList(store, items, ref, search, loadMore) {
-        return (
-            <FlatList
-                ref={ref}
-                style={[styles.listContainer]}
-                contentContainerStyle={[styles.listContent]}
-                data={store.recipes}
-                keyExtractor={(item, idx) => `recipe_${search ? 'search' : 'recommend'}_${item.id}_${idx}`}
-                onEndReached={loadMore}
-                onEndReachedThreshold={2}
-                removeClippedSubviews={true}
-                legacyImplementation={true}
-                ListEmptyComponent={() => (
-                    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                        {!store.isFetching &&
-                            <>
-                                <Image style={{ width: 100, height: 100, marginTop: -10 }} source={no_result} />
-                                <Text style={{ padding: 15, fontSize: 16, color: '#777777', fontWeight: 'bold' }}>레시피가 없어요</Text>
-                            </>
-                        }
-                        {store.isFetching &&
-                            <ActivityIndicator
-                                animating={true}
-                                size='large'
-                                color={MainTheme.colors.primary} />
-                        }
-                    </View>
-                )}
-                renderItem={items} />
         );
     }
 
@@ -147,8 +109,8 @@ const HomeScreen = ({ route, navigation }) => {
                     active={active}
                     onChange={(i) => {
                         scrollToTop(i);
-                        if (i)  pageRef.current.scrollToEnd();
-                        else  pageRef.current.scrollTo({ x: 0, y: 0, animated: true });
+                        if (i) pageRef.current.scrollToEnd();
+                        else pageRef.current.scrollTo({ x: 0, y: 0, animated: true });
                     }} />
             </View>
 
@@ -159,8 +121,18 @@ const HomeScreen = ({ route, navigation }) => {
                 bounces={false}
                 scrollEventThrottle={10}
                 onScroll={(e) => handlePagination(e)}>
-                {renderList(recommendRecipeStore, memorizedRecoomeds, recommendScrollRef, false, recommendLoadMore)}
-                {renderList(recipeStore, memorizedSearchs, searchScrollRef, true, searchLoadMore)}
+                <RecipeList
+                    scrollRef={recommendScrollRef}
+                    data={recommendRecipeStore.recipes}
+                    renderItem={memorizedRecoomeds}
+                    isFetching={recommendRecipeStore.isFetching} />
+                <RecipeList
+                    scrollRef={searchScrollRef}
+                    data={recipeStore.recipes}
+                    renderItem={memorizedSearchs}
+                    isFetching={recipeStore.isFetching}
+                    loadMore={searchLoadMore}
+                    search />
             </ScrollView>
 
             <LoadingModal visible={isDetectioning} text='식재료를 확인하고 있어요' />
