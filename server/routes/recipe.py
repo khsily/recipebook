@@ -21,7 +21,7 @@ item2idx: 카테고리에서 레시피 리스트를 가져오면, 레시피들�
 '''
 
 
-def get_recommend_ids(id):
+def get_recommend_ids(id, top_n):
     if not id:
         return None
 
@@ -31,7 +31,7 @@ def get_recommend_ids(id):
     model_path = 'models/recommenders/models/test_model.h5'
     user_id = [id]   # 하나만 들어오면 요리 갯수 만큼 곱해주는 함수 위에 있음.
     item_id = recipe_ids            # 카테고리에 속한 요리 갯수 만큼 중복되지 않게 들어와야 함.
-    recommends = predictions(user_id, item_id, model_path, Top_K=50)
+    recommends = predictions(user_id, item_id, model_path, Top_K=top_n)
     recommends = list(map(int, recommends))
 
     print('recommends:', recommends, flush=True)
@@ -48,12 +48,10 @@ def fetch_recommend(page):
     limit = 20
     offset = (int(page) - 1) * limit
 
-    recommends = get_recommend_ids(combination_id)
+    recommends = get_recommend_ids(combination_id, top_n=50)
 
     # TODO: 나중에 추천모델 사용하도록 변경하기
     recipes = db.execute('fetchRecipeList.sql', {
-        'categories': None,
-        'ingredients': None,
         'ids': recommends,
         'limit': limit,
         'offset': offset,
@@ -73,12 +71,12 @@ def fetch_list(page):
     limit = 20
     offset = (int(page) - 1) * limit
 
-    recommends = get_recommend_ids(combination_id)
+    recommends = get_recommend_ids(combination_id, top_n=10)
 
-    recipes = db.execute('fetchRecipeList.sql', {
+    recipes = db.execute('searchRecipeList.sql', {
         'categories': categories,
         'ingredients': ingredients,
-        'ids': None,
+        'ids': recommends,
         'limit': limit,
         'offset': offset,
     })
@@ -100,6 +98,7 @@ def fetch_combination_id():
     combination_id = db.execute('fetchCombinationId.sql', {
         'combination': favors
     })
+    
     return jsonify(combination_id)
 
 
