@@ -9,16 +9,18 @@ export const fetchCombinationId = (favors) => {
     return Api.get(`recipe/combination?${form}`);
 }
 
-export const fetchRecommendList = (page) => {
-    return Api.post(`recipe/recommend/${page}`);
+export const fetchRecommendList = (page, combinationId) => {
+    return Api.post(`recipe/recommend/${page}`, {
+        payload: { combinationId },
+    });
 }
 
-export const searchList = ({ page, ingredients, categories, favors }) => {
+export const searchList = ({ page, ingredients, categories, combinationId }) => {
     return Api.post(`recipe/${page}`, {
         payload: {
             ingredients,
             categories,
-            favors,
+            combinationId,
         }
     });
 }

@@ -5,7 +5,7 @@ class RecipeDetailStore {
     recipes = [];
     page = 0;
     isFetching = false;
-    favors = [];
+    combinationId = [];
 
     constructor() {
         makeAutoObservable(this)
@@ -28,14 +28,14 @@ class RecipeDetailStore {
         this._setRecipes([]);
     }
 
-    async fetchList(page, favors, reset) {
+    async fetchList(page, combinationId, reset) {
         if (this.page >= page) return;
         this._setIsFetching(true);
 
-        this.favors = favors;
+        this.combinationId = combinationId;
 
         this._setPage(page);
-        let recipes = await Recipe.fetchRecommendList(this.page);
+        let recipes = await Recipe.fetchRecommendList(this.page, combinationId);
 
         if (reset) recipes = [...recipes.data];
         else recipes = [...this.recipes, ...recipes.data];
@@ -46,7 +46,7 @@ class RecipeDetailStore {
     }
 
     async refresh() {
-        await this.fetchList(1, this.favors, true);
+        await this.fetchList(1, this.combinationId, true);
     }
 }
 

@@ -10,7 +10,7 @@ import { blob2base54, cookie2obj, decodeUnicode } from '../../utils';
 import { layoutAnimConfig } from '../../animation';
 import { styles } from './styles';
 import { observer } from 'mobx-react';
-import { ingredientStore, recipeStore } from '../../store';
+import { ingredientStore, myFavorStore, recipeStore } from '../../store';
 import { Ingredient } from '../../api';
 
 Keyboard.addListener('keyboardDidHide', () => {
@@ -71,7 +71,7 @@ const SearchScreen = ({ route, navigation }) => {
         recipeStore.reset();
         await recipeStore.fetchList({
             page: 1,
-            favors: [],
+            combinationId: myFavorStore.combinationId,
             ingredients,
             categories,
         });

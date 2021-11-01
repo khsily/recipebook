@@ -5,7 +5,7 @@ class RecipeStore {
     recipes = []
     page = 0;
     isFetching = false;
-    favors = [];
+    combinationId = [];
     ingredients = [];
     categories = [];
 
@@ -30,20 +30,20 @@ class RecipeStore {
         this._setRecipes([]);
     }
 
-    async fetchList({ page, favors, ingredients, categories }, reset) {
+    async fetchList({ page, combinationId, ingredients, categories }, reset) {
         if (this.page >= page) return;
         
         this._setIsFetching(true);
 
 
-        this.favors = favors;
+        this.combinationId = combinationId;
         this.ingredients = ingredients;
         this.categories = categories;
 
         this._setPage(page);
         let recipes = await Recipe.searchList({
             page: this.page,
-            favors,
+            combinationId,
             ingredients: ingredients.map(v => v.id),
             categories: categories.map(v => v.id),
         });
@@ -61,7 +61,7 @@ class RecipeStore {
 
         await this.fetchList({
             page: 1,
-            favors: this.favors,
+            combinationId: this.combinationId,
             ingredients: this.ingredients,
             categories: this.categories,
         }, true);
