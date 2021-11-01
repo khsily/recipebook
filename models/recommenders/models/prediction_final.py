@@ -14,7 +14,7 @@ def predictions(user_id, item_id, model_path, Top_K):
     '''
     user_id = user_id * len(item_id)
 
-    user_id, item_id = np.array(user_id, dtype=np.int32) - 1, np.array(item_id, dtype=np.int32) - 1
+    user_id, item_id = np.array(user_id, dtype=np.int32), np.array(item_id, dtype=np.int32)
 
     user_id = user_id - 1
     item_id = item_id - 1
