@@ -14,7 +14,7 @@ import { useCameraAction } from '../../customHook/useCameraAction';
 import { useScrollTop } from '../../customHook/useScrollTop';
 import { blob2base54, cookie2obj, decodeUnicode } from '../../utils';
 import { Ingredient } from '../../api';
-import { ingredientStore, recipeStore, recommendRecipeStore } from '../../store';
+import { favorStore, ingredientStore, myFavorStore, recipeStore, recommendRecipeStore } from '../../store';
 
 import ic_search from '../../../assets/icon/ic_search.png';
 import no_result from '../../../assets/no_result.png';
@@ -51,16 +51,16 @@ const HomeScreen = ({ route, navigation }) => {
     }, [params]);
 
     async function fetchData() {
-        await recommendRecipeStore.fetchList(1);
+        await recommendRecipeStore.fetchList(1, myFavorStore.combinationId);
     }
 
     async function handleLoadMore() {
         if (active === 0) {
-            await recommendRecipeStore.fetchList(recommendRecipeStore.page + 1);
+            await recommendRecipeStore.fetchList(recommendRecipeStore.page + 1, myFavorStore.combinationId);
         } else {
             await recipeStore.fetchList({
                 page: recipeStore.page + 1,
-                favors: recipeStore.favors,
+                combinationId: myFavorStore.combinationId,
                 ingredients: recipeStore.ingredients,
                 categories: recipeStore.categories,
             });

@@ -35,8 +35,8 @@ class MyFavor {
 
         const jsonValue = await AsyncStorage.getItem(this.storageKey);
         const favors = jsonValue ? JSON.parse(jsonValue) : [];
-        this._setFavors(favors);
         await this.fetchId(favors);
+        this._setFavors(favors);
 
         this._setIsFetching(false);
     }
@@ -46,7 +46,7 @@ class MyFavor {
 
         const favorTitles = favors.map((v) => v.title);
         const combination = await Recipe.fetchCombinationId(favorTitles);
-        const id = combination.data.id;
+        const id = combination.data[0].id;
         this._setCombinationId(id);
     }
 
