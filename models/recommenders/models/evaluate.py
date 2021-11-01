@@ -56,9 +56,9 @@ def eval_one_rating(idx):
     # Get prediction scores
     map_item_score = {}
     users = np.full(len(items), u, dtype='int32')       # 모든 영화 길이 만큼 유저를 옆에 붙여줌 150, 150, 150, ...
+
     predictions = _model.predict([users, np.array(items)],
                                  batch_size=100, verbose=0)
-
 
     for i in range(len(items)):
         item = items[i]
@@ -69,6 +69,7 @@ def eval_one_rating(idx):
     ranklist = heapq.nlargest(_K, map_item_score, key=map_item_score.get)
     hr = getHitRatio(ranklist, gtItem)
     ndcg = getNDCG(ranklist, gtItem)
+
     return (hr, ndcg)
 
 
