@@ -5,12 +5,6 @@ export const styles = StyleSheet.create({
         width: Dimensions.get('window').width,
     },
 
-    listInVisible: {
-        width: 0,
-        height: 0,
-        overflow: 'hidden',
-    },
-
     listContent: {
         padding: 14,
         paddingTop: 0,

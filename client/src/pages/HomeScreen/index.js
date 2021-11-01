@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { observer } from 'mobx-react';
-import { ActivityIndicator, FlatList, Image, Text, View, ScrollView } from 'react-native';
+import { ActivityIndicator, FlatList, Image, Text, View, ScrollView, Dimensions } from 'react-native';
 
 import {
     FloatingCameraButton,
@@ -76,6 +76,8 @@ const HomeScreen = ({ route, navigation }) => {
 
     function handlePagination(e) {
         const offset = e.nativeEvent.contentOffset.x;
+        if (offset === lastScroll) return;
+
         const isScrollRight = offset > lastScroll;
         lastScroll = offset;
         setActive(Number(!!isScrollRight))
@@ -154,6 +156,8 @@ const HomeScreen = ({ route, navigation }) => {
                 ref={pageRef}
                 horizontal
                 pagingEnabled
+                bounces={false}
+                scrollEventThrottle={10}
                 onScroll={(e) => handlePagination(e)}>
                 {renderList(recommendRecipeStore, memorizedRecoomeds, recommendScrollRef, false, recommendLoadMore)}
                 {renderList(recipeStore, memorizedSearchs, searchScrollRef, true, searchLoadMore)}
