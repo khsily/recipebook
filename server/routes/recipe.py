@@ -32,7 +32,6 @@ def get_recommend_ids(id, top_n):
     user_id = [id]   # 하나만 들어오면 요리 갯수 만큼 곱해주는 함수 위에 있음.
     item_id = recipe_ids            # 카테고리에 속한 요리 갯수 만큼 중복되지 않게 들어와야 함.
     recommends = predictions(user_id, item_id, model_path, Top_K=top_n)
-    recommends = list(map(int, recommends))
 
     print('recommends:', recommends, flush=True)
 
