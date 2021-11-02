@@ -44,7 +44,7 @@ def fetch_recommend(page):
     body = request.json or {}
     combination_id = 'combinationId' in body and body['combinationId'] or None
 
-    limit = 20
+    limit = 50
     offset = (int(page) - 1) * limit
 
     recommends = get_recommend_ids(combination_id, top_n=50)
