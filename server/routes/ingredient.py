@@ -4,6 +4,7 @@ from utils import root_path
 import os
 import json
 import db
+import uuid
 
 from models.detection.yolo_f.tf2_keras_yolo3.object_detection import execute_object_dictation
 
@@ -18,20 +19,25 @@ def fetch_list():
 
 @ingredient.post('/detection')
 def detection():
+    unique_id = uuid.uuid4()
+
     base_path = os.path.join(root_path, 'models/detection/yolo_f/tf2_keras_yolo3')
 
-    save_path = os.path.join(root_path, 'temp/detection.jpg')
-    img_path = os.path.join(root_path, 'temp/smaple.jpg')
+    save_path = os.path.join(root_path, f'temp/detection_{unique_id}.jpg')
+    img_path = os.path.join(root_path, f'temp/smaple_{unique_id}.jpg')
     model_name = 'model_final.h5'
 
     img = request.files.get('image', '')
     img.save(img_path)
 
     ingredients = execute_object_dictation(save_path, img_path, base_path, model_name)
-    ingredients = json.dumps(','.join(ingredients), ensure_ascii=False)
+    ingredients = json.dumps(','.join(ingredients))
 
     res = send_file(save_path, mimetype='image/jpeg', as_attachment=True)
     res.set_cookie('ingredients', ingredients)
+
+    print(unique_id, flush=True)
+    print('^^' * 10, flush=True)
 
     # 디텍션 완료 후 삭제
     os.remove(img_path)

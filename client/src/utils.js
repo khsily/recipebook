@@ -1,6 +1,7 @@
 import React from 'react'
 import { Text, StyleSheet } from 'react-native'
 import * as ImagePicker from 'expo-image-picker';
+import { manipulateAsync } from 'expo-image-manipulator';
 
 
 export async function openGallery(options) {
@@ -11,11 +12,13 @@ export async function openGallery(options) {
     }
 
     try {
-        return await ImagePicker.launchImageLibraryAsync({
+        const image = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.All,
             quality: 1,
             ...options,
         });
+        const resizedImage = await resizeImage(image, 800);
+        return { ...image, ...resizedImage };
     } catch (e) {
         console.error(e);
     }
@@ -30,13 +33,27 @@ export async function openCamera(options) {
     }
 
     try {
-        return await ImagePicker.launchCameraAsync({
+        const image = await ImagePicker.launchCameraAsync({
+            quality: 0.5,
             mediaTypes: ImagePicker.MediaTypeOptions.All,
             ...options,
         });
+        const resizedImage = await resizeImage(image, 800);
+        return { ...image, ...resizedImage };
     } catch (e) {
         console.error(e);
     }
+}
+
+
+export async function resizeImage(image, width) {
+    const resizedImage = await manipulateAsync(
+        image.localUri || image.uri,
+        [{ resize: { width } }],
+        { compress: 1, format: 'jpeg' },
+    );
+
+    return resizedImage;
 }
 
 
@@ -76,10 +93,17 @@ export function cookie2obj(cookieStr) {
     return cookieStr.split('; ').reduce((prev, current) => {
         const [name, ...value] = current.split('=');
         prev[name] = value.join('=').replace(/"/g, '');
-        prev[name] = prev[name].replace(/\\054/g, ',').split(',');
-        if (prev[name].length <= 1) prev[name] = prev[name][0]
+        prev[name] = prev[name].replace(/\\054/g, ',');
         return prev;
     }, {});
+}
+
+export function decodeUnicode(unicodeString) {
+    const r = /\\u([\d\w]{4})/gi;
+    unicodeString = unicodeString.replace(r, (_, grp) => {
+        return String.fromCharCode(parseInt(grp, 16));
+    });
+    return unicodeString.replace(/\\/g, '');
 }
 
 

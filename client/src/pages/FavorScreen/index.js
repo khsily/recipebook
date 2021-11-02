@@ -9,7 +9,7 @@ import { styles } from './styles';
 const FavorScreen = () => {
     const [selectedItems, setSelectedItems] = useState([]);
 
-    function selectItem(item, maxSize = 5) {
+    function selectItem(item, maxSize = 4) {
         const index = getIndexOfSelectedItem(item.id);
 
         if (index > -1) {
@@ -30,12 +30,12 @@ const FavorScreen = () => {
         return selectedItems.findIndex((v) => v.id === id);
     }
 
-    function handleSubmit() {
+    async function handleSubmit() {
         if (selectedItems.length < 3) {
             alert('최소 3개 이상 선택해 주세요');
             return;
         }
-        myFavorStore.saveFavors(selectedItems);
+        await myFavorStore.saveFavors(selectedItems);
     }
 
     return (

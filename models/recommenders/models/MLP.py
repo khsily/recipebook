@@ -10,7 +10,7 @@ from tensorflow.keras.layers import Dense, Lambda, Activation
 from tensorflow.keras.layers import Embedding, Input, Dense, Reshape, concatenate, add, Flatten, Dropout
 from tensorflow.keras.constraints import max_norm
 from tensorflow.keras.optimizers import Adagrad, Adam, SGD, RMSprop
-from evaluate import evaluate_model
+from our_evaluate import evaluate_model
 from dataset import Dataset
 from time import time
 import sys
@@ -21,15 +21,13 @@ import multiprocessing as mp
 #################### Arguments ####################
 def parse_args():
     parser = argparse.ArgumentParser(description="Run MLP.")
-
     parser.add_argument('--path', nargs='?', default='data/',
                         help='Input data path.')
     parser.add_argument('--dataset', nargs='?', default='recipe',
                         help='Choose a dataset.')
-    parser.add_argument('--epochs', type=int, default=100,
+    parser.add_argument('--epochs', type=int, default=2,
                         help='Number of epochs.')
-    parser.add_argument('--batch_size', type=int, default=100,
-
+    parser.add_argument('--batch_size', type=int, default=512,
                         help='Batch size.')
     parser.add_argument('--layers', nargs='?', default='[64,32,16,8]',
                         help="Size of each layer. Note that the first layer is the concatenation of user and item embeddings. So layers[0]/2 is the embedding size.")
@@ -121,55 +119,70 @@ if __name__ == '__main__':
     print("MLP arguments: %s " % (args))
 
     model_out_file = 'pretrain/%s_MLP_%s_%d.h5' \
-
                      % (args.dataset, args.layers, time())
 
     # Loading data
     t1 = time()
     data = Dataset(args.path + args.dataset)
-    train, testRatings, testNegatives = data.trainMatrix, data.testRatings, data.testNegatives
+    train, testLabels, testPredictions = data.trainMatrix, data.testLabels, data.testPredictions
     num_users, num_items = train.shape
     print("Load data done [%.1f s]. #user=%d, #item=%d, #train=%d, #test=%d"
-          % (time() - t1, num_users, num_items, train.nnz, len(testRatings)))
+          % (time() - t1, num_users, num_items, train.nnz, len(testLabels)))
 
     # Build model
     model = get_model(num_users, num_items, layers, reg_layers)
 
     if learner.lower() == "adagrad":
-        model.compile(optimizer=Adagrad(lr=learning_rate), loss='binary_crossentropy')
+        model.compile(optimizer=Adagrad(learning_rate=learning_rate), loss='binary_crossentropy')
     elif learner.lower() == "rmsprop":
-        model.compile(optimizer=RMSprop(lr=learning_rate), loss='binary_crossentropy')
+        model.compile(optimizer=RMSprop(learning_rate=learning_rate), loss='binary_crossentropy')
     elif learner.lower() == "adam":
-        model.compile(optimizer=Adam(lr=learning_rate), loss='binary_crossentropy')
+        model.compile(optimizer=Adam(learning_rate=learning_rate), loss='binary_crossentropy', metrics=['acc'])
     else:
-        model.compile(optimizer=SGD(lr=learning_rate), loss='binary_crossentropy')
+        model.compile(optimizer=SGD(learning_rate=learning_rate), loss='binary_crossentropy')
     #print(model.summary())
 
     # Check Init performance
     t1 = time()
-    (hits, ndcgs) = evaluate_model(model, testRatings, testNegatives, topK, evaluation_threads)
+    (hits, ndcgs) = evaluate_model(model, topK, testPredictions, testLabels, evaluation_threads)
     hr, ndcg = np.array(hits).mean(), np.array(ndcgs).mean()
     print('Init: HR = %.4f, NDCG = %.4f [%.1f]' % (hr, ndcg, time() - t1))
 
-    user_input, item_input, labels = get_train_instances(train, num_negatives)
+    best_hr, best_ndcg, best_iter = hr, ndcg, -1
+    for epoch in range(epochs):
+        t1 = time()
+        # Generate training instances
+        user_input, item_input, labels = get_train_instances(train, num_negatives)
 
-    checkpoint = tf.keras.callbacks.ModelCheckpoint(filepath=model_out_file,
-                                                    monitor='loss',
-                                                    verbose=1,
-                                                    save_weights_only=True,
-                                                    save_best_only=True,
-                                                    save_freq=epochs)
-    # Training
-    hist = model.fit([np.array(user_input), np.array(item_input)],  # input
-                     np.array(labels),  # labels
-                     batch_size=batch_size, epochs=epochs, verbose=1, shuffle=True,
-                     callbacks=[checkpoint])
+        checkpoint = tf.keras.callbacks.ModelCheckpoint(filepath=model_out_file,
+                                                        monitor='loss',
+                                                        verbose=0,
+                                                        save_weights_only=True,
+                                                        save_best_only=True,
+                                                        save_freq=epoch)
 
-    model.save_weights(model_out_file, overwrite=True)
-    model.save('pretrain/recipe_MLP.h5', overwrite=True)
+        early_stopping = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=10)
 
-    (hits, ndcgs) = evaluate_model(model, testRatings, testNegatives, topK, evaluation_threads)
-    hr, ndcg, loss = np.array(hits).mean(), np.array(ndcgs).mean(), hist.history['loss'][0]
-    print('HR = %.4f, NDCG = %.4f, loss = %.4f' % (hr, ndcg, loss))
+        # Training
+        hist = model.fit([np.array(user_input), np.array(item_input)],  # input
+                         np.array(labels),  # labels
+                         batch_size=batch_size, epochs=1, verbose=1, shuffle=True,
+                         callbacks=[checkpoint, early_stopping])
+        t2 = time()
+
+        # Evaluation
+        if epoch % verbose == 0:
+            (hits, ndcgs) = evaluate_model(model, topK, testPredictions, testLabels, evaluation_threads)
+            hr, ndcg, loss = np.array(hits).mean(), np.array(ndcgs).mean(), hist.history['loss'][0]
+            print('Iteration %d [%.1f s]: HR = %.4f, NDCG = %.4f, loss = %.4f [%.1f s]'
+                  % (epoch, t2 - t1, hr, ndcg, loss, time() - t2))
+            if hr > best_hr:
+                best_hr, best_ndcg, best_iter = hr, ndcg, epoch
+                if args.out > 0:
+                    model.save_weights(model_out_file, overwrite=True)
+
+    print("End. Best Iteration %d:  HR = %.4f, NDCG = %.4f. " % (best_iter, best_hr, best_ndcg))
+    if args.out > 0:
+        print("The best MLP model is saved to %s" % (model_out_file))
 
 

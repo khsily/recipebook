@@ -21,24 +21,37 @@ item2idx: 카테고리에서 레시피 리스트를 가져오면, 레시피들�
 '''
 
 
+def get_recommend_ids(id, top_n):
+    if not id:
+        return None
+
+    recipe_ids = db.execute('fetchAllRecipeIds.sql')
+    recipe_ids = [recipe['id'] for recipe in recipe_ids]
+
+    model_path = 'models/recommenders/models/test_model.h5'
+    user_id = [id]   # 하나만 들어오면 요리 갯수 만큼 곱해주는 함수 위에 있음.
+    item_id = recipe_ids            # 카테고리에 속한 요리 갯수 만큼 중복되지 않게 들어와야 함.
+    recommends = predictions(user_id, item_id, model_path, Top_K=top_n)
+
+    print('recommends:', recommends, flush=True)
+
+    return recommends
+
+
 # 추천 리스트
 @recipe.post('/recommend/<page>')
 def fetch_recommend(page):
-    body = request.form
-    favors = body.get('favors') or '[]'  # TODO: favors 사용
+    body = request.json or {}
+    combination_id = 'combinationId' in body and body['combinationId'] or None
 
-    limit = 20
+    limit = 50
     offset = (int(page) - 1) * limit
 
-    # model_path = 'models/recommenders/models/test_model.h5'
-    # user_id = [3]                       # 하나만 들어오면 요리 갯수 만큼 곱해주는 함수 위에 있음.
-    # item_id = [2, 6, 199, 235]          # 카테고리에 속한 요리 갯수 만큼 중복되지 않게 들어와야 함.
-    # recommends_top10 = predictions(user_id, item_id, model_path)
+    recommends = get_recommend_ids(combination_id, top_n=50)
 
     # TODO: 나중에 추천모델 사용하도록 변경하기
     recipes = db.execute('fetchRecipeList.sql', {
-        'categories': None,
-        'ingredients': None,
+        'ids': recommends,
         'limit': limit,
         'offset': offset,
     })
@@ -49,17 +62,20 @@ def fetch_recommend(page):
 # 검색 (검색 리스트 + 추천 리스트)
 @recipe.post('/<page>')
 def fetch_list(page):
-    body = request.json
+    body = request.json or {}
     ingredients = body['ingredients'] or None
     categories = body['categories'] or None
-    favors = body['favors'] or None  # TODO: favors 사용
+    combination_id = 'combinationId' in body and body['combinationId'] or None
 
     limit = 20
     offset = (int(page) - 1) * limit
 
-    recipes = db.execute('fetchRecipeList.sql', {
+    recommends = get_recommend_ids(combination_id, top_n=10)
+
+    recipes = db.execute('searchRecipeList.sql', {
         'categories': categories,
         'ingredients': ingredients,
+        'ids': recommends,
         'limit': limit,
         'offset': offset,
     })
@@ -81,6 +97,7 @@ def fetch_combination_id():
     combination_id = db.execute('fetchCombinationId.sql', {
         'combination': favors
     })
+    
     return jsonify(combination_id)
 
 

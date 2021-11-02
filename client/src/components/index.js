@@ -12,7 +12,8 @@ import FloatingCameraButton from './Home/FloatingCameraButton';
 import AutoComplete from './Common/AutoComplete';
 
 // home
-import RecipeList from "./Home/RecipeList";
+import RecipeItem from "./Home/RecipeItem";
+import RecipeList from './Home/RecipeList';
 
 // Recipe
 import RecipeSection from './Recipe/RecipeSection';
@@ -47,6 +48,7 @@ export {
     AutoComplete,
 
     // home
+    RecipeItem,
     RecipeList,
 
     // Recipe
