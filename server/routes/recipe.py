@@ -1,5 +1,3 @@
-import os
-import json
 from flask import Blueprint, request, jsonify
 from models.recommenders.models.prediction_final import predictions
 import db
