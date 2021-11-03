@@ -88,7 +88,7 @@ const HomeScreen = ({ route, navigation }) => {
             <RecipeItem
                 {...item}
                 searchIngredients={[]}
-                onPress={() => navigation.navigate('Recipe', { recipe: item })} />
+                onPress={() => navigation.navigate('Recipe', { recipe: item, search: false })} />
         );
     }
 
@@ -96,8 +96,9 @@ const HomeScreen = ({ route, navigation }) => {
         return (
             <RecipeItem
                 {...item}
+                search
                 searchIngredients={recipeStore.ingredients.map(v => v.name)}
-                onPress={() => navigation.navigate('Recipe', { recipe: item })} />
+                onPress={() => navigation.navigate('Recipe', { recipe: item, search: true })} />
         );
     }
 

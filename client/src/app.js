@@ -71,8 +71,8 @@ const app = () => {
                                 options={{ title: '레시피 정보', ...header_style, ...transition_style }}
                                 sharedElements={(route, _, showing) => {
                                     if (Platform.OS === 'ios' && !showing) return;
-                                    const { recipe } = route.params;
-                                    return [`recipe.${recipe.id}.photo`];
+                                    const { recipe, search } = route.params;
+                                    return [`recipe.${search}.${recipe.id}.photo`];
                                 }} />
                             <Stack.Screen
                                 name="Detection"

@@ -10,6 +10,7 @@ import { styles } from './styles';
 import { recipeDetailStore } from '../../store';
 
 const RecipeScreen = ({ route }) => {
+    const { search } = route.params;
     const [recipe, setRecipe] = useState(route.params.recipe);
     const [images, setImages] = useState([]);
     const [imageViewerVisible, setImageViewerVisible] = useState(false);
@@ -37,7 +38,7 @@ const RecipeScreen = ({ route }) => {
         <>
             <ScrollView>
                 <TouchableOpacity activeOpacity={0.8} onPress={() => showImageViewer([recipe.image])}>
-                    <SharedElement id={`recipe.${recipe.id}.photo`}>
+                    <SharedElement id={`recipe.${search}.${recipe.id}.photo`}>
                         <Image style={styles.image} source={{ uri: recipe.thumbnail }} />
                     </SharedElement>
                 </TouchableOpacity>

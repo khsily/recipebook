@@ -5,13 +5,13 @@ import { SharedElement } from 'react-navigation-shared-element';
 import RBCard from '../../Common/RBCard';
 import { styles } from './styles';
 
-function RecipeItem({ id, title, thumbnail, ingredients = [], searchIngredients = [], rating, view = 0, category, ...props }) {
+function RecipeItem({ id, title, thumbnail, search = false, ingredients = [], searchIngredients = [], rating, view = 0, category, ...props }) {
     view = view.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     const sIngredients = new Set(searchIngredients);
 
     return (
         <RBCard style={styles.container} touchable {...props}>
-            <SharedElement style={styles.thumbnailWrapper} id={`recipe.${id}.photo`}>
+            <SharedElement style={styles.thumbnailWrapper} id={`recipe.${search}.${id}.photo`}>
                 <Image style={styles.thumbnail} source={{ uri: thumbnail }} />
             </SharedElement>
             <View style={styles.content}>
