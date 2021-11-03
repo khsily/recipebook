@@ -69,6 +69,7 @@ const AddScreen = ({ route, navigation }) => {
                 style={styles.list}
                 data={getFilteredData(query)}
                 keyExtractor={item => `${params.type}_${item.id}`}
+                keyboardShouldPersistTaps='handled'
                 renderItem={({ item }) => (
                     <AddItem
                         text={item.name}

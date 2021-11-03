@@ -13,11 +13,6 @@ import { observer } from 'mobx-react';
 import { ingredientStore, myFavorStore, recipeStore } from '../../store';
 import { Ingredient } from '../../api';
 
-Keyboard.addListener('keyboardDidHide', () => {
-    Keyboard.dismiss(); // lose focus
-});
-
-
 const SearchScreen = ({ route, navigation }) => {
     const params = route.params || {};
     const [categories, setCategories] = useState([]);
@@ -111,12 +106,10 @@ const SearchScreen = ({ route, navigation }) => {
         <KeyboardAvoidingView
             style={styles.container}
             behavior={Platform.OS === 'ios' ? 'padding' : null}
-            enabled
             keyboardVerticalOffset={Constants.statusBarHeight + 44}>
             <ScrollView
                 contentContainerStyle={styles.scrollview}
-                nestedScrollEnabled={true}
-                keyboardShouldPersistTaps='handled'>
+                nestedScrollEnabled={true}>
                 <SearchForm title='식재료'>
                     <RBButton style={styles.addButton} title='추가' onPress={() => handleAdd('ingredients')} />
                     {ingredients.length > 0 &&
