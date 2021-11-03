@@ -95,7 +95,7 @@ def fetch_combination_id():
     combination_id = db.execute('fetchCombinationId.sql', {
         'combination': favors
     })
-    
+
     return jsonify(combination_id)
 
 
