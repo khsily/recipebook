@@ -39,7 +39,7 @@ const HomeScreen = ({ route, navigation }) => {
 
     React.useLayoutEffect(() => {
         navigation.setOptions({
-            headerLeft: () => <HeaderButton icon={ic_info} style={{ width: 18, height: 18 }} onPress={() => {}} />,
+            headerLeft: () => <HeaderButton icon={ic_info} style={{ width: 18, height: 18 }} onPress={() => navigation.navigate('Info')} />,
             headerRight: () => <HeaderButton icon={ic_search} onPress={() => navigation.navigate('Search')} />,
         });
     }, [navigation]);

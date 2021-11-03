@@ -4,6 +4,7 @@ import AddScreen from './AddScreen';
 import RecipeScreen from './RecipeScreen';
 import DetectionResultScreen from './DetectionResultScreen';
 import FavorScreen from './FavorScreen';
+import InfoScreen from './InfoScreen';
 
 export {
     HomeScreen,
@@ -12,4 +13,5 @@ export {
     RecipeScreen,
     DetectionResultScreen,
     FavorScreen,
+    InfoScreen,
 }

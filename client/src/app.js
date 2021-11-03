@@ -14,8 +14,9 @@ import {
     DetectionResultScreen,
     FavorScreen,
     AddScreen,
+    InfoScreen,
 } from './pages';
-import { header_style, transition_style } from './styles/common';
+import { header_style, transition_style, transition_vertical_style } from './styles/common';
 import { MainTheme } from './styles/themes';
 import { typography } from './utils';
 import { fetchInitalData, myFavorStore } from './store';
@@ -57,6 +58,10 @@ const app = () => {
                                 name="Home"
                                 component={HomeScreen}
                                 options={{ title: '라따뚜이', ...header_style, ...transition_style }} />
+                            <Stack.Screen
+                                name="Info"
+                                component={InfoScreen}
+                                options={{ title: '앱 정보', ...header_style, ...transition_vertical_style }} />
                             <Stack.Screen
                                 name="Search"
                                 component={SearchScreen}

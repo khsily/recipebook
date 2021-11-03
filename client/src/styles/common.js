@@ -17,3 +17,7 @@ export const header_style = {
 export const transition_style = {
     cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
 }
+
+export const transition_vertical_style = {
+    cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
+}
