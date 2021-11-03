@@ -4,15 +4,11 @@ import tensorflow as tf
 
 from tensorflow.keras.initializers import glorot_uniform
 from tensorflow.keras.models import Sequential, Model, load_model, save_model
-from tensorflow.keras.layers import Dense, Lambda, Activation
 from tensorflow.keras.layers import Embedding, Input, Dense, concatenate, Reshape, multiply, Flatten
 from tensorflow.keras.optimizers import Adagrad, Adam, SGD, RMSprop
 from dataset import Dataset
 from our_evaluate import evaluate_model
 from time import time
-import multiprocessing as mp
-import sys
-import math
 import argparse
 import os
 
@@ -25,9 +21,9 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Run GMF.")
     parser.add_argument('--path', nargs='?', default='data/',
                         help='Input data path.')
-    parser.add_argument('--dataset', nargs='?', default='recipe',
+    parser.add_argument('--dataset', nargs='?', default='small_recipe',
                         help='Choose a dataset.')
-    parser.add_argument('--epochs', type=int, default=100,
+    parser.add_argument('--epochs', type=int, default=20,
                         help='Number of epochs.')
     parser.add_argument('--batch_size', type=int, default=256,
                         help='Batch size.')
