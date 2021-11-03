@@ -69,7 +69,7 @@ const SearchScreen = ({ route, navigation }) => {
 
     async function handleSearch() {
         recipeStore.reset();
-        await recipeStore.fetchList({
+        recipeStore.fetchList({
             page: 1,
             combinationId: myFavorStore.combinationId,
             ingredients,
