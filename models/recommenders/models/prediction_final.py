@@ -33,30 +33,3 @@ def predictions(user_id, item_id, model_path, Top_K):
     recommends = [int(p[0])+1 for p in predictions[:Top_K]]
 
     return recommends
-
-
-if __name__ == '__main__':
-    model_path = 'sample_test_model.h5'
-    user_id = [3]                       # 하나만 들어오면 요리 갯수 만큼 곱해주는 함수 위에 있음.
-
-    f = open('data/idx_item.csv', 'r', encoding='utf-8')
-    item_id = []      # 카테고리에 속한 요리 갯수 만큼 중복되지 않게 들어와야 함.
-    for row in f.readlines():
-        item_id.append(row.strip().split('|')[0])
-
-    f.close()
-
-    recommends_top10 = predictions(user_id, item_id, model_path, 20)
-
-    model = tf.keras.models.load_model('sample_test_model.h5')
-    topK = 10
-    evaluation_threads = 1
-    dataset = Dataset('data' + '/sample')
-    train, testLabels, testPredictions = dataset.trainMatrix, dataset.testLabels, dataset.testPredictions
-
-    (hits, ndcgs) = evaluate_model(model, topK, testPredictions, testLabels, evaluation_threads)
-
-    print(recommends_top10)
-    print(np.mean(hits), np.mean(ndcgs))
-
-
