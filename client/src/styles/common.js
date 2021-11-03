@@ -8,6 +8,7 @@ export const header_style = {
     headerTintColor: '#fff',
     headerTitleStyle: {
         fontWeight: 'bold',
+        fontSize: 20,
     },
     headerTitleAlign: 'center',
     headerBackTitleVisible: false,

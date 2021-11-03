@@ -82,7 +82,7 @@ const SearchScreen = ({ route, navigation }) => {
     useLayoutEffect(() => {
         navigation.setOptions({
             headerRight: () => (
-                <HeaderButton icon={ic_camera} onPress={handleDetection} />
+                <HeaderButton icon={ic_camera} style={{ width: 25, height: 25 }} onPress={handleDetection} />
             )
         });
 
