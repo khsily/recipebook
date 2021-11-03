@@ -1,14 +1,8 @@
 # make_data.py
-import requests
-import json
-import pprint
 import collections
 import random
 import pandas as pd
-import numpy as np
-import os
 import re
-import csv
 
 
 def get_recommend_title():
@@ -60,25 +54,14 @@ def train_rating(path, idx2id, item2idx, theme2item, rating):
             print('{}\t{}\t{}'.format(i, item2idx[j], 5), file=f)
             often_use[i] = [item2idx[j]]
             print('{}\t{}\t{}'.format(i, item2idx[j], 5), file=f)
-            often_use[i].append(item2idx[j])
+            often_use[i] = [item2idx[j]]
             print('{}\t{}\t{}'.format(i, item2idx[j], 5), file=f)
-            often_use[i].append(item2idx[j])
+            often_use[i] = [item2idx[j]]
             print('{}\t{}\t{}'.format(i, item2idx[j], 5), file=f)
-            often_use[i].append(item2idx[j])
-            print('{}\t{}\t{}'.format(i, item2idx[j], 5), file=f)
-            often_use[i].append(item2idx[j])
-            print('{}\t{}\t{}'.format(i, item2idx[j], 5), file=f)
-            often_use[i].append(item2idx[j])
-            print('{}\t{}\t{}'.format(i, item2idx[j], 5), file=f)
-            often_use[i].append(item2idx[j])
-            print('{}\t{}\t{}'.format(i, item2idx[j], 5), file=f)
-            often_use[i].append(item2idx[j])
-            print('{}\t{}\t{}'.format(i, item2idx[j], 5), file=f)
-            often_use[i].append(item2idx[j])
-            print('{}\t{}\t{}'.format(i, item2idx[j], 5), file=f)
-            often_use[i].append(item2idx[j])
+            often_use[i] = [item2idx[j]]
             for_unique.append(j)
-            for _ in range(20):
+
+            for _ in range(15):
                 for t in range(7):
                     if j in list(theme2item.values())[t]:
                         name = random.choice(list(theme2item.values())[t])
@@ -102,7 +85,7 @@ def test_rating(path, idx2id, idx2item, rating):
     :param rating: 평가 점수 리스트
     :return: None path에 파일로 저장
     '''
-    df = pd.read_csv('recipe.train.rating', delimiter='\t', names=['user_id', 'item_id', 'rating'])
+    df = pd.read_csv('small_recipe.train.rating', delimiter='\t', names=['user_id', 'item_id', 'rating'])
     f = open(path, 'w', encoding='utf-8')
     test_item = []
     while len(test_item) <= max(df['user_id']):
@@ -129,7 +112,7 @@ def test_negative(path, item2idx):
     :param item2idx: dict {요리명: 0, ...}
     :return: None recipe.test.negative 파일 생성
     '''
-    df = pd.read_csv('recipe.train.rating', delimiter='\t', names=['user_id', 'item_id', 'rating'])
+    df = pd.read_csv('small_recipe.train.rating', delimiter='\t', names=['user_id', 'item_id', 'rating'])
     pos_rat = []
     for i in range(1, max(df['user_id'])+1):
         rated = df.loc[df['user_id'] == i].item_id.values
@@ -142,15 +125,15 @@ def test_negative(path, item2idx):
     # print(sample)
     # print(type(sample.split('\t')[1]))
 
-    with open('recipe.test.rating', 'r', encoding='utf-8') as f:
+    with open('small_recipe.test.rating', 'r', encoding='utf-8') as f:
         rows = f.readlines()
         id_rat, pos_list = [], []
         for row in rows:
             # print(row.split()[0], row.split()[1])
             id = '({},{})'.format(int(row.split()[0]), int(row.split()[1]))
             id_rat.append(id)
-            pos_rat[int(row.split()[0])-1].append(row.split()[1])
-            rated = pos_rat[int(row.split()[0])-1]
+            pos_rat[int(row.split()[0])].append(row.split()[1])
+            rated = pos_rat[int(row.split()[0])]
             pos_list.append(rated)
         # print(len(pos_list))            # 2341
 
@@ -208,7 +191,7 @@ def test_preds(idx2item, idx2id):
     for item_num in idx2item.keys():
         item_nums.append(item_num)
 
-    with open('recipe.test.preds', 'w', encoding='utf-8') as f:
+    with open('small_recipe.test.preds', 'w', encoding='utf-8') as f:
         for num in idx2id.keys():
             print(num, *item_nums, file=f)
 
@@ -221,7 +204,7 @@ theme_title_top6 = get_recommend_title()
 
 idx2id, id2idx = get_user_id('idx_id.csv')
 
-item_title = pd.read_csv('csv/csv/recipe.csv', delimiter=',')
+item_title = pd.read_csv('csv_final/csv_final/recipe.csv', delimiter=',')
 
 theme2item, title = {}, []
 for C in category_name:
@@ -248,18 +231,16 @@ for_record = {}
 for i in idx2id:
     for_record[i] = []
 
-for i in range(5):
-    often_use = train_rating('recipe.train.rating', idx2id, item2idx, theme2item, rating)     # 파일 만듬
-    for j in often_use:
-        for_record[j] += (often_use[j])
+often_use = train_rating('small_recipe.train.rating', idx2id, item2idx, theme2item, rating)     # 파일 만듬
+for j in often_use:
+    for_record[j] += (often_use[j])
 
-with open('recipe.test.label', 'w', encoding='utf-8') as f:
+with open('small_recipe.test.label', 'w', encoding='utf-8') as f:
     for i in for_record:
-        print('{},{},{},{},{},{},{},{},{},{},{}'
-              .format(i, *[j[0] for j in collections.Counter(for_record[i]).most_common(10)]), file=f)
+        print(i, *[j[0] for j in collections.Counter(for_record[i]).most_common()], sep=',', file=f)
 
-# test_rating('recipe.test.rating', idx2id, idx2item, rating)                   # 파일 만듬
-# test_negative('recipe.test.negative', item2idx)                               # 파일 만듬
+# test_rating('small_recipe.test.rating', idx2id, idx2item, rating)                   # 파일 만듬
+# test_negative('small_recipe.test.negative', item2idx)                               # 파일 만듬
 
 # get_label(idx2id, top_k=20)
 test_preds(idx2item, idx2id)

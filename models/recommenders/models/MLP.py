@@ -1,21 +1,15 @@
 # MLP.py
 import numpy as np
-
 import tensorflow as tf
-from keras import backend as K
+
 from tensorflow.keras.initializers import glorot_uniform
-from tensorflow.keras.regularizers import l2
 from tensorflow.keras.models import Sequential, Model
-from tensorflow.keras.layers import Dense, Lambda, Activation
 from tensorflow.keras.layers import Embedding, Input, Dense, Reshape, concatenate, add, Flatten, Dropout
-from tensorflow.keras.constraints import max_norm
 from tensorflow.keras.optimizers import Adagrad, Adam, SGD, RMSprop
 from our_evaluate import evaluate_model
 from dataset import Dataset
 from time import time
-import sys
 import argparse
-import multiprocessing as mp
 
 
 #################### Arguments ####################
@@ -23,11 +17,11 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Run MLP.")
     parser.add_argument('--path', nargs='?', default='data/',
                         help='Input data path.')
-    parser.add_argument('--dataset', nargs='?', default='recipe',
+    parser.add_argument('--dataset', nargs='?', default='small_recipe',
                         help='Choose a dataset.')
-    parser.add_argument('--epochs', type=int, default=2,
+    parser.add_argument('--epochs', type=int, default=20,
                         help='Number of epochs.')
-    parser.add_argument('--batch_size', type=int, default=512,
+    parser.add_argument('--batch_size', type=int, default=256,
                         help='Batch size.')
     parser.add_argument('--layers', nargs='?', default='[64,32,16,8]',
                         help="Size of each layer. Note that the first layer is the concatenation of user and item embeddings. So layers[0]/2 is the embedding size.")
