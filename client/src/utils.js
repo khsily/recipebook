@@ -24,7 +24,7 @@ export async function openGallery(options) {
         return { ...image, ...resizedImage };
     } catch (e) {
         console.error(e);
-
+        return { cancelled: true };
     }
 }
 
@@ -49,6 +49,7 @@ export async function openCamera(options) {
         return { ...image, ...resizedImage };
     } catch (e) {
         console.error(e);
+        return { cancelled: true };
     }
 }
 
