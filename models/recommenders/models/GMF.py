@@ -1,6 +1,8 @@
 # GMF.py
 import numpy as np
 import tensorflow as tf
+import matplotlib.pyplot as plt
+from sklearn import model_selection
 
 from tensorflow.keras.initializers import glorot_uniform
 from tensorflow.keras.models import Sequential, Model, load_model, save_model
@@ -65,10 +67,19 @@ def get_model(num_users, num_items, latent_dim, regs=[0, 0]):
 
     # Final prediction layer
     # prediction = Lambda(lambda x: K.sigmoid(K.sum(x)), output_shape=(1,))(predict_vector)
-    prediction = Dense(1, activation='sigmoid', name='prediction')(predict_vector)
+    dense1 = Dense(512, activation='relu', name='dense1')(predict_vector)
+    dropout = tf.keras.layers.Dropout(rate=0.5)(dense1)
+    dense2 = Dense(256, activation='relu', name='dense2')(dropout)
+    dropout = tf.keras.layers.Dropout(rate=0.5)(dense2)
+    dense3 = Dense(128, activation='relu', name='dense3')(dropout)
+    dropout = tf.keras.layers.Dropout(rate=0.5)(dense3)
+    dense4 = Dense(64, activation='relu', name='dense4')(dropout)
+    dense5 = Dense(32, activation='relu', name='dense5')(dense4)
+
+    prediction = Dense(1, activation='sigmoid', name='prediction')(dense5)
 
     model = Model([user_input, item_input], prediction)
-    # model.summary()
+    model.summary()
 
     return model
 
@@ -135,31 +146,67 @@ if __name__ == '__main__':
     hr, ndcg = np.array(hits).mean(), np.array(ndcgs).mean()
     print('Init: HR = %.4f, NDCG = %.4f\t [%.1f s]' % (hr, ndcg, time() - t1))
 
+    user_input, item_input, labels = get_train_instances(train, num_negatives)
+
+    user_input, item_input, labels = np.array(user_input), np.array(item_input), np.array(labels)
+
+    # Training
+    checkpoint = tf.keras.callbacks.ModelCheckpoint(filepath=model_out_file,
+                                                    monitor='val_loss',
+                                                    verbose=0,
+                                                    save_weights_only=True,
+                                                    save_best_only=True,
+                                                    )
+
+    early_stopping = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=10)
+
+    hist = model.fit([user_input, item_input],  # input
+                     labels,  # labels
+                     batch_size=batch_size, epochs=1, verbose=1, shuffle=True,
+                     validation_split=0.2,
+                     callbacks=[checkpoint, early_stopping])
+    print(hist.history['loss'])
+    exit()
+
+
     # Train model
     best_hr, best_ndcg, best_iter = hr, ndcg, -1
+    train_loss, val_loss, train_acc, val_acc = [], [], [], []
     for epoch in range(epochs):
         t1 = time()
         # Generate training instances
         user_input, item_input, labels = get_train_instances(train, num_negatives)
 
+        user_input, item_input, labels = np.array(user_input), np.array(item_input), np.array(labels)
+
         # Training
         checkpoint = tf.keras.callbacks.ModelCheckpoint(filepath=model_out_file,
-                                                        monitor='loss',
+                                                        monitor='val_loss',
                                                         verbose=0,
                                                         save_weights_only=True,
                                                         save_best_only=True,
-                                                        save_freq=epoch)
+                                                        )
 
-        early_stopping = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=10)
+        early_stopping = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=10)
 
-        hist = model.fit([np.array(user_input), np.array(item_input)],  # input
-                         np.array(labels),  # labels
-                         batch_size=batch_size, epochs=1, verbose=1, shuffle=True,
+        hist = model.fit([user_input, item_input],  # input
+                         labels,  # labels
+                         batch_size=batch_size, epochs=epoch, verbose=1, shuffle=True,
+                         validation_split=0.2,
                          callbacks=[checkpoint, early_stopping])
+
+        # train_loss.append(hist.history['loss'])
+        # val_loss.append(hist.history['val_loss'])
+        # train_acc.append(hist.history['acc'])
+        # val_acc.append(hist.history['val_acc'])
+
+        print(hist.history['loss'])
+        exit()
+
         t2 = time()
 
         # Evaluation
-        if epoch % verbose == 0:
+        if epoch % 5 == 0:
             (hits, ndcgs) = evaluate_model(model, topK, testPredictions, testLabels, evaluation_threads)
             hr, ndcg, loss = np.array(hits).mean(), np.array(ndcgs).mean(), hist.history['loss'][0]
             print('Iteration %d [%.1f s]: HR = %.4f, NDCG = %.4f, loss = %.4f [%.1f s]'
@@ -172,3 +219,20 @@ if __name__ == '__main__':
     print("End. Best Iteration %d:  HR = %.4f, NDCG = %.4f. " % (best_iter, best_hr, best_ndcg))
     if args.out > 0:
         print("The best GMF model is saved to %s" % (model_out_file))
+
+    fig, loss_ax = plt.subplots()
+    acc_ax = loss_ax.twinx()
+
+    loss_ax.plot(train_loss, 'y', label='train loss')
+    loss_ax.plot(val_loss, 'r', label='val loss')
+    loss_ax.set_xlabel('epoch')
+    loss_ax.set_ylabel('loss')
+    loss_ax.legend(loc='upper left')
+
+    acc_ax.plot(train_acc, 'b', label='train acc')
+    acc_ax.plot(val_acc, 'g', label='val acc')
+    acc_ax.set_ylabel('accuracy')
+    acc_ax.legend(loc='lower left')
+
+    plt.show()
+
