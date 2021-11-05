@@ -6,7 +6,7 @@ from tensorflow.keras.initializers import glorot_uniform
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Embedding, Input, Dense, multiply, Reshape, concatenate, Flatten, Dropout
 from tensorflow.keras.optimizers import Adagrad, Adam, SGD, RMSprop
-from our_evaluate import evaluate_model
+from evaluate import evaluate_model
 from dataset import Dataset
 from time import time
 import GMF, MLP
@@ -168,10 +168,10 @@ if __name__ == '__main__':
     # Loading data
     t1 = time()
     dataset = Dataset(args.path + args.dataset)
-    train, testLabels, testPredictions = dataset.trainMatrix, dataset.testLabels, dataset.testPredictions
+    train, testRatings, testNegatives = dataset.trainMatrix, dataset.testRatings, dataset.testNegatives
     num_users, num_items = train.shape
     print("Load data done [%.1f s]. #user=%d, #item=%d, #train=%d, #test=%d"
-          % (time() - t1, num_users, num_items, train.nnz, len(testLabels)))
+          % (time() - t1, num_users, num_items, train.nnz, len(testRatings)))
 
     # Build model
     model = get_model(num_users, num_items, mf_dim, layers, reg_layers, reg_mf)
@@ -197,7 +197,7 @@ if __name__ == '__main__':
         print("Load pretrained GMF (%s) and MLP (%s) models done. " % (mf_pretrain, mlp_pretrain))
 
     # Init performance
-    (hits, ndcgs) = evaluate_model(model, topK, testPredictions, testLabels, evaluation_threads)
+    (hits, ndcgs) = evaluate_model(model, testRatings, testNegatives, topK, evaluation_threads)
     hr, ndcg = np.array(hits).mean(), np.array(ndcgs).mean()
     print('Init: HR = %.4f, NDCG = %.4f' % (hr, ndcg))
 
@@ -223,14 +223,13 @@ if __name__ == '__main__':
 
         hist = model.fit([np.array(user_input), np.array(item_input)],  # input
                          np.array(labels),  # labels
-                         batch_size=batch_size, epochs=1, verbose=1, shuffle=True,
-                         callbacks=[checkpoint, early_stopping])
+                         batch_size=batch_size, epochs=1, verbose=1, shuffle=True)
 
         t2 = time()
 
         # Evaluation
         if epoch % verbose == 0:
-            (hits, ndcgs) = evaluate_model(model, topK, testPredictions, testLabels, evaluation_threads)
+            (hits, ndcgs) = evaluate_model(model, testRatings, testNegatives, topK, evaluation_threads)
             hr, ndcg, loss = np.array(hits).mean(), np.array(ndcgs).mean(), hist.history['loss'][0]
             print('Iteration %d [%.1f s]: HR = %.4f, NDCG = %.4f, loss = %.4f [%.1f s]'
                   % (epoch, t2 - t1, hr, ndcg, loss, time() - t2))

@@ -3,6 +3,7 @@ import math
 import heapq  # for retrieval topK
 import multiprocessing
 import numpy as np
+import random
 from time import time
 
 
@@ -40,10 +41,12 @@ def evaluate_model(model, testRatings, testNegatives, K, num_thread):
         ndcgs = [r[1] for r in res]
         return (hits, ndcgs)
     # Single thread
-    for idx in range(len(_testRatings)):
+    for idx in random.choices(range(len(_testRatings)), k=5000):
         (hr, ndcg) = eval_one_rating(idx)
         hits.append(hr)
         ndcgs.append(ndcg)
+        if idx % 100 == 0:
+            print(idx)
     return (hits, ndcgs)
 
 
