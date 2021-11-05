@@ -16,8 +16,9 @@ const InfoScreen = () => {
                 <View style={styles.contributorContrainer}>
                     <Text style={styles.contributorTitle}>Contributors</Text>
                     <Text style={styles.contributorInfo}>김한수: 앱 / 서버 / DB</Text>
-                    <Text style={styles.contributorInfo}>김한성: 추천 모델 (NeuMF)</Text>
-                    <Text style={styles.contributorInfo}>이예인: 객체 인식 모델 (YoloV3)</Text>
+                    <Text style={styles.contributorInfo}>김한성: 추천 모델 (NeuMF) / 데이터수집</Text>
+                    <Text style={styles.contributorInfo}>이예인: 객체 인식 모델 (YoloV3) / 데이터수집</Text>
+                    <Text style={styles.contributorInfo}>김효동: 데이터수집</Text>
                 </View>
 
                 <View style={styles.contributorContrainer}>
