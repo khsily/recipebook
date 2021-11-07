@@ -25,7 +25,7 @@ class Dataset(object):
             line = f.readline()
             while line != None and line != "":
                 arr = line.split("\t")
-                user, item = int(arr[0]), int(arr[1])
+                user, item = int(arr[0]) - 1, int(arr[1]) - 1
                 ratingList.append([user, item])
                 line = f.readline()
         return ratingList
@@ -38,7 +38,7 @@ class Dataset(object):
                 arr = line.split()
                 negatives = []
                 for x in arr[1:]:
-                    negatives.append(int(x))
+                    negatives.append(int(x) - 1)
                 negativeList.append(negatives)
                 line = f.readline()
         return negativeList
@@ -54,7 +54,7 @@ class Dataset(object):
             line = f.readline()
             while line != None and line != "":
                 arr = line.split("\t")
-                u, i = int(arr[0]), int(arr[1])
+                u, i = int(arr[0]) - 1, int(arr[1]) - 1
                 num_users = max(num_users, u)
                 num_items = max(num_items, i)       # 826 으로 정해져 있음. max(num_items, i)
                 line = f.readline()
@@ -64,7 +64,7 @@ class Dataset(object):
             line = f.readline()
             while line != None and line != "":
                 arr = line.split("\t")
-                user, item, rating = int(arr[0]), int(arr[1]), float(arr[2])
+                user, item, rating = int(arr[0]) - 1, int(arr[1]) - 1, float(arr[2]) - 1
                 if (rating > 0):
                     mat[user, item] = rating
                 line = f.readline()

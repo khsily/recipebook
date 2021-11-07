@@ -2,6 +2,7 @@
 import numpy as np
 import tensorflow as tf
 
+
 from tensorflow.keras.initializers import glorot_uniform
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Embedding, Input, Dense, Reshape, concatenate, add, Flatten, Dropout
@@ -117,7 +118,7 @@ if __name__ == '__main__':
 
     # Loading data
     t1 = time()
-    data = Dataset(args.path + args.dataset)
+    dataset = Dataset(args.path + args.dataset)
     train, testRatings, testNegatives = dataset.trainMatrix, dataset.testRatings, dataset.testNegatives
     num_users, num_items = train.shape
     print("Load data done [%.1f s]. #user=%d, #item=%d, #train=%d, #test=%d"

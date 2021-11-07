@@ -42,9 +42,9 @@ def parse_args():
                         help='Show performance per X iterations')
     parser.add_argument('--out', type=int, default=1,
                         help='Whether to save the trained model.')
-    parser.add_argument('--mf_pretrain', nargs='?', default=r'pretrain\sample_GMF_8_1635747971.h5',
+    parser.add_argument('--mf_pretrain', nargs='?', default=r'pretrain\small_recipe_GMF_8_1636097655.h5',
                         help='Specify the pretrain model file for MF part. If empty, no pretrain will be used')
-    parser.add_argument('--mlp_pretrain', nargs='?', default=r'pretrain\sample_MLP_[64,32,16,8]_1635748157.h5',
+    parser.add_argument('--mlp_pretrain', nargs='?', default=r'pretrain\small_recipe_MLP_[64,32,16,8]_1635904342.h5',
                         help='Specify the pretrain model file for MLP part. If empty, no pretrain will be used')
     return parser.parse_args()
 

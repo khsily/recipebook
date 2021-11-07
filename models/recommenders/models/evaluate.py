@@ -41,7 +41,7 @@ def evaluate_model(model, testRatings, testNegatives, K, num_thread):
         ndcgs = [r[1] for r in res]
         return (hits, ndcgs)
     # Single thread
-    for idx in random.choices(range(len(_testRatings)), k=5000):
+    for idx in random.choices(range(len(_testRatings)), k=10000):
         (hr, ndcg) = eval_one_rating(idx)
         hits.append(hr)
         ndcgs.append(ndcg)
