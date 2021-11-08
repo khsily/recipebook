@@ -17,10 +17,14 @@ export async function openGallery(options) {
             quality: 1,
             ...options,
         });
+
+        if (image.cancelled) return image;
+
         const resizedImage = await resizeImage(image, 800);
         return { ...image, ...resizedImage };
     } catch (e) {
         console.error(e);
+        return { cancelled: true };
     }
 }
 
@@ -38,10 +42,14 @@ export async function openCamera(options) {
             mediaTypes: ImagePicker.MediaTypeOptions.All,
             ...options,
         });
+
+        if (image.cancelled) return image;
+        
         const resizedImage = await resizeImage(image, 800);
         return { ...image, ...resizedImage };
     } catch (e) {
         console.error(e);
+        return { cancelled: true };
     }
 }
 

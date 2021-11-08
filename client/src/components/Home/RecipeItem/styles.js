@@ -4,7 +4,8 @@ import { MainTheme } from "../../../styles/themes";
 export const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
-        marginBottom: 12,
+        marginTop: 2,
+        marginBottom: 10,
     },
 
     thumbnailWrapper: {
