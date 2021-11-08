@@ -155,13 +155,13 @@ if __name__ == '__main__':
 
         user_input, item_input, labels = np.array(user_input), np.array(item_input), np.array(labels)
 
-        # Training
-        # checkpoint = tf.keras.callbacks.ModelCheckpoint(filepath=model_out_file,
-        #                                                 monitor='val_loss',
-        #                                                 verbose=0,
-        #                                                 save_weights_only=True,
-        #                                                 save_best_only=True)
-        # callback = TrainingPlot()
+        Training
+        checkpoint = tf.keras.callbacks.ModelCheckpoint(filepath=model_out_file,
+                                                        monitor='val_loss',
+                                                        verbose=0,
+                                                        save_weights_only=True,
+                                                        save_best_only=True)
+        callback = TrainingPlot()
 
         early_stopping = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=10)
 
