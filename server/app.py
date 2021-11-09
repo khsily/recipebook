@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 import os
 
 from routes import api
@@ -11,9 +11,12 @@ config = {
 }
 
 
-@api.route("/test_db")
+@api.get("/test_db")
 def db_info():
-    return db.execute('server.sql')[0][0]
+    body = request.json
+    print(body, flush=True)
+    info = db.execute('server.sql')[0]['version']
+    return info
 
 
 def create_app():
