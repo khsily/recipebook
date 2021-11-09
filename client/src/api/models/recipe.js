@@ -10,9 +10,8 @@ export const fetchCombinationId = (favors) => {
 }
 
 export const fetchRecommendList = (page, combinationId) => {
-    return Api.post(`recipe/recommend/${page}`, {
-        payload: { combinationId },
-    });
+    const form = objToForm({ combinationId });
+    return Api.get(`recipe/recommend/${page}?${form}`);
 }
 
 export const searchList = ({ page, ingredients, categories, combinationId }) => {
