@@ -29,5 +29,5 @@ AND
 		WHERE (ingredient_id = ANY (%(ingredients)s) OR %(ingredients)s IS NULL)
 	)
 GROUP BY r.id, c.name
-ORDER BY ARRAY_POSITION(%(ids)s, r.id), counts DESC, score DESC
+ORDER BY ARRAY_POSITION(%(ids)s, r.id), counts DESC, score DESC, id ASC
 LIMIT %(limit)s OFFSET %(offset)s;

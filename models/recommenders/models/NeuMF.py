@@ -3,15 +3,12 @@ import numpy as np
 import tensorflow as tf
 
 from tensorflow.keras.initializers import glorot_uniform
-from tensorflow.keras.regularizers import l1, l2, l1_l2
 from tensorflow.keras.models import Sequential, Model
-from tensorflow.keras.layers import Dense, Lambda, Activation
 from tensorflow.keras.layers import Embedding, Input, Dense, multiply, Reshape, concatenate, Flatten, Dropout
 from tensorflow.keras.optimizers import Adagrad, Adam, SGD, RMSprop
 from our_evaluate import evaluate_model
 from dataset import Dataset
 from time import time
-import sys
 import GMF, MLP
 import argparse
 
@@ -21,7 +18,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Run NeuMF.")
     parser.add_argument('--path', nargs='?', default='data//',
                         help='Input data path.')
-    parser.add_argument('--dataset', nargs='?', default='recipe',
+    parser.add_argument('--dataset', nargs='?', default='small_recipe',
                         help='Choose a dataset.')
     parser.add_argument('--epochs', type=int, default=100,
                         help='Number of epochs.')
@@ -45,9 +42,9 @@ def parse_args():
                         help='Show performance per X iterations')
     parser.add_argument('--out', type=int, default=1,
                         help='Whether to save the trained model.')
-    parser.add_argument('--mf_pretrain', nargs='?', default=r'pretrain\recipe_GMF_8_1635387732.h5',
+    parser.add_argument('--mf_pretrain', nargs='?', default=r'pretrain\sample_GMF_8_1635747971.h5',
                         help='Specify the pretrain model file for MF part. If empty, no pretrain will be used')
-    parser.add_argument('--mlp_pretrain', nargs='?', default=r'pretrain\recipe_MLP_[64,32,16,8]_1635466304.h5',
+    parser.add_argument('--mlp_pretrain', nargs='?', default=r'pretrain\sample_MLP_[64,32,16,8]_1635748157.h5',
                         help='Specify the pretrain model file for MLP part. If empty, no pretrain will be used')
     return parser.parse_args()
 

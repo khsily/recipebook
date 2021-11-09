@@ -8,6 +8,7 @@ export const header_style = {
     headerTintColor: '#fff',
     headerTitleStyle: {
         fontWeight: 'bold',
+        fontSize: 20,
     },
     headerTitleAlign: 'center',
     headerBackTitleVisible: false,
@@ -15,4 +16,8 @@ export const header_style = {
 
 export const transition_style = {
     cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+}
+
+export const transition_vertical_style = {
+    cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
 }

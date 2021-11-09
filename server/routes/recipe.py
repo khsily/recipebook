@@ -1,5 +1,3 @@
-import os
-import json
 from flask import Blueprint, request, jsonify
 from models.recommenders.models.prediction_final import predictions
 import db
@@ -39,10 +37,9 @@ def get_recommend_ids(id, top_n):
 
 
 # 추천 리스트
-@recipe.post('/recommend/<page>')
+@recipe.get('/recommend/<page>')
 def fetch_recommend(page):
-    body = request.json or {}
-    combination_id = 'combinationId' in body and body['combinationId'] or None
+    combination_id = request.args.get('combinationId')
 
     limit = 50
     offset = (int(page) - 1) * limit
@@ -97,7 +94,7 @@ def fetch_combination_id():
     combination_id = db.execute('fetchCombinationId.sql', {
         'combination': favors
     })
-    
+
     return jsonify(combination_id)
 
 

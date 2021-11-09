@@ -5,10 +5,10 @@ import { styles } from './styles';
 function HeaderButton({ icon, ...props }) {
     return (
         <TouchableOpacity
+            {...props}
             style={styles.button}
-            activeOpacity={0.6}
-            {...props}>
-            <Image style={styles.icon} source={icon} />
+            activeOpacity={0.6}>
+            <Image style={[styles.icon, props.style]} source={icon} />
         </TouchableOpacity>
     );
 }

@@ -18,6 +18,7 @@ import { Ingredient } from '../../api';
 import { ingredientStore, myFavorStore, recipeStore, recommendRecipeStore } from '../../store';
 
 import ic_search from '../../../assets/icon/ic_search.png';
+import ic_info from '../../../assets/icon/ic_info.png';
 
 let lastScroll = 0;
 
@@ -38,9 +39,8 @@ const HomeScreen = ({ route, navigation }) => {
 
     React.useLayoutEffect(() => {
         navigation.setOptions({
-            headerRight: () => (
-                <HeaderButton icon={ic_search} onPress={() => navigation.navigate('Search')} />
-            )
+            headerLeft: () => <HeaderButton icon={ic_info} style={{ width: 18, height: 18 }} onPress={() => navigation.navigate('Info')} />,
+            headerRight: () => <HeaderButton icon={ic_search} onPress={() => navigation.navigate('Search')} />,
         });
     }, [navigation]);
 
