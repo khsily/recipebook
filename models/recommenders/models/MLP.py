@@ -19,7 +19,7 @@ def parse_args():
                         help='Input data path.')
     parser.add_argument('--dataset', nargs='?', default='small_recipe',
                         help='Choose a dataset.')
-    parser.add_argument('--epochs', type=int, default=20,
+    parser.add_argument('--epochs', type=int, default=100,
                         help='Number of epochs.')
     parser.add_argument('--batch_size', type=int, default=256,
                         help='Batch size.')
@@ -173,6 +173,7 @@ if __name__ == '__main__':
                 best_hr, best_ndcg, best_iter = hr, ndcg, epoch
                 if args.out > 0:
                     model.save_weights(model_out_file, overwrite=True)
+                    model.save('small_recipe_mlp.h5', overwrite=True)
 
     print("End. Best Iteration %d:  HR = %.4f, NDCG = %.4f. " % (best_iter, best_hr, best_ndcg))
     if args.out > 0:

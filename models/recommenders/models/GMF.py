@@ -182,6 +182,7 @@ if __name__ == '__main__':
                 best_hr, best_ndcg, best_iter = hr, ndcg, epoch
                 if args.out > 0:
                     model.save_weights(model_out_file, overwrite=True)
+                    model.save('small_recipe_gmf.h5', overwrite=True)
 
     print("End. Best Iteration %d:  HR = %.4f, NDCG = %.4f. " % (best_iter, best_hr, best_ndcg))
     if args.out > 0:
