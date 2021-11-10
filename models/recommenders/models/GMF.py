@@ -169,7 +169,6 @@ if __name__ == '__main__':
                          labels,  # labels
                          batch_size=batch_size, epochs=1, verbose=1, shuffle=True,
                          callbacks=[checkpoint, early_stopping, callback])
-
         t2 = time()
 
         # Evaluation
