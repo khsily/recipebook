@@ -228,6 +228,7 @@ if __name__ == '__main__':
                          np.array(labels),  # labels
                          batch_size=batch_size, epochs=1, verbose=1, shuffle=True,
                          callbacks=[checkpoint, early_stopping, graph])
+
         t2 = time()
 
         # Evaluation
