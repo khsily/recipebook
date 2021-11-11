@@ -70,7 +70,6 @@ def train_rating(path, idx2id, item2idx, theme2item, rating):
                             often_use[i].append(item2idx[name])
                             for_unique.append(name)
         num += 1
-
     f.close()
 
     return often_use
