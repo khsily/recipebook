@@ -1,4 +1,4 @@
-# dataset.py
+# dataset_1.py
 import scipy.sparse as sp
 import numpy as np
 
@@ -13,25 +13,25 @@ class Dataset(object):
         Constructor
         '''
         self.trainMatrix = self.load_rating_file_as_matrix(path + ".train.rating")
-        self.testLabels = self.load_label_file_as_list(path + ".test.label")
-        self.testPredictions = self.load_predict_file(path + ".test.preds")
-        assert len(self.testLabels) == len(self.testPredictions)
+        self.testRatings = self.load_rating_file_as_list(path + ".test.rating")
+        self.testNegatives = self.load_negative_file(path + ".test.negative")
+        assert len(self.testRatings) == len(self.testNegatives)
 
         self.num_users, self.num_items = self.trainMatrix.shape
 
-    def load_label_file_as_list(self, filename):
-        labelList = []
+    def load_rating_file_as_list(self, filename):
+        ratingList = []
         with open(filename, "r") as f:
             line = f.readline()
             while line != None and line != "":
-                arr = line.split(',')
-                user, item = int(arr[0]) - 1, [int(n) - 1 for n in arr[1:]]
-                labelList.append([user, item])
+                arr = line.split("\t")
+                user, item = int(arr[0]) - 1, int(arr[1]) - 1
+                ratingList.append([user, item])
                 line = f.readline()
-        return labelList
+        return ratingList
 
-    def load_predict_file(self, filename):
-        predictList = []
+    def load_negative_file(self, filename):
+        negativeList = []
         with open(filename, "r") as f:
             line = f.readline()
             while line != None and line != "":
@@ -39,9 +39,9 @@ class Dataset(object):
                 negatives = []
                 for x in arr[1:]:
                     negatives.append(int(x) - 1)
-                predictList.append(negatives)
+                negativeList.append(negatives)
                 line = f.readline()
-        return predictList
+        return negativeList
 
     def load_rating_file_as_matrix(self, filename):
         '''
@@ -56,7 +56,7 @@ class Dataset(object):
                 arr = line.split("\t")
                 u, i = int(arr[0]) - 1, int(arr[1]) - 1
                 num_users = max(num_users, u)
-                num_items = max(num_items, i)
+                num_items = max(num_items, i)       # 826 으로 정해져 있음. max(num_items, i)
                 line = f.readline()
         # Construct matrix
         mat = sp.dok_matrix((num_users + 1, num_items + 1), dtype=np.float32)
@@ -64,8 +64,8 @@ class Dataset(object):
             line = f.readline()
             while line != None and line != "":
                 arr = line.split("\t")
-                user, item, rating = int(arr[0]) - 1, int(arr[1]) - 1, float(arr[2])
+                user, item, rating = int(arr[0]) - 1, int(arr[1]) - 1, float(arr[2]) - 1
                 if (rating > 0):
-                    mat[user, item] = 1.0
+                    mat[user, item] = rating
                 line = f.readline()
         return mat

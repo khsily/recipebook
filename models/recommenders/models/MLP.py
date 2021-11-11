@@ -2,11 +2,12 @@
 import numpy as np
 import tensorflow as tf
 
+from callback import TrainingPlot
 from tensorflow.keras.initializers import glorot_uniform
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Embedding, Input, Dense, Reshape, concatenate, add, Flatten, Dropout
 from tensorflow.keras.optimizers import Adagrad, Adam, SGD, RMSprop
-from our_evaluate import evaluate_model
+from evaluate import evaluate_model
 from dataset import Dataset
 from time import time
 import argparse
@@ -19,7 +20,7 @@ def parse_args():
                         help='Input data path.')
     parser.add_argument('--dataset', nargs='?', default='small_recipe',
                         help='Choose a dataset.')
-    parser.add_argument('--epochs', type=int, default=20,
+    parser.add_argument('--epochs', type=int, default=100,
                         help='Number of epochs.')
     parser.add_argument('--batch_size', type=int, default=256,
                         help='Batch size.')
@@ -117,11 +118,12 @@ if __name__ == '__main__':
 
     # Loading data
     t1 = time()
-    data = Dataset(args.path + args.dataset)
-    train, testLabels, testPredictions = data.trainMatrix, data.testLabels, data.testPredictions
+    dataset = Dataset(args.path + args.dataset)
+    train, testRatings, testNegatives = dataset.trainMatrix, dataset.testRatings, dataset.testNegatives
     num_users, num_items = train.shape
+
     print("Load data done [%.1f s]. #user=%d, #item=%d, #train=%d, #test=%d"
-          % (time() - t1, num_users, num_items, train.nnz, len(testLabels)))
+          % (time() - t1, num_users, num_items, train.nnz, len(testRatings)))
 
     # Build model
     model = get_model(num_users, num_items, layers, reg_layers)
@@ -138,7 +140,7 @@ if __name__ == '__main__':
 
     # Check Init performance
     t1 = time()
-    (hits, ndcgs) = evaluate_model(model, topK, testPredictions, testLabels, evaluation_threads)
+    (hits, ndcgs) = evaluate_model(model, testRatings, testNegatives, topK, evaluation_threads)
     hr, ndcg = np.array(hits).mean(), np.array(ndcgs).mean()
     print('Init: HR = %.4f, NDCG = %.4f [%.1f]' % (hr, ndcg, time() - t1))
 
@@ -156,17 +158,19 @@ if __name__ == '__main__':
                                                         save_freq=epoch)
 
         early_stopping = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=10)
+        callback = TrainingPlot()
+
 
         # Training
         hist = model.fit([np.array(user_input), np.array(item_input)],  # input
                          np.array(labels),  # labels
                          batch_size=batch_size, epochs=1, verbose=1, shuffle=True,
-                         callbacks=[checkpoint, early_stopping])
+                         callbacks=[checkpoint, early_stopping, callback])
         t2 = time()
 
         # Evaluation
         if epoch % verbose == 0:
-            (hits, ndcgs) = evaluate_model(model, topK, testPredictions, testLabels, evaluation_threads)
+            (hits, ndcgs) = evaluate_model(model, testRatings, testNegatives, topK, evaluation_threads)
             hr, ndcg, loss = np.array(hits).mean(), np.array(ndcgs).mean(), hist.history['loss'][0]
             print('Iteration %d [%.1f s]: HR = %.4f, NDCG = %.4f, loss = %.4f [%.1f s]'
                   % (epoch, t2 - t1, hr, ndcg, loss, time() - t2))
@@ -174,6 +178,7 @@ if __name__ == '__main__':
                 best_hr, best_ndcg, best_iter = hr, ndcg, epoch
                 if args.out > 0:
                     model.save_weights(model_out_file, overwrite=True)
+                    model.save('small_recipe_mlp.h5', overwrite=True)
 
     print("End. Best Iteration %d:  HR = %.4f, NDCG = %.4f. " % (best_iter, best_hr, best_ndcg))
     if args.out > 0:
