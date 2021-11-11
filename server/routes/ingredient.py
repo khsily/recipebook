@@ -6,7 +6,11 @@ import json
 import db
 import uuid
 
-from models.detection.yolo_f.tf2_keras_yolo3.object_detection import execute_object_dictation
+from models.detection.yolo_f.tf2_keras_yolo3.object_detection_yolo_v4 import load_model, predict
+
+base_path = os.path.join(root_path, 'models/detection/yolo_f/tf2_keras_yolo3')
+model_path = os.path.join(base_path, 'model_yolov4.h5')
+model = load_model(model_path)
 
 ingredient = Blueprint('ingredient', __name__, url_prefix='/ingredient')
 
@@ -21,17 +25,15 @@ def fetch_list():
 def detection():
     unique_id = uuid.uuid4()
 
-    base_path = os.path.join(root_path, 'models/detection/yolo_f/tf2_keras_yolo3')
-
+    class_path = os.path.join(base_path, 'model_data/recipebook.korean.names')
     save_path = os.path.join(root_path, f'temp/detection_{unique_id}.jpg')
     img_path = os.path.join(root_path, f'temp/smaple_{unique_id}.jpg')
-    model_name = 'model_final.h5'
 
     img = request.files.get('image', '')
     img.save(img_path)
 
-    ingredients = execute_object_dictation(save_path, img_path, base_path, model_name)
-    ingredients = json.dumps(','.join(ingredients))
+    ingredients = predict(model, class_path, img_path, save_path)
+    ingredients = json.dumps(','.join(list(ingredients)))
 
     res = send_file(save_path, mimetype='image/jpeg', as_attachment=True)
     res.set_cookie('ingredients', ingredients)
