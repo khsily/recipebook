@@ -1,11 +1,13 @@
 # prediction_final.py
 import tensorflow as tf
 import numpy as np
-from our_evaluate import evaluate_model
-from dataset_1 import Dataset
 
 
-def predictions(user_id, item_id, model_path, Top_K):
+def load_model(model_path):
+    return tf.keras.models.load_model(model_path)
+
+
+def predictions(user_id, item_id, model, Top_K):
     '''
     prediction func
     :param user_id: user_id list [3]
@@ -21,7 +23,6 @@ def predictions(user_id, item_id, model_path, Top_K):
     user_id = user_id - 1
     item_id = item_id - 1
 
-    model = tf.keras.models.load_model(model_path)
     preds = model.predict([user_id, item_id])
 
     predictions = []

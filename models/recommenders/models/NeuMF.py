@@ -175,18 +175,19 @@ if __name__ == '__main__':
           % (time() - t1, num_users, num_items, train.nnz, len(testRatings)))
 
     # Build model
-    model = get_model(num_users, num_items, mf_dim, layers, reg_layers, reg_mf)
-
-    if learner.lower() == "adagrad":
-        model.compile(optimizer=Adagrad(learning_rate=learning_rate), loss='binary_crossentropy')
-    elif learner.lower() == "rmsprop":
-        model.compile(optimizer=RMSprop(learning_rate=learning_rate), loss='binary_crossentropy')
-    elif learner.lower() == "adam":
-        model.compile(optimizer=Adam(learning_rate=learning_rate), loss='binary_crossentropy', metrics=['acc'])
-    else:
-        model.compile(optimizer=SGD(learning_rate=learning_rate), loss='binary_crossentropy')
+    # model = get_model(num_users, num_items, mf_dim, layers, reg_layers, reg_mf)
+    #
+    # if learner.lower() == "adagrad":
+    #     model.compile(optimizer=Adagrad(learning_rate=learning_rate), loss='binary_crossentropy')
+    # elif learner.lower() == "rmsprop":
+    #     model.compile(optimizer=RMSprop(learning_rate=learning_rate), loss='binary_crossentropy')
+    # elif learner.lower() == "adam":
+    #     model.compile(optimizer=Adam(learning_rate=learning_rate), loss='binary_crossentropy', metrics=['acc'])
+    # else:
+    #     model.compile(optimizer=SGD(learning_rate=learning_rate), loss='binary_crossentropy')
     #print(model.summary())
 
+    model = tf.keras.models.load_model('small_recipe_test_model.h5')
 
     # Load pretrain model
     if mf_pretrain != '' and mlp_pretrain != '':
