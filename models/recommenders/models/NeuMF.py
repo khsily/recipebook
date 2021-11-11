@@ -2,6 +2,7 @@
 import numpy as np
 import tensorflow as tf
 
+from callback import TrainingPlot
 from tensorflow.keras.initializers import glorot_uniform
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Embedding, Input, Dense, multiply, Reshape, concatenate, Flatten, Dropout
@@ -42,9 +43,9 @@ def parse_args():
                         help='Show performance per X iterations')
     parser.add_argument('--out', type=int, default=1,
                         help='Whether to save the trained model.')
-    parser.add_argument('--mf_pretrain', nargs='?', default=r'pretrain\small_recipe_GMF_8_1636097655.h5',
+    parser.add_argument('--mf_pretrain', nargs='?', default=r'pretrain\small_recipe_GMF_8_1636360821.h5',
                         help='Specify the pretrain model file for MF part. If empty, no pretrain will be used')
-    parser.add_argument('--mlp_pretrain', nargs='?', default=r'pretrain\small_recipe_MLP_[64,32,16,8]_1635904342.h5',
+    parser.add_argument('--mlp_pretrain', nargs='?', default=r'pretrain\small_recipe_MLP_[64,32,16,8]_1636360820.h5',
                         help='Specify the pretrain model file for MLP part. If empty, no pretrain will be used')
     return parser.parse_args()
 
@@ -221,9 +222,12 @@ if __name__ == '__main__':
 
         early_stopping = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=10)
 
+        graph = TrainingPlot()
+
         hist = model.fit([np.array(user_input), np.array(item_input)],  # input
                          np.array(labels),  # labels
-                         batch_size=batch_size, epochs=1, verbose=1, shuffle=True)
+                         batch_size=batch_size, epochs=1, verbose=1, shuffle=True,
+                         callbacks=[checkpoint, early_stopping, graph])
         t2 = time()
 
         # Evaluation

@@ -2,6 +2,7 @@
 import numpy as np
 import tensorflow as tf
 
+from callback import TrainingPlot
 from tensorflow.keras.initializers import glorot_uniform
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Embedding, Input, Dense, Reshape, concatenate, add, Flatten, Dropout
@@ -157,11 +158,14 @@ if __name__ == '__main__':
                                                         save_freq=epoch)
 
         early_stopping = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=10)
+        callback = TrainingPlot()
+
 
         # Training
         hist = model.fit([np.array(user_input), np.array(item_input)],  # input
                          np.array(labels),  # labels
-                         batch_size=batch_size, epochs=1, verbose=1, shuffle=True)
+                         batch_size=batch_size, epochs=1, verbose=1, shuffle=True,
+                         callbacks=[checkpoint, early_stopping, callback])
         t2 = time()
 
         # Evaluation

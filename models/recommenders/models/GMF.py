@@ -1,7 +1,6 @@
 # GMF.py
 import numpy as np
 import tensorflow as tf
-import matplotlib.pyplot as plt
 from callback import TrainingPlot
 
 from tensorflow.keras.initializers import glorot_uniform
