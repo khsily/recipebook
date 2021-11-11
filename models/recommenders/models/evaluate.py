@@ -45,7 +45,7 @@ def evaluate_model(model, testRatings, testNegatives, K, num_thread):
         (hr, ndcg) = eval_one_rating(idx)
         hits.append(hr)
         ndcgs.append(ndcg)
-        if idx % 100 == 0:
+        if idx % 1000 == 0:
             print(idx)
     return (hits, ndcgs)
 

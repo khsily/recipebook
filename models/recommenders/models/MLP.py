@@ -2,7 +2,6 @@
 import numpy as np
 import tensorflow as tf
 
-
 from tensorflow.keras.initializers import glorot_uniform
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Embedding, Input, Dense, Reshape, concatenate, add, Flatten, Dropout
@@ -20,7 +19,7 @@ def parse_args():
                         help='Input data path.')
     parser.add_argument('--dataset', nargs='?', default='small_recipe',
                         help='Choose a dataset.')
-    parser.add_argument('--epochs', type=int, default=20,
+    parser.add_argument('--epochs', type=int, default=100,
                         help='Number of epochs.')
     parser.add_argument('--batch_size', type=int, default=256,
                         help='Batch size.')
@@ -121,6 +120,7 @@ if __name__ == '__main__':
     dataset = Dataset(args.path + args.dataset)
     train, testRatings, testNegatives = dataset.trainMatrix, dataset.testRatings, dataset.testNegatives
     num_users, num_items = train.shape
+
     print("Load data done [%.1f s]. #user=%d, #item=%d, #train=%d, #test=%d"
           % (time() - t1, num_users, num_items, train.nnz, len(testRatings)))
 
@@ -174,6 +174,7 @@ if __name__ == '__main__':
                 best_hr, best_ndcg, best_iter = hr, ndcg, epoch
                 if args.out > 0:
                     model.save_weights(model_out_file, overwrite=True)
+                    model.save('small_recipe_mlp.h5', overwrite=True)
 
     print("End. Best Iteration %d:  HR = %.4f, NDCG = %.4f. " % (best_iter, best_hr, best_ndcg))
     if args.out > 0:
