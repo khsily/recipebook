@@ -26,13 +26,14 @@ def detection():
     unique_id = uuid.uuid4()
 
     class_path = os.path.join(base_path, 'model_data/recipebook.korean.names')
+    font_path = os.path.join(base_path, 'font/malgun.ttf')
     save_path = os.path.join(root_path, f'temp/detection_{unique_id}.jpg')
     img_path = os.path.join(root_path, f'temp/smaple_{unique_id}.jpg')
 
     img = request.files.get('image', '')
     img.save(img_path)
 
-    ingredients = predict(model, class_path, img_path, save_path)
+    ingredients = predict(model, class_path, img_path, save_path, font_path)
     ingredients = json.dumps(','.join(list(ingredients)))
 
     res = send_file(save_path, mimetype='image/jpeg', as_attachment=True)
