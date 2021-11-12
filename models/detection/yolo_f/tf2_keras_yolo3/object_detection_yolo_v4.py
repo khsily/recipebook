@@ -2,7 +2,7 @@ import tensorflow as tf
 from tensorflow import keras
 import numpy as np
 import cv2
-from PIL import Image
+from PIL import Image, ImageFont, ImageDraw
 import random
 import colorsys
 
@@ -22,7 +22,7 @@ def read_class_names(class_file_name):
     return names, kor_names
 
 
-def draw_bbox(image, bboxes, classes, show_label=True):
+def draw_bbox(image, bboxes, classes, kor_classes, font_path, show_label=True):
     num_classes = len(classes)
     image_h, image_w, _ = image.shape
     hsv_tuples = [(1.0 * x / num_classes, 1., 1.) for x in range(num_classes)]
@@ -51,13 +51,20 @@ def draw_bbox(image, bboxes, classes, show_label=True):
         cv2.rectangle(image, c1, c2, bbox_color, bbox_thick)
 
         if show_label:
-            bbox_mess = '%s: %.2f' % (classes[class_ind], score)
-            t_size = cv2.getTextSize(bbox_mess, 0, fontScale, thickness=bbox_thick // 2)[0]
-            c3 = (c1[0] + t_size[0], c1[1] - t_size[1] - 3)
-            cv2.rectangle(image, c1, (int(np.float32(c3[0])), int(np.float32(c3[1]))), bbox_color, -1)
+            bbox_mess = '%s: %.2f' % (kor_classes[class_ind], score)
 
-            cv2.putText(image, bbox_mess, (c1[0], int(np.float32(c1[1] - 2))), cv2.FONT_HERSHEY_SIMPLEX,
-                        fontScale, (0, 0, 0), bbox_thick // 2, lineType=cv2.LINE_AA)
+            # 이미지 라벨 그리기
+            img_pil = Image.fromarray(image)
+            font = ImageFont.truetype(font_path, np.floor(3e-2 * img_pil.size[1] + fontScale).astype('int32'))
+            draw = ImageDraw.Draw(img_pil)
+
+            t_size = font.getsize(bbox_mess)
+            c3 = (c1[0] + t_size[0], c1[1] - t_size[1] - 3)
+            draw.rectangle((c1, c3), fill=bbox_color)
+            draw.text((c1[0] + 0.1, int(np.float32(c3[1]))), bbox_mess, font=font, fill=(0, 0, 0))
+
+            image = np.array(img_pil)
+
     return image
 
 
@@ -65,7 +72,7 @@ def load_model(model_path):
     return keras.models.load_model(model_path)
 
 
-def predict(model, class_path, image_path, output_path):
+def predict(model, class_path, image_path, output_path, font_path):
     original_image = cv2.imread(image_path)
     original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
 
@@ -93,7 +100,7 @@ def predict(model, class_path, image_path, output_path):
     # 이미지 뿌려주고 저장
     id_classes, kor_classes = read_class_names(class_path)
     pred_bbox = [boxes.numpy(), scores.numpy(), classes.numpy(), valid_detections.numpy()]
-    image = draw_bbox(original_image, pred_bbox, id_classes)
+    image = draw_bbox(original_image, pred_bbox, id_classes, kor_classes, font_path)
     image = Image.fromarray(image.astype(np.uint8))
     image = cv2.cvtColor(np.array(image), cv2.COLOR_BGR2RGB)
     cv2.imwrite(output_path, image)
@@ -106,10 +113,11 @@ def predict(model, class_path, image_path, output_path):
 
 if __name__ == '__main__':
     model_path = 'checkpoints/new_model.h5'
-    image_path = 'data/test1.jpg'
+    image_path = 'data/test2.jpg'
     output_path = 'result.jpg'
     classes = 'data/classes/recipebook.korean.names'
+    font_path = 'font/malgun.ttf'
 
     model = load_model(model_path)
-    res = predict(model, classes, image_path, output_path)
+    res = predict(model, classes, image_path, output_path, font_path)
     print(res)
