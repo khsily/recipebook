@@ -175,19 +175,18 @@ if __name__ == '__main__':
           % (time() - t1, num_users, num_items, train.nnz, len(testRatings)))
 
     # Build model
-    # model = get_model(num_users, num_items, mf_dim, layers, reg_layers, reg_mf)
-    #
-    # if learner.lower() == "adagrad":
-    #     model.compile(optimizer=Adagrad(learning_rate=learning_rate), loss='binary_crossentropy')
-    # elif learner.lower() == "rmsprop":
-    #     model.compile(optimizer=RMSprop(learning_rate=learning_rate), loss='binary_crossentropy')
-    # elif learner.lower() == "adam":
-    #     model.compile(optimizer=Adam(learning_rate=learning_rate), loss='binary_crossentropy', metrics=['acc'])
-    # else:
-    #     model.compile(optimizer=SGD(learning_rate=learning_rate), loss='binary_crossentropy')
-    #print(model.summary())
+    model = get_model(num_users, num_items, mf_dim, layers, reg_layers, reg_mf)
 
-    model = tf.keras.models.load_model('small_recipe_test_model.h5')
+    if learner.lower() == "adagrad":
+        model.compile(optimizer=Adagrad(learning_rate=learning_rate), loss='binary_crossentropy')
+    elif learner.lower() == "rmsprop":
+        model.compile(optimizer=RMSprop(learning_rate=learning_rate), loss='binary_crossentropy')
+    elif learner.lower() == "adam":
+        model.compile(optimizer=Adam(learning_rate=learning_rate), loss='binary_crossentropy', metrics=['acc'])
+    else:
+        model.compile(optimizer=SGD(learning_rate=learning_rate), loss='binary_crossentropy')
+
+    # model = tf.keras.models.load_model('small_recipe_test_model.h5')
 
     # Load pretrain model
     if mf_pretrain != '' and mlp_pretrain != '':
@@ -203,7 +202,7 @@ if __name__ == '__main__':
     hr, ndcg = np.array(hits).mean(), np.array(ndcgs).mean()
     print('Init: HR = %.4f, NDCG = %.4f' % (hr, ndcg))
 
-    f = open('64factor_graph_gmf.csv', 'w', encoding='utf-8')
+    f = open('64factor_graph_neumf.csv', 'w', encoding='utf-8')
 
     # Training model
     best_hr, best_ndcg, best_iter, losses, accses,  hit_ratio, NDCG = hr, ndcg, -1, [], [], [], []
@@ -253,6 +252,6 @@ if __name__ == '__main__':
         print("The best NeuMF model is saved to %s" % (model_out_file))
 
     for l, a, h, n in zip(losses, accses, hit_ratio, NDCG):
-        print('loss: {} acc: {} hit_ratio: {} ndcg: {}'.format(l, a, h, n), file=f)
+        print('loss: {},acc: {},hit_ratio: {},ndcg: {}'.format(l, a, h, n), file=f)
 
     f.close()

@@ -60,7 +60,7 @@ def train_rating(path, idx2id, item2idx, theme2item, rating):
             print('{}\t{}\t{}'.format(i, item2idx[j], 5), file=f)
             often_use[i] = [item2idx[j]]
             for_unique.append(j)
-            for _ in range(30):
+            for _ in range(10):
                 for t in range(7):
                     if j in list(theme2item.values())[t]:
                         name = random.choice(list(theme2item.values())[t])
@@ -83,7 +83,7 @@ def test_rating(path, idx2item, rating):
     :return: None path에 파일로 저장
     '''
     user_id, used_item = [], []
-    with open('once_recipe.test.label', 'r', encoding='utf-8') as f:
+    with open('10_recipe.test.label', 'r', encoding='utf-8') as f:
         for row in f.readlines():
             user_id.append(row.strip().split(',')[0])
             used_item.append(row.strip().split(',')[1:])
@@ -115,13 +115,13 @@ def test_negative(path, item2idx):
     :return: None recipe.test.negative 파일 생성
     '''
     user_id, used_item = [], []
-    with open('once_recipe.test.label', 'r', encoding='utf-8') as f:
+    with open('10_recipe.test.label', 'r', encoding='utf-8') as f:
         for row in f.readlines():
             user_id.append(row.strip().split(',')[0])
             used_item.append(row.strip().split(',')[1:])
 
     g = open(path, 'w', encoding='utf-8')
-    with open('once_recipe.test.rating', 'r', encoding='utf-8') as f:
+    with open('10_recipe.test.rating', 'r', encoding='utf-8') as f:
         id_rat, item, pos_list = [], [], []
         for row in f.readlines():
             id = '({},{})'.format(int(row.split()[0]), int(row.split()[1]))
@@ -194,13 +194,13 @@ for_record = {}
 for i in idx2id:
     for_record[i] = []
 
-often_use = train_rating('once_recipe.train.rating', idx2id, item2idx, theme2item, rating)     # 파일 만듬
+often_use = train_rating('10_recipe.train.rating', idx2id, item2idx, theme2item, rating)     # 파일 만듬
 for j in often_use:
     for_record[j] += (often_use[j])
 
-with open('once_recipe.test.label', 'w', encoding='utf-8') as f:
+with open('10_recipe.test.label', 'w', encoding='utf-8') as f:
     for i in for_record:
         print(i, *[j[0] for j in collections.Counter(for_record[i]).most_common()], sep=',', file=f)
 
-test_rating('once_recipe.test.rating', idx2item, rating)                   # 파일 만듬
-test_negative('once_recipe.test.negative', item2idx)                               # 파일 만듬
+test_rating('10_recipe.test.rating', idx2item, rating)                   # 파일 만듬
+test_negative('10_recipe.test.negative', item2idx)                               # 파일 만듬

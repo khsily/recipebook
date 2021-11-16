@@ -23,7 +23,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Run GMF.")
     parser.add_argument('--path', nargs='?', default='data/',
                         help='Input data path.')
-    parser.add_argument('--dataset', nargs='?', default='small_recipe',
+    parser.add_argument('--dataset', nargs='?', default='once_recipe',
                         help='Choose a dataset.')
     parser.add_argument('--epochs', type=int, default=20,
                         help='Number of epochs.')
@@ -188,6 +188,6 @@ if __name__ == '__main__':
         print("The best GMF model is saved to %s" % (model_out_file))
 
     for l, a, h, n in zip(losses, accses, hit_ratio, NDCG):
-        print('loss: {} acc: {} hit_ratio: {} ndcg: {}'.format(l, a, h, n), file=f)
+        print('loss: {},acc: {},hit_ratio: {},ndcg: {}'.format(l, a, h, n), file=f)
 
     f.close()
