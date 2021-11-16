@@ -203,7 +203,7 @@ if __name__ == '__main__':
     hr, ndcg = np.array(hits).mean(), np.array(ndcgs).mean()
     print('Init: HR = %.4f, NDCG = %.4f' % (hr, ndcg))
 
-    f = open('64factor_graph_gmf.csv', 'w', encoding='utf-8')
+    f = open('64factor_graph_neumf.csv', 'w', encoding='utf-8')
 
     # Training model
     best_hr, best_ndcg, best_iter, losses, accses,  hit_ratio, NDCG = hr, ndcg, -1, [], [], [], []
