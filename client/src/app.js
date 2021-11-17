@@ -3,7 +3,7 @@ import { registerRootComponent } from 'expo';
 import { NavigationContainer } from '@react-navigation/native';
 import { createSharedElementStackNavigator } from 'react-navigation-shared-element';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet'
-import { Platform, StatusBar } from 'react-native';
+import { BackHandler, Platform, StatusBar } from 'react-native';
 import * as Font from 'expo-font';
 import { observer } from 'mobx-react';
 
@@ -21,6 +21,7 @@ import { MainTheme } from './styles/themes';
 import { typography } from './utils';
 import { fetchInitalData, myFavorStore } from './store';
 import { useSplash } from './customHook/useSplash';
+import { checkConnection } from './api';
 
 const Stack = createSharedElementStackNavigator();
 
@@ -28,14 +29,21 @@ const Stack = createSharedElementStackNavigator();
 const app = () => {
     // 초기 데이터 가져오기
     const appIsReady = useSplash(async () => {
-        await Font.loadAsync({
-            AppleSDGothicNeoM: require('../assets/fonts/AppleSDGothicNeoM.ttf'),
-            AppleSDGothicNeoB: require('../assets/fonts/AppleSDGothicNeoB.ttf'),
-        });
+        try {
+            await Font.loadAsync({
+                AppleSDGothicNeoM: require('../assets/fonts/AppleSDGothicNeoM.ttf'),
+                AppleSDGothicNeoB: require('../assets/fonts/AppleSDGothicNeoB.ttf'),
+            });
 
-        // await myFavorStore.clear();   // 임시 (테스트용)
-        await fetchInitalData();
-        typography();
+            await checkConnection();
+            // await myFavorStore.clear();   // 임시 (테스트용)
+            await fetchInitalData();
+            typography();
+        } catch (e) {
+            console.log(e);
+            alert('서버 연결 실패');
+            BackHandler.exitApp()
+        }
     });
 
     if (!appIsReady) return null;
