@@ -1,5 +1,6 @@
 # GMF.py
 import numpy as np
+import matplotlib.pyplot as plt
 import tensorflow as tf
 from callback import TrainingPlot
 
@@ -22,13 +23,13 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Run GMF.")
     parser.add_argument('--path', nargs='?', default='data/',
                         help='Input data path.')
-    parser.add_argument('--dataset', nargs='?', default='small_recipe',
+    parser.add_argument('--dataset', nargs='?', default='once_recipe',
                         help='Choose a dataset.')
-    parser.add_argument('--epochs', type=int, default=100,
+    parser.add_argument('--epochs', type=int, default=20,
                         help='Number of epochs.')
     parser.add_argument('--batch_size', type=int, default=256,
                         help='Batch size.')
-    parser.add_argument('--num_factors', type=int, default=8,
+    parser.add_argument('--num_factors', type=int, default=64,
                         help='Embedding size.')
     parser.add_argument('--regs', nargs='?', default='[0,0]',
                         help="Regularization for user and item embeddings.")
@@ -63,17 +64,8 @@ def get_model(num_users, num_items, latent_dim, regs=[0, 0]):
 
     # Element-wise product of user and item embeddings
     predict_vector = multiply([user_latent, item_latent])
-
     # Final prediction layer
     # prediction = Lambda(lambda x: K.sigmoid(K.sum(x)), output_shape=(1,))(predict_vector)
-    # dense1 = Dense(512, activation='relu', name='dense1')(predict_vector)
-    # dropout = tf.keras.layers.Dropout(rate=0.5)(dense1)
-    # dense2 = Dense(256, activation='relu', name='dense2')(dropout)
-    # dropout = tf.keras.layers.Dropout(rate=0.5)(dense2)
-    # dense3 = Dense(128, activation='relu', name='dense3')(dropout)
-    # dropout = tf.keras.layers.Dropout(rate=0.5)(dense3)
-    # dense4 = Dense(64, activation='relu', name='dense4')(dropout)
-    # dense5 = Dense(32, activation='relu', name='dense5')(dense4)
 
     prediction = Dense(1, activation='sigmoid', name='prediction')(predict_vector)
 
@@ -145,8 +137,10 @@ if __name__ == '__main__':
     hr, ndcg = np.array(hits).mean(), np.array(ndcgs).mean()
     print('Init: HR = %.4f, NDCG = %.4f\t [%.1f s]' % (hr, ndcg, time() - t1))
 
+    f = open('64factor_graph_gmf.csv', 'w', encoding='utf-8')
+
     # Train model
-    best_hr, best_ndcg, best_iter = hr, ndcg, -1
+    best_hr, best_ndcg, best_iter, losses, accses,  hit_ratio, NDCG = hr, ndcg, -1, [], [], [], []
     for epoch in range(epochs):
         t1 = time()
         # Generate training instances
@@ -168,6 +162,7 @@ if __name__ == '__main__':
                          labels,  # labels
                          batch_size=batch_size, epochs=1, verbose=1, shuffle=True,
                          callbacks=[checkpoint, early_stopping, callback])
+
         t2 = time()
 
         # Evaluation
@@ -176,6 +171,12 @@ if __name__ == '__main__':
             hr, ndcg, loss = np.array(hits).mean(), np.array(ndcgs).mean(), hist.history['loss'][0]
             print('Iteration %d [%.1f s]: HR = %.4f, NDCG = %.4f, loss = %.4f [%.1f s]'
                   % (epoch, t2 - t1, hr, ndcg, loss, time() - t2))
+
+            losses.append(hist.history['loss'])
+            accses.append(hist.history['acc'])
+            hit_ratio.append(hr)
+            NDCG.append(ndcg)
+
             if hr > best_hr:
                 best_hr, best_ndcg, best_iter = hr, ndcg, epoch
                 if args.out > 0:
@@ -185,3 +186,8 @@ if __name__ == '__main__':
     print("End. Best Iteration %d:  HR = %.4f, NDCG = %.4f. " % (best_iter, best_hr, best_ndcg))
     if args.out > 0:
         print("The best GMF model is saved to %s" % (model_out_file))
+
+    for l, a, h, n in zip(losses, accses, hit_ratio, NDCG):
+        print('loss: {},acc: {},hit_ratio: {},ndcg: {}'.format(l, a, h, n), file=f)
+
+    f.close()

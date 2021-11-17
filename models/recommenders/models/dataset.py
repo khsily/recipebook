@@ -64,7 +64,7 @@ class Dataset(object):
             line = f.readline()
             while line != None and line != "":
                 arr = line.split("\t")
-                user, item, rating = int(arr[0]) - 1, int(arr[1]) - 1, float(arr[2]) - 1
+                user, item, rating = int(arr[0]) - 1, int(arr[1]) - 1, float(arr[2])
                 if (rating > 0):
                     mat[user, item] = rating
                 line = f.readline()
