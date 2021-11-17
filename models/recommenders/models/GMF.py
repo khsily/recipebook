@@ -1,13 +1,14 @@
 # GMF.py
 import numpy as np
 import tensorflow as tf
+from callback import TrainingPlot
 
 from tensorflow.keras.initializers import glorot_uniform
 from tensorflow.keras.models import Sequential, Model, load_model, save_model
 from tensorflow.keras.layers import Embedding, Input, Dense, concatenate, Reshape, multiply, Flatten
 from tensorflow.keras.optimizers import Adagrad, Adam, SGD, RMSprop
 from dataset import Dataset
-from our_evaluate import evaluate_model
+from evaluate import evaluate_model
 from time import time
 import argparse
 import os
@@ -23,7 +24,7 @@ def parse_args():
                         help='Input data path.')
     parser.add_argument('--dataset', nargs='?', default='small_recipe',
                         help='Choose a dataset.')
-    parser.add_argument('--epochs', type=int, default=20,
+    parser.add_argument('--epochs', type=int, default=100,
                         help='Number of epochs.')
     parser.add_argument('--batch_size', type=int, default=256,
                         help='Batch size.')
@@ -65,10 +66,19 @@ def get_model(num_users, num_items, latent_dim, regs=[0, 0]):
 
     # Final prediction layer
     # prediction = Lambda(lambda x: K.sigmoid(K.sum(x)), output_shape=(1,))(predict_vector)
+    # dense1 = Dense(512, activation='relu', name='dense1')(predict_vector)
+    # dropout = tf.keras.layers.Dropout(rate=0.5)(dense1)
+    # dense2 = Dense(256, activation='relu', name='dense2')(dropout)
+    # dropout = tf.keras.layers.Dropout(rate=0.5)(dense2)
+    # dense3 = Dense(128, activation='relu', name='dense3')(dropout)
+    # dropout = tf.keras.layers.Dropout(rate=0.5)(dense3)
+    # dense4 = Dense(64, activation='relu', name='dense4')(dropout)
+    # dense5 = Dense(32, activation='relu', name='dense5')(dense4)
+
     prediction = Dense(1, activation='sigmoid', name='prediction')(predict_vector)
 
     model = Model([user_input, item_input], prediction)
-    # model.summary()
+    model.summary()
 
     return model
 
@@ -112,10 +122,10 @@ if __name__ == '__main__':
     # Loading data
     t1 = time()
     dataset = Dataset(args.path + args.dataset)
-    train, testLabels, testPredictions = dataset.trainMatrix, dataset.testLabels, dataset.testPredictions
+    train, testRatings, testNegatives = dataset.trainMatrix, dataset.testRatings, dataset.testNegatives
     num_users, num_items = train.shape
     print("Load data done [%.1f s]. #user=%d, #item=%d, #train=%d, #test=%d"
-          % (time() - t1, num_users, num_items, train.nnz, len(testLabels)))
+          % (time() - t1, num_users, num_items, train.nnz, len(testRatings)))
 
     # Build model
     model = get_model(num_users, num_items, num_factors, regs)
@@ -131,7 +141,7 @@ if __name__ == '__main__':
 
     # Init performance
     t1 = time()
-    (hits, ndcgs) = evaluate_model(model, topK, testPredictions, testLabels, evaluation_threads)
+    (hits, ndcgs) = evaluate_model(model, testRatings, testNegatives, topK, evaluation_threads)
     hr, ndcg = np.array(hits).mean(), np.array(ndcgs).mean()
     print('Init: HR = %.4f, NDCG = %.4f\t [%.1f s]' % (hr, ndcg, time() - t1))
 
@@ -142,25 +152,27 @@ if __name__ == '__main__':
         # Generate training instances
         user_input, item_input, labels = get_train_instances(train, num_negatives)
 
+        user_input, item_input, labels = np.array(user_input), np.array(item_input), np.array(labels)
+
         # Training
         checkpoint = tf.keras.callbacks.ModelCheckpoint(filepath=model_out_file,
                                                         monitor='loss',
                                                         verbose=0,
                                                         save_weights_only=True,
-                                                        save_best_only=True,
-                                                        save_freq=epoch)
+                                                        save_best_only=True)
+        callback = TrainingPlot()
 
         early_stopping = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=10)
 
-        hist = model.fit([np.array(user_input), np.array(item_input)],  # input
-                         np.array(labels),  # labels
+        hist = model.fit([user_input, item_input],  # input
+                         labels,  # labels
                          batch_size=batch_size, epochs=1, verbose=1, shuffle=True,
-                         callbacks=[checkpoint, early_stopping])
+                         callbacks=[checkpoint, early_stopping, callback])
         t2 = time()
 
         # Evaluation
         if epoch % verbose == 0:
-            (hits, ndcgs) = evaluate_model(model, topK, testPredictions, testLabels, evaluation_threads)
+            (hits, ndcgs) = evaluate_model(model, testRatings, testNegatives, topK, evaluation_threads)
             hr, ndcg, loss = np.array(hits).mean(), np.array(ndcgs).mean(), hist.history['loss'][0]
             print('Iteration %d [%.1f s]: HR = %.4f, NDCG = %.4f, loss = %.4f [%.1f s]'
                   % (epoch, t2 - t1, hr, ndcg, loss, time() - t2))
@@ -168,6 +180,7 @@ if __name__ == '__main__':
                 best_hr, best_ndcg, best_iter = hr, ndcg, epoch
                 if args.out > 0:
                     model.save_weights(model_out_file, overwrite=True)
+                    model.save('small_recipe_gmf.h5', overwrite=True)
 
     print("End. Best Iteration %d:  HR = %.4f, NDCG = %.4f. " % (best_iter, best_hr, best_ndcg))
     if args.out > 0:

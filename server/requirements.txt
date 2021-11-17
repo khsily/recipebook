@@ -5,3 +5,4 @@ tensorflow==2.5.1
 numpy==1.19.5
 pandas
 matplotlib
+opencv-python

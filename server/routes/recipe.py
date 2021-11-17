@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from models.recommenders.models.prediction_final import predictions
+from models.recommenders.models.prediction_final import predictions, load_model
 import db
 
 recipe = Blueprint('recipe', __name__, url_prefix='/recipe')
@@ -18,6 +18,9 @@ item2idx: 카테고리에서 레시피 리스트를 가져오면, 레시피들�
 4. 카테고리에 해당하는 요리 리스트
 '''
 
+model_path = 'models/recommenders/models/test_model.h5'
+recommend_model = load_model(model_path)
+
 
 def get_recommend_ids(id, top_n):
     if not id:
@@ -26,10 +29,9 @@ def get_recommend_ids(id, top_n):
     recipe_ids = db.execute('fetchAllRecipeIds.sql')
     recipe_ids = [recipe['id'] for recipe in recipe_ids]
 
-    model_path = 'models/recommenders/models/test_model.h5'
     user_id = [id]   # 하나만 들어오면 요리 갯수 만큼 곱해주는 함수 위에 있음.
     item_id = recipe_ids            # 카테고리에 속한 요리 갯수 만큼 중복되지 않게 들어와야 함.
-    recommends = predictions(user_id, item_id, model_path, Top_K=top_n)
+    recommends = predictions(user_id, item_id, recommend_model, Top_K=top_n)
 
     print('recommends:', recommends, flush=True)
 

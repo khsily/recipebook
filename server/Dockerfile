@@ -9,6 +9,9 @@ ENV TZ=Asia/Seoul
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN python3 -m pip install --upgrade pip
 
+RUN apt-get update
+RUN apt-get install -y libgl1-mesa-glx
+
 COPY requirements.txt /tmp/requirements.txt
 RUN python3 -m pip install -r /tmp/requirements.txt
 
