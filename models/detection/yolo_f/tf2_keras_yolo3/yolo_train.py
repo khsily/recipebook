@@ -161,7 +161,6 @@ def DarknetConv2D_BN_Leaky(*args, **kwargs):
         DarknetConv2D(*args, **no_bias_kwargs),
         BatchNormalization(),
         LeakyReLU(alpha=0.2),
-        # Dropout(0.5)
     )
 
 
@@ -174,7 +173,6 @@ def resblock_body(x, num_filters, num_blocks):
     for i in range(num_blocks):
         y = compose(
             DarknetConv2D_BN_Leaky(num_filters // 2, (1, 1)),
-            # Dropout(0.5),
             DarknetConv2D_BN_Leaky(num_filters, (3, 3)))(x)
         x = Add()([x, y])
     return x
@@ -195,17 +193,12 @@ def make_last_layers(x, num_filters, out_filters):
     '''6 Conv2D_BN_Leaky layers followed by a Conv2D_linear layer'''
     x = compose(
         DarknetConv2D_BN_Leaky(num_filters, (1, 1)),
-        Dropout(0.5),
         DarknetConv2D_BN_Leaky(num_filters * 2, (3, 3)),
-        Dropout(0.5),
         DarknetConv2D_BN_Leaky(num_filters, (1, 1)),
-        Dropout(0.5),
         DarknetConv2D_BN_Leaky(num_filters * 2, (3, 3)),
-        Dropout(0.5),
         DarknetConv2D_BN_Leaky(num_filters, (1, 1)))(x)
     y = compose(
         DarknetConv2D_BN_Leaky(num_filters * 2, (3, 3)),
-        Dropout(0.5),
         DarknetConv2D(out_filters, (1, 1)))(x)
     return x, y
 
@@ -217,67 +210,17 @@ def yolo_body(inputs, num_anchors, num_classes):
         darknet.output, 512, num_anchors * (num_classes + 5))
     x = compose(
         DarknetConv2D_BN_Leaky(256, (1, 1)),
-        Dropout(0.5),
         UpSampling2D(2))(x)
     x = Concatenate()([x, darknet.layers[152].output])
     x, y2 = make_last_layers(x, 256, num_anchors * (num_classes + 5))
 
     x = compose(
         DarknetConv2D_BN_Leaky(128, (1, 1)),
-        Dropout(0.5),
         UpSampling2D(2))(x)
     x = Concatenate()([x, darknet.layers[92].output])
     x, y3 = make_last_layers(x, 128, num_anchors * (num_classes + 5))
 
     return Model(inputs, [y1, y2, y3])
-
-
-# def tiny_yolo_body(inputs, num_anchors, num_classes):
-#     '''Create Tiny YOLO_v3 model CNN body in keras.'''
-#     x1 = compose(
-#         DarknetConv2D_BN_Leaky(16, (3, 3)),
-#         MaxPooling2D(pool_size=(2, 2), strides=(2, 2), padding='same'),
-#         Dropout(0.7),
-#         DarknetConv2D_BN_Leaky(32, (3, 3)),
-#         MaxPooling2D(pool_size=(2, 2), strides=(2, 2), padding='same'),
-#         Dropout(0.7),
-#         DarknetConv2D_BN_Leaky(64, (3, 3)),
-#         MaxPooling2D(pool_size=(2, 2), strides=(2, 2), padding='same'),
-#         Dropout(0.7),
-#         DarknetConv2D_BN_Leaky(128, (3, 3)),
-#         MaxPooling2D(pool_size=(2, 2), strides=(2, 2), padding='same'),
-#         Dropout(0.7),
-#         DarknetConv2D_BN_Leaky(128, (3, 3)),
-#         MaxPooling2D(pool_size=(2, 2), strides=(2, 2), padding='same'),
-#         Dropout(0.7),
-#         DarknetConv2D_BN_Leaky(256, (3, 3)))(inputs)
-#     x2 = compose(
-#         MaxPooling2D(pool_size=(2, 2), strides=(2, 2), padding='same'),
-#         DarknetConv2D_BN_Leaky(512, (3, 3)),
-#         Dropout(0.7),
-#         MaxPooling2D(pool_size=(2, 2), strides=(2, 2), padding='same'),
-#         DarknetConv2D_BN_Leaky(512, (3, 3)),
-#         Dropout(0.7),
-#         MaxPooling2D(pool_size=(2, 2), strides=(1, 1), padding='same'),
-#         DarknetConv2D_BN_Leaky(1024, (3, 3)),
-#         Dropout(0.7),
-#         MaxPooling2D(pool_size=(2, 2), strides=(1, 1), padding='same'),
-#         DarknetConv2D_BN_Leaky(1024, (3, 3)),
-#         Dropout(0.7),
-#         DarknetConv2D_BN_Leaky(256, (1, 1)))(x1)
-#     y1 = compose(
-#         DarknetConv2D_BN_Leaky(512, (3, 3)),
-#         DarknetConv2D(num_anchors * (num_classes + 5), (1, 1)))(x2)
-#
-#     x2 = compose(
-#         DarknetConv2D_BN_Leaky(128, (1, 1)),
-#         UpSampling2D(2))(x2)
-#     y2 = compose(
-#         Concatenate(),
-#         DarknetConv2D_BN_Leaky(256, (3, 3)),
-#         DarknetConv2D(num_anchors * (num_classes + 5), (1, 1)))([x2, x1])
-#
-#     return Model(inputs, [y1, y2])
 
 
 def yolo_head(feats, anchors, num_classes, input_shape, calc_loss=False):
@@ -614,7 +557,7 @@ MODEL_IMAGE_SIZE = (416, 416)
 # PRE_TRAINING_YOLO_WEIGHTS = 'logs/000/ep065-loss363.232-val_loss315.378.h5'
 PRE_TRAINING_YOLO_WEIGHTS = 'model_data/darknet53_weights.h5'
 
-VALID_SPLIT = 0.2
+VALID_SPLIT = 0.3
 FROZEN_TRAIN = False
 FROZEN_TRAIN_LR = 1e-3
 FROZEN_TRAIN_BATCH_SIZE = 32
@@ -752,37 +695,6 @@ def create_model(input_shape, anchors, num_classes, load_pretrained=True, freeze
     model = Model([model_body.input, *y_true], model_loss)
 
     return model
-
-
-# def create_tiny_model(input_shape, anchors, num_classes, load_pretrained=True, freeze_body=2,
-#                       weights_path='model_data/tiny_yolo_weights.h5'):
-#     '''create the training model, for Tiny YOLOv3'''
-#     K.clear_session()  # get a new session
-#     image_input = Input(shape=(None, None, 3))
-#     h, w = input_shape
-#     num_anchors = len(anchors)
-#
-#     y_true = [Input(shape=(h // {0: 32, 1: 16}[l], w // {0: 32, 1: 16}[l], \
-#                            num_anchors // 2, num_classes + 5)) for l in range(2)]
-#
-#     model_body = tiny_yolo_body(image_input, num_anchors // 2, num_classes)
-#     print('Create Tiny YOLOv3 model with {} anchors and {} classes.'.format(num_anchors, num_classes))
-#
-#     if load_pretrained:
-#         model_body.load_weights(weights_path, by_name=True, skip_mismatch=True)
-#         print('Load weights {}.'.format(weights_path))
-#         if freeze_body in [1, 2]:
-#             # Freeze the darknet body or freeze all but 2 output layers.
-#             num = (20, len(model_body.layers) - 2)[freeze_body - 1]
-#             for i in range(num): model_body.layers[i].trainable = False
-#             print('Freeze the first {} layers of total {} layers.'.format(num, len(model_body.layers)))
-#
-#     model_loss = Lambda(yolo_loss, output_shape=(1,), name='yolo_loss',
-#                         arguments={'anchors': anchors, 'num_classes': num_classes, 'ignore_thresh': 0.7})(
-#         [*model_body.output, *y_true])
-#     model = Model([model_body.input, *y_true], model_loss)
-#
-#     return model
 
 
 def data_generator(annotation_lines, batch_size, input_shape, anchors, num_classes):
