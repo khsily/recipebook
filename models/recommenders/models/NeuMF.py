@@ -21,11 +21,11 @@ def parse_args():
                         help='Input data path.')
     parser.add_argument('--dataset', nargs='?', default='small_recipe',
                         help='Choose a dataset.')
-    parser.add_argument('--epochs', type=int, default=100,
+    parser.add_argument('--epochs', type=int, default=20,
                         help='Number of epochs.')
     parser.add_argument('--batch_size', type=int, default=256,
                         help='Batch size.')
-    parser.add_argument('--num_factors', type=int, default=8,
+    parser.add_argument('--num_factors', type=int, default=64,
                         help='Embedding size of MF model.')
     parser.add_argument('--layers', nargs='?', default='[64,32,16,8]',
                         help="MLP layers. Note that the first layer is the concatenation of user and item embeddings. So layers[0]/2 is the embedding size.")
@@ -175,19 +175,18 @@ if __name__ == '__main__':
           % (time() - t1, num_users, num_items, train.nnz, len(testRatings)))
 
     # Build model
-    # model = get_model(num_users, num_items, mf_dim, layers, reg_layers, reg_mf)
-    #
-    # if learner.lower() == "adagrad":
-    #     model.compile(optimizer=Adagrad(learning_rate=learning_rate), loss='binary_crossentropy')
-    # elif learner.lower() == "rmsprop":
-    #     model.compile(optimizer=RMSprop(learning_rate=learning_rate), loss='binary_crossentropy')
-    # elif learner.lower() == "adam":
-    #     model.compile(optimizer=Adam(learning_rate=learning_rate), loss='binary_crossentropy', metrics=['acc'])
-    # else:
-    #     model.compile(optimizer=SGD(learning_rate=learning_rate), loss='binary_crossentropy')
-    #print(model.summary())
+    model = get_model(num_users, num_items, mf_dim, layers, reg_layers, reg_mf)
 
-    model = tf.keras.models.load_model('small_recipe_test_model.h5')
+    if learner.lower() == "adagrad":
+        model.compile(optimizer=Adagrad(learning_rate=learning_rate), loss='binary_crossentropy')
+    elif learner.lower() == "rmsprop":
+        model.compile(optimizer=RMSprop(learning_rate=learning_rate), loss='binary_crossentropy')
+    elif learner.lower() == "adam":
+        model.compile(optimizer=Adam(learning_rate=learning_rate), loss='binary_crossentropy', metrics=['acc'])
+    else:
+        model.compile(optimizer=SGD(learning_rate=learning_rate), loss='binary_crossentropy')
+
+    # model = tf.keras.models.load_model('small_recipe_test_model.h5')
 
     # Load pretrain model
     if mf_pretrain != '' and mlp_pretrain != '':
@@ -203,11 +202,10 @@ if __name__ == '__main__':
     hr, ndcg = np.array(hits).mean(), np.array(ndcgs).mean()
     print('Init: HR = %.4f, NDCG = %.4f' % (hr, ndcg))
 
-    best_hr, best_ndcg, best_iter = hr, ndcg, -1
-    if args.out > 0:
-        model.save_weights(model_out_file, overwrite=True)
+    f = open('64factor_graph_neumf.csv', 'w', encoding='utf-8')
 
-        # Training model
+    # Training model
+    best_hr, best_ndcg, best_iter, losses, accses,  hit_ratio, NDCG = hr, ndcg, -1, [], [], [], []
     for epoch in range(num_epochs):
         t1 = time()
         # Generate training instances
@@ -237,6 +235,12 @@ if __name__ == '__main__':
             hr, ndcg, loss = np.array(hits).mean(), np.array(ndcgs).mean(), hist.history['loss'][0]
             print('Iteration %d [%.1f s]: HR = %.4f, NDCG = %.4f, loss = %.4f [%.1f s]'
                   % (epoch, t2 - t1, hr, ndcg, loss, time() - t2))
+
+            losses.append(hist.history['loss'])
+            accses.append(hist.history['acc'])
+            hit_ratio.append(hr)
+            NDCG.append(ndcg)
+
             if hr > best_hr:
                 best_hr, best_ndcg, best_iter = hr, ndcg, epoch
                 if args.out > 0:
@@ -246,3 +250,8 @@ if __name__ == '__main__':
     print("End. Best Iteration %d:  HR = %.4f, NDCG = %.4f. " % (best_iter, best_hr, best_ndcg))
     if args.out > 0:
         print("The best NeuMF model is saved to %s" % (model_out_file))
+
+    for l, a, h, n in zip(losses, accses, hit_ratio, NDCG):
+        print('loss: {},acc: {},hit_ratio: {},ndcg: {}'.format(l, a, h, n), file=f)
+
+    f.close()

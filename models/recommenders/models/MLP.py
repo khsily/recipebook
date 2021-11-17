@@ -18,9 +18,9 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Run MLP.")
     parser.add_argument('--path', nargs='?', default='data/',
                         help='Input data path.')
-    parser.add_argument('--dataset', nargs='?', default='small_recipe',
+    parser.add_argument('--dataset', nargs='?', default='once_recipe',
                         help='Choose a dataset.')
-    parser.add_argument('--epochs', type=int, default=100,
+    parser.add_argument('--epochs', type=int, default=20,
                         help='Number of epochs.')
     parser.add_argument('--batch_size', type=int, default=256,
                         help='Batch size.')
@@ -144,7 +144,9 @@ if __name__ == '__main__':
     hr, ndcg = np.array(hits).mean(), np.array(ndcgs).mean()
     print('Init: HR = %.4f, NDCG = %.4f [%.1f]' % (hr, ndcg, time() - t1))
 
-    best_hr, best_ndcg, best_iter = hr, ndcg, -1
+    f = open('64factor_graph_mlp.csv', 'w', encoding='utf-8')
+
+    best_hr, best_ndcg, best_iter, losses, accses,  hit_ratio, NDCG = hr, ndcg, -1, [], [], [], []
     for epoch in range(epochs):
         t1 = time()
         # Generate training instances
@@ -174,6 +176,12 @@ if __name__ == '__main__':
             hr, ndcg, loss = np.array(hits).mean(), np.array(ndcgs).mean(), hist.history['loss'][0]
             print('Iteration %d [%.1f s]: HR = %.4f, NDCG = %.4f, loss = %.4f [%.1f s]'
                   % (epoch, t2 - t1, hr, ndcg, loss, time() - t2))
+
+            losses.append(hist.history['loss'])
+            accses.append(hist.history['acc'])
+            hit_ratio.append(hr)
+            NDCG.append(ndcg)
+
             if hr > best_hr:
                 best_hr, best_ndcg, best_iter = hr, ndcg, epoch
                 if args.out > 0:
@@ -184,4 +192,7 @@ if __name__ == '__main__':
     if args.out > 0:
         print("The best MLP model is saved to %s" % (model_out_file))
 
+    for l, a, h, n in zip(losses, accses, hit_ratio, NDCG):
+        print('loss: {},acc: {},hit_ratio: {},ndcg: {}'.format(l, a, h, n), file=f)
 
+    f.close()
