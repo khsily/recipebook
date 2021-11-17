@@ -41,8 +41,7 @@ const app = () => {
             typography();
         } catch (e) {
             console.log(e);
-            alert('서버 연결 실패');
-            BackHandler.exitApp()
+            alert('서비스 연결 실패');
         }
     });
 
