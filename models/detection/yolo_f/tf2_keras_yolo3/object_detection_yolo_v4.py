@@ -51,7 +51,7 @@ def draw_bbox(image, bboxes, classes, kor_classes, font_path, show_label=True):
         cv2.rectangle(image, c1, c2, bbox_color, bbox_thick)
 
         if show_label:
-            bbox_mess = '%s: %.2f' % (kor_classes[class_ind], score)
+            bbox_mess = '%s' % (kor_classes[class_ind])
 
             # 이미지 라벨 그리기
             img_pil = Image.fromarray(image)
@@ -105,7 +105,7 @@ def predict(model, class_path, image_path, output_path, font_path):
     image = cv2.cvtColor(np.array(image), cv2.COLOR_BGR2RGB)
     cv2.imwrite(output_path, image)
 
-    valid_classes = classes[classes > 0].numpy().astype(int)
+    valid_classes = classes[0][:int(valid_detections[0].numpy())].numpy().astype(int)
     predicted_classes = {kor_classes[key] for key in valid_classes}
 
     return predicted_classes
