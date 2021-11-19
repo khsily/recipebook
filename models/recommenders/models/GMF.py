@@ -23,13 +23,13 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Run GMF.")
     parser.add_argument('--path', nargs='?', default='data/',
                         help='Input data path.')
-    parser.add_argument('--dataset', nargs='?', default='once_recipe',
+    parser.add_argument('--dataset', nargs='?', default='10_recipe',
                         help='Choose a dataset.')
     parser.add_argument('--epochs', type=int, default=20,
                         help='Number of epochs.')
     parser.add_argument('--batch_size', type=int, default=256,
                         help='Batch size.')
-    parser.add_argument('--num_factors', type=int, default=64,
+    parser.add_argument('--num_factors', type=int, default=8,
                         help='Embedding size.')
     parser.add_argument('--regs', nargs='?', default='[0,0]',
                         help="Regularization for user and item embeddings.")
@@ -137,7 +137,7 @@ if __name__ == '__main__':
     hr, ndcg = np.array(hits).mean(), np.array(ndcgs).mean()
     print('Init: HR = %.4f, NDCG = %.4f\t [%.1f s]' % (hr, ndcg, time() - t1))
 
-    f = open('64factor_graph_gmf.csv', 'w', encoding='utf-8')
+    f = open('8factor_graph_gmf.csv', 'w', encoding='utf-8')
 
     # Train model
     best_hr, best_ndcg, best_iter, losses, accses,  hit_ratio, NDCG = hr, ndcg, -1, [], [], [], []
@@ -154,14 +154,11 @@ if __name__ == '__main__':
                                                         verbose=0,
                                                         save_weights_only=True,
                                                         save_best_only=True)
-        callback = TrainingPlot()
-
-        early_stopping = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=10)
 
         hist = model.fit([user_input, item_input],  # input
                          labels,  # labels
                          batch_size=batch_size, epochs=1, verbose=1, shuffle=True,
-                         callbacks=[checkpoint, early_stopping, callback])
+                         callbacks=[checkpoint])
 
         t2 = time()
 

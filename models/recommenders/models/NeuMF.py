@@ -19,13 +19,13 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Run NeuMF.")
     parser.add_argument('--path', nargs='?', default='data//',
                         help='Input data path.')
-    parser.add_argument('--dataset', nargs='?', default='small_recipe',
+    parser.add_argument('--dataset', nargs='?', default='10_recipe',
                         help='Choose a dataset.')
     parser.add_argument('--epochs', type=int, default=20,
                         help='Number of epochs.')
     parser.add_argument('--batch_size', type=int, default=256,
                         help='Batch size.')
-    parser.add_argument('--num_factors', type=int, default=64,
+    parser.add_argument('--num_factors', type=int, default=8,
                         help='Embedding size of MF model.')
     parser.add_argument('--layers', nargs='?', default='[64,32,16,8]',
                         help="MLP layers. Note that the first layer is the concatenation of user and item embeddings. So layers[0]/2 is the embedding size.")
@@ -43,9 +43,9 @@ def parse_args():
                         help='Show performance per X iterations')
     parser.add_argument('--out', type=int, default=1,
                         help='Whether to save the trained model.')
-    parser.add_argument('--mf_pretrain', nargs='?', default=r'pretrain\small_recipe_GMF_8_1636360821.h5',
+    parser.add_argument('--mf_pretrain', nargs='?', default=r'pretrain\10_recipe_GMF_8_1637194638.h5',
                         help='Specify the pretrain model file for MF part. If empty, no pretrain will be used')
-    parser.add_argument('--mlp_pretrain', nargs='?', default=r'pretrain\small_recipe_MLP_[64,32,16,8]_1636360820.h5',
+    parser.add_argument('--mlp_pretrain', nargs='?', default=r'pretrain\10_recipe_MLP_[64,32,16,8]_1637112707_1.h5',
                         help='Specify the pretrain model file for MLP part. If empty, no pretrain will be used')
     return parser.parse_args()
 
@@ -178,13 +178,13 @@ if __name__ == '__main__':
     model = get_model(num_users, num_items, mf_dim, layers, reg_layers, reg_mf)
 
     if learner.lower() == "adagrad":
-        model.compile(optimizer=Adagrad(learning_rate=learning_rate), loss='binary_crossentropy')
+        model.compile(optimizer=Adagrad(learning_rate=learning_rate), loss='binary_crossentropy', metrics=['acc'])
     elif learner.lower() == "rmsprop":
-        model.compile(optimizer=RMSprop(learning_rate=learning_rate), loss='binary_crossentropy')
+        model.compile(optimizer=RMSprop(learning_rate=learning_rate), loss='binary_crossentropy', metrics=['acc'])
     elif learner.lower() == "adam":
         model.compile(optimizer=Adam(learning_rate=learning_rate), loss='binary_crossentropy', metrics=['acc'])
     else:
-        model.compile(optimizer=SGD(learning_rate=learning_rate), loss='binary_crossentropy')
+        model.compile(optimizer=SGD(learning_rate=learning_rate), loss='binary_crossentropy', metrics=['acc'])
 
     # model = tf.keras.models.load_model('small_recipe_test_model.h5')
 
@@ -202,7 +202,7 @@ if __name__ == '__main__':
     hr, ndcg = np.array(hits).mean(), np.array(ndcgs).mean()
     print('Init: HR = %.4f, NDCG = %.4f' % (hr, ndcg))
 
-    f = open('64factor_graph_neumf.csv', 'w', encoding='utf-8')
+    f = open('8factor_graph_neumf.csv', 'w', encoding='utf-8')
 
     # Training model
     best_hr, best_ndcg, best_iter, losses, accses,  hit_ratio, NDCG = hr, ndcg, -1, [], [], [], []
@@ -219,14 +219,10 @@ if __name__ == '__main__':
                                                         save_best_only=True,
                                                         save_freq=epoch)
 
-        early_stopping = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=10)
-
-        graph = TrainingPlot()
-
         hist = model.fit([np.array(user_input), np.array(item_input)],  # input
                          np.array(labels),  # labels
                          batch_size=batch_size, epochs=1, verbose=1, shuffle=True,
-                         callbacks=[checkpoint, early_stopping, graph])
+                         callbacks=[checkpoint])
         t2 = time()
 
         # Evaluation

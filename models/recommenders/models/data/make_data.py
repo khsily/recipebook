@@ -154,7 +154,7 @@ def make_user_pick(item2idx):
     df = pd.read_csv('user_like_act.csv', delimiter='|', header=None,
                      names=['user_idx', 'user_id', 'item_name', 'rating'])
     df = df.dropna()
-    with open('recipe.train.rating', 'a', encoding='utf-8') as f:
+    with open('user_pick.csv', 'w', encoding='utf-8') as f:
         for idx, item, rating in zip(df.user_idx, df.item_name, df.rating):
             print('{}\t{}\t{}'.format(idx, item2idx[item], int(rating)), file=f)
 
@@ -190,17 +190,17 @@ idx2item = {i: n for i, n in zip(list(item_title.id.values), i_title)}
 # print(len(i_title))                   # 891
 
 # make_user_pick(item2idx)
-for_record = {}
-for i in idx2id:
-    for_record[i] = []
-
-often_use = train_rating('10_recipe.train.rating', idx2id, item2idx, theme2item, rating)     # 파일 만듬
-for j in often_use:
-    for_record[j] += (often_use[j])
-
-with open('10_recipe.test.label', 'w', encoding='utf-8') as f:
-    for i in for_record:
-        print(i, *[j[0] for j in collections.Counter(for_record[i]).most_common()], sep=',', file=f)
-
-test_rating('10_recipe.test.rating', idx2item, rating)                   # 파일 만듬
-test_negative('10_recipe.test.negative', item2idx)                               # 파일 만듬
+# for_record = {}
+# for i in idx2id:
+#     for_record[i] = []
+#
+# often_use = train_rating('10_recipe.train.rating', idx2id, item2idx, theme2item, rating)     # 파일 만듬
+# for j in often_use:
+#     for_record[j] += (often_use[j])
+#
+# with open('10_recipe.test.label', 'w', encoding='utf-8') as f:
+#     for i in for_record:
+#         print(i, *[j[0] for j in collections.Counter(for_record[i]).most_common()], sep=',', file=f)
+#
+# test_rating('10_recipe.test.rating', idx2item, rating)                   # 파일 만듬
+# test_negative('10_recipe.test.negative', item2idx)                               # 파일 만듬

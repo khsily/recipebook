@@ -18,7 +18,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Run MLP.")
     parser.add_argument('--path', nargs='?', default='data/',
                         help='Input data path.')
-    parser.add_argument('--dataset', nargs='?', default='once_recipe',
+    parser.add_argument('--dataset', nargs='?', default='10_recipe',
                         help='Choose a dataset.')
     parser.add_argument('--epochs', type=int, default=20,
                         help='Number of epochs.')
@@ -129,13 +129,13 @@ if __name__ == '__main__':
     model = get_model(num_users, num_items, layers, reg_layers)
 
     if learner.lower() == "adagrad":
-        model.compile(optimizer=Adagrad(learning_rate=learning_rate), loss='binary_crossentropy')
+        model.compile(optimizer=Adagrad(learning_rate=learning_rate), loss='binary_crossentropy', metrics=['acc'])
     elif learner.lower() == "rmsprop":
-        model.compile(optimizer=RMSprop(learning_rate=learning_rate), loss='binary_crossentropy')
+        model.compile(optimizer=RMSprop(learning_rate=learning_rate), loss='binary_crossentropy', metrics=['acc'])
     elif learner.lower() == "adam":
         model.compile(optimizer=Adam(learning_rate=learning_rate), loss='binary_crossentropy', metrics=['acc'])
     else:
-        model.compile(optimizer=SGD(learning_rate=learning_rate), loss='binary_crossentropy')
+        model.compile(optimizer=SGD(learning_rate=learning_rate), loss='binary_crossentropy', metrics=['acc'])
     #print(model.summary())
 
     # Check Init performance
@@ -144,7 +144,7 @@ if __name__ == '__main__':
     hr, ndcg = np.array(hits).mean(), np.array(ndcgs).mean()
     print('Init: HR = %.4f, NDCG = %.4f [%.1f]' % (hr, ndcg, time() - t1))
 
-    f = open('64factor_graph_mlp.csv', 'w', encoding='utf-8')
+    f = open('8factor_graph_mlp_10_recipe.csv', 'w', encoding='utf-8')
 
     best_hr, best_ndcg, best_iter, losses, accses,  hit_ratio, NDCG = hr, ndcg, -1, [], [], [], []
     for epoch in range(epochs):
@@ -159,15 +159,11 @@ if __name__ == '__main__':
                                                         save_best_only=True,
                                                         save_freq=epoch)
 
-        early_stopping = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=10)
-        callback = TrainingPlot()
-
-
         # Training
         hist = model.fit([np.array(user_input), np.array(item_input)],  # input
                          np.array(labels),  # labels
                          batch_size=batch_size, epochs=1, verbose=1, shuffle=True,
-                         callbacks=[checkpoint, early_stopping, callback])
+                         callbacks=[checkpoint])
         t2 = time()
 
         # Evaluation
