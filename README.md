@@ -1,6 +1,6 @@
 # 프로젝트 레시피북
 
-<img src="./hamster.png" width='300px' />
+<img src="./images/hamster.png" width='300px' />
 
 한컴 아카데미 딥러닝 교육과정 파이널 프로젝트. Project Recipebook
 <br/><br/>
