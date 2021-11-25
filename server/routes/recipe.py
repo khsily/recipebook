@@ -18,7 +18,9 @@ item2idx: 카테고리에서 레시피 리스트를 가져오면, 레시피들�
 4. 카테고리에 해당하는 요리 리스트
 '''
 
-model_path = 'models/recommenders/models/test_model.h5'
+# model_path = 'models/recommenders/models/test_model.h5'
+# model_path = 'models/recommenders/models/64_10_recipe_test_model.h5'
+model_path = 'models/recommenders/models/128_small_recipe_test_model.h5'
 recommend_model = load_model(model_path)
 
 
