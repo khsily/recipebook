@@ -1,31 +1,46 @@
 # make_data.py
-import requests
-import json
-import pprint
-import collections
+import re
 import random
 import pandas as pd
-import numpy as np
-import os
-import re
-import csv
 
 
-def get_recommend_title():
+def make_id_combination(path):
     '''
-    추천 순위 리스트를 받는 함수
-    :param num: theme num(list)로 각 테마별 사이트 고유 번호
-    :return: theme 별 item title 6개 list
+    :param path: recipe data file path
+    :return: none save idx_idx to csv
     '''
-    top6 = pd.read_csv('top6_1.csv', delimiter=',', header=None)
-    top6 = top6.dropna(axis=1)
-    pd.DataFrame(top6).columns = ['category', 'title']
-    top6_title = list(top6.title)
+    f = open('idx_id.csv', 'w', encoding='utf-8')
+    df = pd.read_csv(path, names=['id', 'recipe_id', 'category', 'recipe_name'])
+    df = df.dropna()
+    recipe_id = df.recipe_name.values
+    combi, i = [], 0
+    for idx in range(len(recipe_id)):
+        for idx_2 in range(len(recipe_id) + 1):
+            for idx_3 in range(len(recipe_id) + 2):
+                if len(recipe_id) > idx_2 and len(recipe_id) > idx_3 and idx != idx_2 \
+                        and idx != idx_3 and idx_2 != idx_3:
+                    if sorted((idx, idx_2, idx_3)) not in combi:
+                        i += 1
+                        combi.append(sorted((idx, idx_2, idx_3)))
+                        print(i, '|', (recipe_id[idx], recipe_id[idx_2], recipe_id[idx_3]), file=f)
+                        for idx_4 in range(len(recipe_id)):
+                            if idx != idx_4 and idx_2 != idx_4 and idx_3 != idx_4 and \
+                                    sorted((idx, idx_2, idx_3, idx_4)) not in combi:
+                                combi.append(sorted((idx, idx_2,
+                                                     idx_3, idx_4)))
+                                i += 1
+                                print(i, '|', (recipe_id[idx], recipe_id[idx_2],
+                                               recipe_id[idx_3], recipe_id[idx_4]), file=f)
+                                print(i)
 
-    return top6_title
+    f.close()
 
 
 def get_user_id(path):
+    '''
+    :param path: idx_id path
+    :return: idx2id: dict {0: (요리명, 요리명), ...}, id2idx: {(요리명, 요리명): 0, ...}
+    '''
     f = open(path, 'r', encoding='utf-8')
     idx2id, id2idx = {}, {}
     for row in f.readlines():
@@ -47,7 +62,7 @@ def train_rating(path, idx2id, item2idx, theme2item, rating):
     :param item2idx: dict {요리명: 0, ...}
     :param theme2item: dict {한식: [요리명, 요리명, ...}
     :param rating: 평가 점수 리스트
-    :return: None path에 파일로 저장
+    :return: often_use: dict {id: [요리idx, ...]}
     '''
 
     f = open(path, 'a', encoding='utf-8')
@@ -150,25 +165,20 @@ def test_negative(path, item2idx):
     g.close()
 
 
-def make_user_pick(item2idx):
-    df = pd.read_csv('user_like_act.csv', delimiter='|', header=None,
-                     names=['user_idx', 'user_id', 'item_name', 'rating'])
-    df = df.dropna()
-    with open('user_pick.csv', 'w', encoding='utf-8') as f:
-        for idx, item, rating in zip(df.user_idx, df.item_name, df.rating):
-            print('{}\t{}\t{}'.format(idx, item2idx[item], int(rating)), file=f)
-
-
-theme_num = [185, 186, 187, 188, 189, 190, 193]
+# 사용한 데이터의 카테고리를 미리 선정함.
 category_name = ['pad', '한식', '중식', '양식', '일식', '퓨전', '분식', '다이어트']
 rating = [1, 2, 3, 4, 5]
 
-theme_title_top6 = get_recommend_title()
+# 아이디 조합 csv 파일로 생성 및 저장
+# make_id_combination('csv_final/csv_final/favor_full.csv')
 
+# 아이디 조합에 대해 인덱스와 아이디 조합 딕셔너리 변수 저장
 idx2id, id2idx = get_user_id('idx_id.csv')
 
+# 레시피 데이터 변수에 저장
 item_title = pd.read_csv('csv_final/csv_final/recipe.csv', delimiter=',')
 
+# 테마와 레시피 타이틀 딕셔너리
 theme2item, title = {}, []
 for C in category_name:
     for c, t in zip(item_title.category_id.values, item_title.title.values):
@@ -179,28 +189,30 @@ for C in category_name:
 
 del(theme2item['pad'])
 
+# 레시피 타이틀과 인덱스 조합 딕셔너리 변수 저장
 i_title = [i.strip() for i in list(item_title.title.values)]
-
 item2idx = {n: i for i, n in zip(list(item_title.id.values), i_title)}
 idx2item = {i: n for i, n in zip(list(item_title.id.values), i_title)}
 
+# 테마와 테마별 아이템 갯수, 전체 아이템 갯수 확인.
 # print(len(theme2item))              # 7
 # for i in theme2item:                # 한식 328, 중식 75, 양식 225, 일식 58, 퓨전 78, 분식 48, 다이어트 79
 #     print(len(theme2item[i]))
 # print(len(i_title))                   # 891
 
-# make_user_pick(item2idx)
-# for_record = {}
-# for i in idx2id:
-#     for_record[i] = []
-#
-# often_use = train_rating('10_recipe.train.rating', idx2id, item2idx, theme2item, rating)     # 파일 만듬
+
+# 트레인 데이터 생성
+# often_use = train_rating('10_recipe.train.rating', idx2id, item2idx, theme2item, rating)
 # for j in often_use:
 #     for_record[j] += (often_use[j])
-#
+
+# 테스트 라벨 데이터 생성
 # with open('10_recipe.test.label', 'w', encoding='utf-8') as f:
 #     for i in for_record:
 #         print(i, *[j[0] for j in collections.Counter(for_record[i]).most_common()], sep=',', file=f)
-#
-# test_rating('10_recipe.test.rating', idx2item, rating)                   # 파일 만듬
-# test_negative('10_recipe.test.negative', item2idx)                               # 파일 만듬
+
+# 모델 테스트를 위한 데이터 생성
+# test_rating: 정답 데이터 생성
+# test_rating('10_recipe.test.rating', idx2item, rating)
+# test_negative: 평가하지 않은 데이터 생성
+# test_negative('10_recipe.test.negative', item2idx)

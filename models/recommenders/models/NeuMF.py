@@ -2,7 +2,6 @@
 import numpy as np
 import tensorflow as tf
 
-from callback import TrainingPlot
 from tensorflow.keras.initializers import glorot_uniform
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Embedding, Input, Dense, multiply, Reshape, concatenate, Flatten, Dropout
@@ -25,7 +24,7 @@ def parse_args():
                         help='Number of epochs.')
     parser.add_argument('--batch_size', type=int, default=256,
                         help='Batch size.')
-    parser.add_argument('--num_factors', type=int, default=8,
+    parser.add_argument('--num_factors', type=int, default=128,
                         help='Embedding size of MF model.')
     parser.add_argument('--layers', nargs='?', default='[64,32,16,8]',
                         help="MLP layers. Note that the first layer is the concatenation of user and item embeddings. So layers[0]/2 is the embedding size.")
@@ -43,9 +42,9 @@ def parse_args():
                         help='Show performance per X iterations')
     parser.add_argument('--out', type=int, default=1,
                         help='Whether to save the trained model.')
-    parser.add_argument('--mf_pretrain', nargs='?', default=r'pretrain\10_recipe_GMF_8_1637194638.h5',
+    parser.add_argument('--mf_pretrain', nargs='?', default=r'pretrain\small_recipe_GMF_8_1636097655.h5',
                         help='Specify the pretrain model file for MF part. If empty, no pretrain will be used')
-    parser.add_argument('--mlp_pretrain', nargs='?', default=r'pretrain\10_recipe_MLP_[64,32,16,8]_1637112707_1.h5',
+    parser.add_argument('--mlp_pretrain', nargs='?', default=r'pretrain\small_recipe_MLP_[64,32,16,8]_1635904342.h5',
                         help='Specify the pretrain model file for MLP part. If empty, no pretrain will be used')
     return parser.parse_args()
 
@@ -86,8 +85,6 @@ def get_model(num_users, num_items, mf_dim=10, layers=[10], reg_layers=[0], reg_
         mlp_vector = layer(mlp_vector)
 
     # Concatenate MF and MLP parts
-    # mf_vector = Lambda(lambda x: x * alpha)(mf_vector)
-    # mlp_vector = Lambda(lambda x : x * (1-alpha))(mlp_vector)
     predict_vector = concatenate([mf_vector, mlp_vector])
 
     # Final prediction layer
@@ -186,7 +183,7 @@ if __name__ == '__main__':
     else:
         model.compile(optimizer=SGD(learning_rate=learning_rate), loss='binary_crossentropy', metrics=['acc'])
 
-    # model = tf.keras.models.load_model('small_recipe_test_model.h5')
+    # model = tf.keras.models.load_model('128_small_recipe_test_model.h5')
 
     # Load pretrain model
     if mf_pretrain != '' and mlp_pretrain != '':
@@ -202,10 +199,10 @@ if __name__ == '__main__':
     hr, ndcg = np.array(hits).mean(), np.array(ndcgs).mean()
     print('Init: HR = %.4f, NDCG = %.4f' % (hr, ndcg))
 
-    f = open('8factor_graph_neumf.csv', 'w', encoding='utf-8')
+    f = open('128facter_graph_neumf_small_recipe.csv', 'w', encoding='utf-8')
 
     # Training model
-    best_hr, best_ndcg, best_iter, losses, accses,  hit_ratio, NDCG = hr, ndcg, -1, [], [], [], []
+    best_hr, best_ndcg, best_iter, losses, accses, hit_ratio, NDCG = hr, ndcg, -1, [], [], [], []
     for epoch in range(num_epochs):
         t1 = time()
         # Generate training instances
@@ -218,6 +215,8 @@ if __name__ == '__main__':
                                                         save_weights_only=True,
                                                         save_best_only=True,
                                                         save_freq=epoch)
+
+        early_stopping = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=10)
 
         hist = model.fit([np.array(user_input), np.array(item_input)],  # input
                          np.array(labels),  # labels
