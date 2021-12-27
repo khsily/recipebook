@@ -2,7 +2,6 @@
 import numpy as np
 import tensorflow as tf
 
-from callback import TrainingPlot
 from tensorflow.keras.initializers import glorot_uniform
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Embedding, Input, Dense, Reshape, concatenate, add, Flatten, Dropout
@@ -18,15 +17,15 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Run MLP.")
     parser.add_argument('--path', nargs='?', default='data/',
                         help='Input data path.')
-    parser.add_argument('--dataset', nargs='?', default='once_recipe',
+    parser.add_argument('--dataset', nargs='?', default='10_recipe',
                         help='Choose a dataset.')
     parser.add_argument('--epochs', type=int, default=20,
                         help='Number of epochs.')
     parser.add_argument('--batch_size', type=int, default=256,
                         help='Batch size.')
-    parser.add_argument('--layers', nargs='?', default='[64,32,16,8]',
+    parser.add_argument('--layers', nargs='?', default='[128,64,32,16,8]',
                         help="Size of each layer. Note that the first layer is the concatenation of user and item embeddings. So layers[0]/2 is the embedding size.")
-    parser.add_argument('--reg_layers', nargs='?', default='[0,0,0,0]',
+    parser.add_argument('--reg_layers', nargs='?', default='[0,0,0,0,0]',
                         help="Regularization for each layer")
     parser.add_argument('--num_neg', type=int, default=4,
                         help='Number of negative instances to pair with a positive instance.')
@@ -129,13 +128,13 @@ if __name__ == '__main__':
     model = get_model(num_users, num_items, layers, reg_layers)
 
     if learner.lower() == "adagrad":
-        model.compile(optimizer=Adagrad(learning_rate=learning_rate), loss='binary_crossentropy')
+        model.compile(optimizer=Adagrad(learning_rate=learning_rate), loss='binary_crossentropy', metrics=['acc'])
     elif learner.lower() == "rmsprop":
-        model.compile(optimizer=RMSprop(learning_rate=learning_rate), loss='binary_crossentropy')
+        model.compile(optimizer=RMSprop(learning_rate=learning_rate), loss='binary_crossentropy', metrics=['acc'])
     elif learner.lower() == "adam":
         model.compile(optimizer=Adam(learning_rate=learning_rate), loss='binary_crossentropy', metrics=['acc'])
     else:
-        model.compile(optimizer=SGD(learning_rate=learning_rate), loss='binary_crossentropy')
+        model.compile(optimizer=SGD(learning_rate=learning_rate), loss='binary_crossentropy', metrics=['acc'])
     #print(model.summary())
 
     # Check Init performance
@@ -144,9 +143,9 @@ if __name__ == '__main__':
     hr, ndcg = np.array(hits).mean(), np.array(ndcgs).mean()
     print('Init: HR = %.4f, NDCG = %.4f [%.1f]' % (hr, ndcg, time() - t1))
 
-    f = open('64factor_graph_mlp.csv', 'w', encoding='utf-8')
+    f = open('128facter_graph_mlp_small_recipe.csv', 'w', encoding='utf-8')
 
-    best_hr, best_ndcg, best_iter, losses, accses,  hit_ratio, NDCG = hr, ndcg, -1, [], [], [], []
+    best_hr, best_ndcg, best_iter, losses, accses, hit_ratio, NDCG = hr, ndcg, -1, [], [], [], []
     for epoch in range(epochs):
         t1 = time()
         # Generate training instances
@@ -159,15 +158,11 @@ if __name__ == '__main__':
                                                         save_best_only=True,
                                                         save_freq=epoch)
 
-        early_stopping = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=10)
-        callback = TrainingPlot()
-
-
         # Training
         hist = model.fit([np.array(user_input), np.array(item_input)],  # input
                          np.array(labels),  # labels
                          batch_size=batch_size, epochs=1, verbose=1, shuffle=True,
-                         callbacks=[checkpoint, early_stopping, callback])
+                         callbacks=[checkpoint])
         t2 = time()
 
         # Evaluation
@@ -186,7 +181,7 @@ if __name__ == '__main__':
                 best_hr, best_ndcg, best_iter = hr, ndcg, epoch
                 if args.out > 0:
                     model.save_weights(model_out_file, overwrite=True)
-                    model.save('small_recipe_mlp.h5', overwrite=True)
+                    model.save('small_recipe_mlp_128.h5', overwrite=True)
 
     print("End. Best Iteration %d:  HR = %.4f, NDCG = %.4f. " % (best_iter, best_hr, best_ndcg))
     if args.out > 0:
