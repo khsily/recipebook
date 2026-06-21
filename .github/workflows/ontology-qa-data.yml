@@ -4,6 +4,12 @@ on:
   push:
     branches:
       - research/ontology-korean-qa-20260621
+  pull_request:
+    branches:
+      - master
+    paths:
+      - '.github/workflows/ontology-qa-data.yml'
+      - 'research/ontology_korean_qa/**'
   workflow_dispatch:
 
 permissions:
