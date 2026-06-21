@@ -1,0 +1,52 @@
+name: ontology-qa-paper-data
+
+on:
+  push:
+    branches:
+      - research/ontology-korean-qa-20260621
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  prepare-data:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dataset tools
+        run: python -m pip install --upgrade pip datasets pyarrow
+
+      - name: Download official public datasets
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p paper_data
+          curl --fail --location --retry 5 --retry-delay 3 \
+            https://korquad.github.io/dataset/KorQuAD_v1.0_dev.json \
+            --output paper_data/KorQuAD_v1.0_dev.json
+          curl --fail --location --retry 5 --retry-delay 3 \
+            https://korquad.github.io/dataset/KorQuAD_v1.0_train.json \
+            --output paper_data/KorQuAD_v1.0_train.json
+          python - <<'PY'
+          from datasets import load_dataset
+          ds = load_dataset('lbox/kcl', 'kcl_mcqa', split='test')
+          ds.to_json('paper_data/kcl_mcqa.jsonl', force_ascii=False)
+          print(ds)
+          PY
+          sha256sum paper_data/* | tee paper_data/SHA256SUMS.txt
+          du -h paper_data/*
+
+      - name: Upload immutable data snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: ontology-qa-paper-data
+          path: paper_data
+          if-no-files-found: error
+          retention-days: 7
