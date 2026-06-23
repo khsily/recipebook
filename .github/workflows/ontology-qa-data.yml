@@ -1,0 +1,84 @@
+name: ontology-qa-reproducibility-package
+
+on:
+  push:
+    branches:
+      - research/ontology-korean-qa-20260621
+    paths:
+      - '.github/workflows/ontology-qa-data.yml'
+      - 'research/ontology_korean_qa/run_experiment.py'
+      - 'research/ontology_korean_qa/run_holdout_experiment.py'
+      - 'research/ontology_korean_qa/requirements.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  experiment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      HF_HOME: ${{ github.workspace }}/.hf-cache
+      RESULT_DIR: research/ontology_korean_qa/results
+      MODEL_NAME: intfloat/multilingual-e5-small
+      TOKENIZERS_PARALLELISM: 'false'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: research/ontology-korean-qa-20260621
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: research/ontology_korean_qa/requirements.txt
+
+      - name: Cache Hugging Face model
+        uses: actions/cache@v4
+        with:
+          path: .hf-cache
+          key: hf-e5-small-${{ runner.os }}-v1
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r research/ontology_korean_qa/requirements.txt
+
+      - name: Run temporally held-out KCL experiment
+        run: python research/ontology_korean_qa/run_holdout_experiment.py
+
+      - name: Assemble public reproducibility package
+        shell: bash
+        run: |
+          set -euo pipefail
+          PKG=research/ontology_korean_qa/release_package
+          rm -rf "$PKG"
+          mkdir -p "$PKG/code" "$PKG/results"
+          cp research/ontology_korean_qa/run_experiment.py "$PKG/code/"
+          cp research/ontology_korean_qa/run_holdout_experiment.py "$PKG/code/"
+          cp research/ontology_korean_qa/requirements.txt "$PKG/"
+          cp research/ontology_korean_qa/README.md "$PKG/README_upstream.md"
+          cp -a research/ontology_korean_qa/results/. "$PKG/results/"
+          python -m pip freeze > "$PKG/environment_freeze.txt"
+          git rev-parse HEAD > "$PKG/source_commit.txt"
+          (cd "$PKG" && find . -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt)
+
+      - name: Upload code and actual result files
+        uses: actions/upload-artifact@v4
+        with:
+          name: kcl-ontology-reproducibility-package
+          path: research/ontology_korean_qa/release_package
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Commit compact result package to research branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f research/ontology_korean_qa/release_package
+          git diff --cached --quiet || git commit -m 'Add verified held-out experiment package [skip ci]'
+          git push origin HEAD:research/ontology-korean-qa-20260621

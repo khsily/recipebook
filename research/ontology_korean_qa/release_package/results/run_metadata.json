@@ -1,0 +1,15 @@
+{
+  "seed": 20260623,
+  "rrf_k": 60,
+  "ontology_weight": 0.75,
+  "dense_model": "intfloat/multilingual-e5-small",
+  "python": "3.11.15 (main, Mar  3 2026, 16:10:12) [GCC 13.3.0]",
+  "platform": "Linux-6.17.0-1018-azure-x86_64-with-glibc2.39",
+  "timings": {
+    "BM25_s": 20.781057247000007,
+    "Char_s": 16.282658516000026,
+    "E5_s": 208.785564362,
+    "Ontology_s": 2.444879921999984
+  },
+  "elapsed_total_s": 2051.232365846634
+}

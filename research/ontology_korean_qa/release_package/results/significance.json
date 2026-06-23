@@ -1,0 +1,26 @@
+{
+  "MRR@10": {
+    "mean_difference": -0.07693504963822985,
+    "ci_low": -0.11153878512535756,
+    "ci_high": -0.042250546861854296,
+    "p_bootstrap_two_sided": 0.0,
+    "wilcoxon_stat": 6786.0,
+    "wilcoxon_p": 4.227229138962886e-05
+  },
+  "nDCG@10": {
+    "mean_difference": -0.045821686182945735,
+    "ci_low": -0.0629570091825696,
+    "ci_high": -0.02877602180888715,
+    "p_bootstrap_two_sided": 0.0,
+    "wilcoxon_stat": 12140.0,
+    "wilcoxon_p": 8.149985478668481e-07
+  },
+  "Recall@5": {
+    "mean_difference": -0.03274440518256772,
+    "ci_low": -0.054652532391048295,
+    "ci_high": -0.012367491166077736,
+    "p_bootstrap_two_sided": 0.0014,
+    "wilcoxon_stat": 6775.5,
+    "wilcoxon_p": 0.008569656508106689
+  }
+}

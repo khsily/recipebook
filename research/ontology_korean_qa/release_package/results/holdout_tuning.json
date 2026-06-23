@@ -1,0 +1,24 @@
+{
+  "development_cohort": "13회차 변호사시험",
+  "held_out_test_cohort": "14회차 변호사시험",
+  "n_dev": 142,
+  "n_test": 141,
+  "base_config": {
+    "rrf_k": 10,
+    "char_weight": 2.0,
+    "dense_weight": 0.5
+  },
+  "ontology_config": {
+    "mode": "gated_rrf",
+    "weight": 0.2,
+    "top_n": 0,
+    "gate_threshold": 0.14464322924613954
+  },
+  "selection_objective": [
+    "nDCG@10",
+    "MRR@10",
+    "Recall@10"
+  ],
+  "dense_model": "intfloat/multilingual-e5-small",
+  "ontology_nodes": 42
+}
