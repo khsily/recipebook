@@ -8,6 +8,13 @@ on:
       - '.github/workflows/ontology-qa-data.yml'
       - 'research/ontology_korean_qa/run_experiment.py'
       - 'research/ontology_korean_qa/requirements.txt'
+  pull_request:
+    branches:
+      - master
+    paths:
+      - '.github/workflows/ontology-qa-data.yml'
+      - 'research/ontology_korean_qa/run_experiment.py'
+      - 'research/ontology_korean_qa/requirements.txt'
   workflow_dispatch:
 
 permissions:
@@ -62,6 +69,7 @@ jobs:
           retention-days: 30
 
       - name: Commit derived results to research branch
+        if: github.event_name == 'push'
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
