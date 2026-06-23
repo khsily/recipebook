@@ -1,0 +1,10 @@
+{
+  "dataset": "lbox/kcl",
+  "config": "kcl_mcqa",
+  "split": "test",
+  "n_questions": 283,
+  "n_unique_precedents": 992,
+  "n_question_precedent_links": 1054,
+  "n_questions_without_gold": 0,
+  "corpus_sha256": "51cc7ac95182b976b9f56c282362fd0ddd6c51b6f0a0377d09611939dc1323bb"
+}

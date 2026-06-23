@@ -1,0 +1,9 @@
+datasets==4.4.2
+sentence-transformers==5.1.2
+rank-bm25==0.2.2
+scikit-learn>=1.5,<1.9
+pandas>=2.2,<3
+numpy>=1.26,<3
+scipy>=1.13,<2
+pyarrow>=18
+matplotlib>=3.8
