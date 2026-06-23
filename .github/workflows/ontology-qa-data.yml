@@ -1,4 +1,4 @@
-name: ontology-qa-ltr-experiment
+name: ontology-qa-reproducibility-package
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     paths:
       - '.github/workflows/ontology-qa-data.yml'
       - 'research/ontology_korean_qa/run_experiment.py'
-      - 'research/ontology_korean_qa/run_ltr_experiment.py'
+      - 'research/ontology_korean_qa/run_holdout_experiment.py'
       - 'research/ontology_korean_qa/requirements.txt'
   pull_request:
     branches:
@@ -15,7 +15,7 @@ on:
     paths:
       - '.github/workflows/ontology-qa-data.yml'
       - 'research/ontology_korean_qa/run_experiment.py'
-      - 'research/ontology_korean_qa/run_ltr_experiment.py'
+      - 'research/ontology_korean_qa/run_holdout_experiment.py'
       - 'research/ontology_korean_qa/requirements.txt'
   workflow_dispatch:
 
@@ -54,26 +54,29 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r research/ontology_korean_qa/requirements.txt
 
-      - name: Run ontology-aware pairwise LTR experiment
+      - name: Run temporally held-out KCL experiment
+        run: python research/ontology_korean_qa/run_holdout_experiment.py
+
+      - name: Assemble public reproducibility package
         shell: bash
         run: |
-          mkdir -p research/ontology_korean_qa/results
-          set +e
-          python research/ontology_korean_qa/run_ltr_experiment.py 2>&1 | tee research/ontology_korean_qa/results/ltr_console.log
-          echo ${PIPESTATUS[0]} > research/ontology_korean_qa/results/ltr_exit_code.txt
-          exit 0
+          set -euo pipefail
+          PKG=research/ontology_korean_qa/release_package
+          rm -rf "$PKG"
+          mkdir -p "$PKG/code" "$PKG/results"
+          cp research/ontology_korean_qa/run_experiment.py "$PKG/code/"
+          cp research/ontology_korean_qa/run_holdout_experiment.py "$PKG/code/"
+          cp research/ontology_korean_qa/requirements.txt "$PKG/"
+          cp research/ontology_korean_qa/README.md "$PKG/README_upstream.md"
+          cp -a research/ontology_korean_qa/results/. "$PKG/results/"
+          python -m pip freeze > "$PKG/environment_freeze.txt"
+          git rev-parse HEAD > "$PKG/source_commit.txt"
+          (cd "$PKG" && find . -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt)
 
-      - name: Record checksums
-        if: always()
-        run: |
-          cd research/ontology_korean_qa/results
-          sha256sum * > SHA256SUMS.txt || true
-
-      - name: Upload complete results and debug log
-        if: always()
+      - name: Upload code and actual result files
         uses: actions/upload-artifact@v4
         with:
-          name: kcl-ontology-ltr-results
-          path: research/ontology_korean_qa/results
+          name: kcl-ontology-reproducibility-package
+          path: research/ontology_korean_qa/release_package
           if-no-files-found: error
           retention-days: 30
