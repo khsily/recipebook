@@ -1,4 +1,4 @@
-name: ontology-qa-holdout-experiment
+name: ontology-qa-ltr-experiment
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     paths:
       - '.github/workflows/ontology-qa-data.yml'
       - 'research/ontology_korean_qa/run_experiment.py'
-      - 'research/ontology_korean_qa/run_holdout_experiment.py'
+      - 'research/ontology_korean_qa/run_ltr_experiment.py'
       - 'research/ontology_korean_qa/requirements.txt'
   pull_request:
     branches:
@@ -15,7 +15,7 @@ on:
     paths:
       - '.github/workflows/ontology-qa-data.yml'
       - 'research/ontology_korean_qa/run_experiment.py'
-      - 'research/ontology_korean_qa/run_holdout_experiment.py'
+      - 'research/ontology_korean_qa/run_ltr_experiment.py'
       - 'research/ontology_korean_qa/requirements.txt'
   workflow_dispatch:
 
@@ -54,8 +54,8 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r research/ontology_korean_qa/requirements.txt
 
-      - name: Run temporally held-out KCL experiment
-        run: python research/ontology_korean_qa/run_holdout_experiment.py
+      - name: Run ontology-aware pairwise LTR experiment
+        run: python research/ontology_korean_qa/run_ltr_experiment.py
 
       - name: Record checksums
         run: |
@@ -65,7 +65,7 @@ jobs:
       - name: Upload complete results
         uses: actions/upload-artifact@v4
         with:
-          name: kcl-ontology-holdout-results
+          name: kcl-ontology-ltr-results
           path: research/ontology_korean_qa/results
           if-no-files-found: error
           retention-days: 30
