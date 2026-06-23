@@ -55,14 +55,22 @@ jobs:
           python -m pip install -r research/ontology_korean_qa/requirements.txt
 
       - name: Run ontology-aware pairwise LTR experiment
-        run: python research/ontology_korean_qa/run_ltr_experiment.py
+        shell: bash
+        run: |
+          mkdir -p research/ontology_korean_qa/results
+          set +e
+          python research/ontology_korean_qa/run_ltr_experiment.py 2>&1 | tee research/ontology_korean_qa/results/ltr_console.log
+          echo ${PIPESTATUS[0]} > research/ontology_korean_qa/results/ltr_exit_code.txt
+          exit 0
 
       - name: Record checksums
+        if: always()
         run: |
           cd research/ontology_korean_qa/results
-          sha256sum * > SHA256SUMS.txt
+          sha256sum * > SHA256SUMS.txt || true
 
-      - name: Upload complete results
+      - name: Upload complete results and debug log
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: kcl-ontology-ltr-results
